@@ -6,6 +6,7 @@ var mongoose = require('mongoose'),
 var pollSchema = new Schema({
   slug: { type: String, unique: true },
   title: String,
+  content: Schema.Types.Mixed,
   isPublic: { type: Boolean, default: true },
   participants: [{
     email: String,
@@ -17,7 +18,8 @@ var pollSchema = new Schema({
     content: String
   },
   startTime: Date,
-  endTime: Date
+  endTime: Date,
+  hasResults: { type: Boolean, default: false }
 });
 
 pollSchema.statics.findBySlug = /* async */ function(slug) {
@@ -30,22 +32,6 @@ pollSchema.methods.getBallots = /* async */ function() {
 
 pollSchema.methods.findBallot = /* async */ function(token) {
   return this.model('Ballot').findOne({ poll: this.slug, token: token }).exec();
-}
-
-pollSchema.methods.getBallotPage = /* async */ function() {
-  return Promise.resolve("Ballot page!");
-}
-
-pollSchema.methods.getSuccessPage = /* async */ function() {
-  return Promise.resolve("Success page!");
-}
-
-pollSchema.methods.getResultsPage = /* async */ function() {
-  return Promise.resolve("Results page!");
-}
-
-pollSchema.methods.getRespondedPage = /* async */ function() {
-  return Promise.resolve("Responded page!");
 }
 
 exports.Poll = mongoose.model('Poll', pollSchema);
@@ -62,3 +48,9 @@ ballotSchema.methods.getPoll = /* async */ function() {
 
 exports.Ballot = mongoose.model('Ballot', ballotSchema);
 
+var resultsSchema = new Schema({
+  poll: { type: String, unique: true },
+  results: Schema.Types.Mixed
+});
+
+exports.Results = mongoose.model('Results', resultsSchema);
