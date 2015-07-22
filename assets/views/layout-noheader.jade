@@ -1,0 +1,17 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset='utf-8')
+    title
+      | Oyster |
+      = title
+    script(src="/static/js/jquery-1.11.1.min.js")
+    script(src="/static/js/bootstrap.min.js")
+    link(href="/static/css/bootstrap.min.css", rel="stylesheet")
+    link(href="/static/css/admin.css", rel="stylesheet")
+    style.
+      body { padding-top: 0 }
+
+  body
+    .container
+      block content

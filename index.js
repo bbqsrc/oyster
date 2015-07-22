@@ -8,13 +8,18 @@ var app = require('koa')(),
     views = require('koa-views'),
     logger = require('koa-logger'),
     helmet = require('koa-helmet'),
+    session = require('koa-session'),
+    passport = require('koa-passport'),
     co = require('co');
 
 var models = require('./models'),
     util = require('./util'),
-    router = Router();
+    router = Router(),
+    secured = Router();
 
 // Pre-routing
+
+app.keys = ['lol sekrets are hawt'];
 
 app.use(logger());
 app.use(views('assets/views', {
@@ -41,6 +46,14 @@ router
       return this.status = 404;
     }
 
+    let now = Date.now();
+
+    // Let us be only serving if within the good period of time oh yes.
+    if (this.poll.startTime > now ||
+        this.poll.endTime < now) {
+      return this.status = 403;
+    }
+
     yield next;
   })
   .param('token', function *(token, next) {
@@ -51,7 +64,7 @@ router
     }
 
     if (this.ballot.data != null) {
-      this.body = "responded."; //yield this.poll.getRespondedPage();
+      this.body = "You have already responded.";
       return this.status = 403;
     }
 
@@ -70,7 +83,7 @@ router
     } catch(e) {
       console.error(e);
       this.status = 500;
-      yield this.render('error', {
+      return yield this.render('error', {
         message: "???" // TODO
       });
     }
@@ -78,18 +91,73 @@ router
     yield this.render('success');
   })
   .get('/results/:poll', function *(next) {
-    // Check if poll allows public results
+    // Check if poll allows router results
     if (!this.poll.isPublic) {
       return this.status = 403;
     }
 
-    this.body = "results."; //yield this.poll.getResultsPage();
+    // TODO: instance method on Poll
+    let results = yield model.Results.findOne({ poll: this.poll.slug });
+
+    if (results) {
+      yield this.render('results', { data: results.data });
+    } else {
+      yield this.render('results-pending');
+    }
+
   });
+
+
+function *isAdmin (next) {
+  if (this.user) {
+    if (this.user.isAdmin()) {
+      yield next;
+    } else {
+      return this.status = 403;
+    }
+  } else {
+    this.request.query.r = encodeURIComponent(this.request.originalUrl);
+    this.redirect('login');
+  }
+}
+
+require('./auth');
+
+secured
+  .use(session(app))
+  .use(passport.initialize())
+  .use(passport.session())
+  .get('login', '/login', function* (next) {
+    if (this.user) {
+      return this.body = "Already logged in.";
+    } else {
+      yield this.render('admin-login', {
+        title: "Log in",
+        submit: "Log in"
+      });
+    }
+  })
+  .post('/login', bodyParser(), passport.authenticate('local'), function* (next) {
+    if (this.user) {
+      return this.body = "Already logged in.";
+    }
+
+    if (this.request.query.r) {
+      this.redirect(this.request.query.r);
+    } else {
+      this.redirect('/admin');
+    }
+  });
+
+secured.prefix('/admin');
 
 app
   .use(router.routes())
+  .use(secured.routes())
   .use(router.allowedMethods());
 
+console.log(router.stack.map(function(x) { return [ x.methods,  x.path ] }));
+console.log(secured.stack.map(function(x) { return [ x.methods,  x.path ] }));
 // Post-routing
 
 function calculateResults(slug) {

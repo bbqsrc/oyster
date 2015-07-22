@@ -1,0 +1,19 @@
+extend layout-noheader
+block content
+  .page-header
+    h1.col-sm-offset-3= title
+  if flash
+    .alert.alert-info= flash
+  form.form-horizontal(method="post")
+    .form-group
+      label.control-label.col-sm-4(for='username') Username
+      .col-sm-4
+        input.form-control(type='text', name='username', id='username')
+    .form-group
+      label.control-label.col-sm-4(for='password') Password
+      .col-sm-4
+        input.form-control(type='password', name='password', id='password')
+    .form-group
+      .col-sm-offset-5.col-sm-10
+        button.btn.btn-primary(type='submit')= submit
+    

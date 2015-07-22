@@ -1,0 +1,134 @@
+doctype html
+html(lang="en")
+  head
+    title= pageTitle
+    base(target="_blank")
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(href="/static/css/bootstrap.min.css", rel="stylesheet")
+    link(href="/static/css/style.css", rel="stylesheet")
+    <!--[if lt IE 10]>
+    <script src="es5-shim.min.js"></script>
+    <script src="html5shiv.min.js"></script>
+    <![endif]-->
+  body
+    noscript
+      p.alert.alert-danger
+        | This form requires JavaScript to function. Please enable JavaScript and try again.
+    script(type="text/x-handlebars").
+      <div class='container'>
+        <div class='row'>
+          <div class='col-md-12'>
+            {{outlet}}
+          </div>
+        </div>
+      </div>
+      <footer class='powered-by-oyster'>
+        Powered by <a rel='nofollow' href="https://bbqsrc.github.io/oyster">Oyster</a>.
+      </footer>
+    script(id="index", type="text/x-handlebars").
+      <div>
+        <div class='aside privacy alert alert-success pull-right'>
+          This form is hosted on a server in <a rel='nofollow' href="http://digitalocean.com">the Netherlands</a>, and is being accessed over a secure SSL link.
+        </div>
+        <h1>
+          <a href="http://pirateparty.org.au" class="logo">
+            <div>
+              <span class="logo-bold-blue">pirate</span>party
+            </div>
+            <div class="logo-australia">{{title}}</div>
+          </a>
+        </h1>
+      </div>
+
+      <hr>
+
+      <div class='alert alert-info'>
+        {{markdown info}}
+      </div>
+
+      <form method='post' target='_self'>
+        {{#each motions}}
+          {{partial "motion"}}
+        {{/each}}
+        {{#each elections}}
+          {{partial "election"}}
+        {{/each}}
+
+        <hr>
+
+        <div class="alert alert-warning">Please ensure that you have completed your ballot. Once you submit, you cannot go back.</div>
+        <button type='submit' class='btn btn-success btn-lg btn-block'>Submit</button>
+      </form>
+
+      <hr>
+
+      <footer class='smile'>:)</footer>
+    script(id="_election", type="text/x-handlebars").
+      <div {{bind-attr class=class}}>
+        <h2>{{name}}</h2>
+        {{#if info}}
+          <div class='alert alert-info'>{{markdown info}}</div>
+        {{/if}}
+        {{#each fields}}
+          {{partial "election/field"}}
+        {{/each}}
+      </div>
+    script(id="election/_field", type="text/x-handlebars").
+      <div class='election'>
+        <h3>{{name}}</h3>
+        <ul>
+          {{#each candidate in candidates}}
+          <li>
+            <label>
+              <input name="elections.{{unbound name}}.{{unbound candidate}}" class='form-control' type='number' step='1' min='1'>
+              <span>{{candidate}}</span>
+            </label>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    script(id="_motion", type="text/x-handlebars").
+      <div>
+        <h2>{{name}}</h2>
+        {{#if info}}
+          <div class='alert alert-info'>{{markdown info}}</div>
+        {{/if}}
+        {{#each fields}}
+          {{partial "motion/field"}}
+        {{/each}}
+      </div>
+    script(id="motion/_field", type="text/x-handlebars").
+      <div class='motion'>
+        <h3>{{title}}</h3>
+        <div>{{markdown body}}</div>
+        <div class='panel panel-primary'>
+          <div class='panel-heading'>
+            <span class='panel-title'>How do you wish to vote on this motion?</span>
+          </div>
+          <div class='panel-body'>
+            <div class='btn-group btn-group-justified' data-toggle="buttons">
+              <label class="btn btn-success">
+                Aye <input name="motions.{{unbound name}}" type='radio' value="aye">
+              </label>
+              <label class="btn btn-warning">
+                Abstain <input name="motions.{{unbound name}}" type='radio' value="abstain" checked>
+              </label>
+              <label class="btn btn-danger">
+                Nay <input name="motions.{{unbound name}}" type='radio' value="nay">
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    script(src="/static/js/underscore.min.js")
+    script(src="/static/js/jquery.min.js")
+    script(src="/static/js/bootstrap.min.js")
+    script(src="/static/js/handlebars.js")
+    script(src="/static/js/ember.min.js")
+    script(src="/static/js/markdown.min.js")
+    script(src="/static/js/data.js")
+    //script
+    //  | var data = !{JSON.stringify(content)};
+    script(src="/static/js/app.js")
+
