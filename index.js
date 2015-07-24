@@ -53,11 +53,11 @@ router
       return this.status = 404;
     }
 
-    let now = Date.now();
+    let now = +Date.now();
 
     // Let us be only serving if within the good period of time oh yes.
-    if (this.poll.startTime > now ||
-        this.poll.endTime < now) {
+    if (+this.poll.startTime > now ||
+        +this.poll.endTime < now) {
       return this.status = 403;
     }
 
@@ -107,15 +107,24 @@ router
       return this.status = 403;
     }
 
-    // TODO: instance method on Poll
-    let results = yield model.Results.findOne({ poll: this.poll.slug });
+    let now = +Date.now();
 
-    if (results) {
-      yield this.render('results', { data: results.data });
-    } else {
-      yield this.render('results-pending');
+    if (+this.poll.startTime > now) {
+      return this.body = "The poll hasn't started yet.";
     }
 
+    if (+this.poll.endTime > now) {
+      return this.body = "The poll hasn't ended yet.";
+    }
+
+    // TODO: instance method on Poll
+    let results = yield models.Results.findOne({ poll: this.poll.slug });
+
+    if (results) {
+      return yield this.render('results', { data: results.data });
+    } else {
+      return this.body = "The results have not finished generating yet. Please try again later.";
+    }
   });
 
 
@@ -208,12 +217,12 @@ secured
     });
   })
   .get('/poll/:poll/edit', isAdmin, function* (next) {
-    let isEditable = this.poll.startTime > Date.now();
+    let isEditable = +this.poll.startTime > +Date.now();
 
     return this.body = "TODO.";
   })
   .post('/poll/:poll/edit', isAdmin, function* (next) {
-    let isEditable = this.poll.startTime > Date.now();
+    let isEditable = +this.poll.startTime > +Date.now();
 
     return this.body = "TODO.";
   })
