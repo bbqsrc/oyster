@@ -1,12 +1,13 @@
 "use strict";
 
 var mongoose = require('mongoose'),
+    config = require('../config'),
     models = require('../models'),
     readline = require('readline'),
     co = require('co');
 
-console.log("Connecting to database...");
-mongoose.connect('mongodb://localhost/oyster');
+console.log("Connecting to " + config.mongoURL + "...");
+mongoose.connect(config.mongoURL);
 var db = mongoose.connection;
 
 var rl = readline.createInterface({
