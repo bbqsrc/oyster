@@ -48,13 +48,14 @@ html(lang="en")
       </div>
 
       <form method='post' target='_self'>
-        {{#each motions}}
-          {{partial "motion"}}
+        {{#each sections}}
+          {{#ifEqual type "motion"}}
+            {{partial "motion"}}
+          {{/ifEqual}}
+          {{#ifEqual type "election"}}
+            {{partial "election"}}
+          {{/ifEqual}}
         {{/each}}
-        {{#each elections}}
-          {{partial "election"}}
-        {{/each}}
-
         <hr>
 
         <div class="alert alert-warning">Please ensure that you have completed your ballot. Once you submit, you cannot go back.</div>
@@ -76,12 +77,12 @@ html(lang="en")
       </div>
     script(id="election/_field", type="text/x-handlebars").
       <div class='election'>
-        <h3>{{name}}</h3>
+        <h3>{{id}}</h3>
         <ul>
           {{#each candidate in candidates}}
           <li>
             <label>
-              <input name="elections.{{unbound name}}.{{unbound candidate}}" class='form-control' type='number' step='1' min='1'>
+              <input name="elections.{{unbound id}}.{{unbound candidate}}" class='form-control' type='number' step='1' min='1'>
               <span>{{candidate}}</span>
             </label>
           </li>
@@ -109,13 +110,13 @@ html(lang="en")
           <div class='panel-body'>
             <div class='btn-group btn-group-justified' data-toggle="buttons">
               <label class="btn btn-success">
-                Aye <input name="motions.{{unbound name}}" type='radio' value="aye">
+                Aye <input name="motions.{{unbound id}}" type='radio' value="aye">
               </label>
               <label class="btn btn-warning">
-                Abstain <input name="motions.{{unbound name}}" type='radio' value="abstain" checked>
+                Abstain <input name="motions.{{unbound id}}" type='radio' value="abstain" checked>
               </label>
               <label class="btn btn-danger">
-                Nay <input name="motions.{{unbound name}}" type='radio' value="nay">
+                Nay <input name="motions.{{unbound id}}" type='radio' value="nay">
               </label>
             </div>
           </div>
@@ -127,8 +128,8 @@ html(lang="en")
     script(src="/static/js/handlebars.js")
     script(src="/static/js/ember.min.js")
     script(src="/static/js/markdown.min.js")
-    script(src="/static/js/data.js")
-    //script
-    //  | var data = !{JSON.stringify(content)};
+    //script(src="/static/js/data.js")
+    script.
+      var data = !{JSON.stringify(content)};
     script(src="/static/js/app.js")
 

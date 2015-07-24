@@ -37,13 +37,13 @@ pollSchema.statics.createPoll = function(o) {
           endTime = moment(o.endDate + o.endTime +
                            timezone, dateFormat).toDate(),
           participants = o.participants,
-          pollData = JSON.parse(pollData);
+          pollData = JSON.parse(o.pollData);
 
       if (typeof participants == "string") {
           participants = [participants];
       }
 
-      let poll = new self.model('Poll')({
+      let poll = new (self.model('Poll'))({
         slug: o.slug,
         title: o.title,
         isPublic: o.isPublic === "on",
@@ -59,7 +59,7 @@ pollSchema.statics.createPoll = function(o) {
       });
 
       yield poll.save();
-      resolve();
+      resolve(poll);
     }).catch(reject);
   });
 }
@@ -68,21 +68,13 @@ pollSchema.statics.findBySlug = /* async */ function(slug) {
   return this.findOne({ slug: slug }).exec();
 };
 
-pollSchema.methods.getBallots = /* async */ function() {
-  return this.model('Ballot').find({ poll: this.slug }).exec();
-};
-
-pollSchema.methods.findBallot = /* async */ function(token) {
-  return this.model('Ballot').findOne({ poll: this.slug, token: token }).exec();
-};
-
 pollSchema.methods.sendEmails = function() {
   let self = this;
 
   return new Promise(function(resolve, reject) {
     co(function*() {
-      let pgs = yield self.Model('ParticipantGroup').find({ name: {
-        $in : self.participantGroups } });
+      let pgs = yield self.model('ParticipantGroup').find({ name: {
+        $in : self.participantGroups } }).exec();
 
       if (pgs.length !== self.participantGroups.length) {
         return reject(new Error('Incorrect number of participant groups returned.'));
@@ -101,13 +93,11 @@ pollSchema.methods.sendEmails = function() {
 
           let token = uuid.v4().replace(/-/g, '');
 
-          let ballot = new self.model('Ballot')({
+          let ballot = new (self.model('Ballot'))({
             token: token,
             poll: self.slug,
             flags: pg.flags
           });
-
-          yield ballot.save();
 
           let url = "https://" + baseUrl + "/poll/" + self.slug + "/" + token;
           let text = self.email.content.replace("{url}", url);
@@ -122,6 +112,7 @@ pollSchema.methods.sendEmails = function() {
           self.emailsSent.push(email);
           self.markModified('emailsSent');
           yield self.save();
+          yield ballot.save();
         }
       }
 
@@ -133,10 +124,24 @@ pollSchema.methods.sendEmails = function() {
 exports.Poll = mongoose.model('Poll', pollSchema);
 
 var ballotSchema = new Schema({
+  _id: { type: Buffer, index: { unique: true } },
   token: String,
   poll: String,
   flags: Array,
-  data: { type: Schema.Types.Mixed, default: null }
+  data: Schema.Types.Mixed
+});
+
+// UUID _id so insertion order isn't assessable.
+// Makes it harder to link order of tokens with Poll.emailsSent
+ballotSchema.pre('save', function(next) {
+  if (this.isNew) {
+    let buffer = new Buffer(16);
+    uuid.v4(null, buffer, 0);
+    this.set('_id', buffer);
+    // BUG: setting the subtype breaks saving in Mongoose.
+    //this._id.subtype(0x04); // BSON subtype UUID
+  }
+  return next();
 });
 
 ballotSchema.methods.getPoll = /* async */ function() {

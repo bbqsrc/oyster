@@ -29,7 +29,11 @@ var config = _.defaults({}, baseConfig, {
     mongoUsername: null,
     mongoPassword: null,
 
-    mailerTransport: function(x) { return x; },
+    mailerTransport: function(x) {
+      return {
+        send: function(x, cb){ cb() }
+      };
+    },
     mailerConfig: {},
 
     cookieSecret: crypto.randomBytes(64).toString(),
@@ -43,7 +47,7 @@ var config = _.defaults({}, baseConfig, {
     },
 
     createMailer: function() {
-      return mailer.createTransport(configJson.mailer);
+      return mailer.createTransport(config.mailerTransport(config.mailerConfig));
     }
 });
 

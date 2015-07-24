@@ -64,7 +64,10 @@ router
     yield next;
   })
   .param('token', function *(token, next) {
-    this.ballot = yield this.poll.findBallot(token);
+    this.ballot = yield models.Ballot.findOne({
+      poll: this.poll.slug,
+      token: token
+    }).exec();
 
     if (!this.ballot) {
       return this.status = 404;
@@ -85,7 +88,7 @@ router
   })
   .post('/poll/:poll/:token', bodyParser(), function *(next) {
     this.ballot.set('data', util.parseNestedKeys(this.request.body));
-
+    this.ballot.markModified('data');
     try {
       yield this.ballot.save();
     } catch(e) {
@@ -187,8 +190,8 @@ secured
     });
   })
   .post('/polls/new', isAdmin, bodyParser(), function* (next) {
-    this.request.body.pollData = JSON.parse(this.request.body.pollData);
-    this.body = JSON.stringify(this.request.body, null, 2);
+    let poll = yield models.Poll.createPoll(this.request.body);
+    this.redirect('/admin/poll/' + poll.slug);
   })
   .param('poll', function *(slug, next) {
     this.poll = yield models.Poll.findBySlug(slug);
@@ -272,9 +275,11 @@ function startResultsScheduler() {
       if (doc.startTime) {
         schedule.scheduleJob("start:" + doc.slug, doc.startTime, function() {
           co(function* () {
+            console.log("Starting job: " + this.name);
             yield doc.sendEmails();
-          }).catch(function(e) {
-            console.error("Failed to send emails for '" + slug + "'.");
+            console.log("Finished job: " + this.name);
+          }.bind(this)).catch(function(e) {
+            console.error("Failed to send emails for '" + doc.slug + "'.");
             console.error(e.stack);
           });
         });
@@ -283,14 +288,16 @@ function startResultsScheduler() {
       }
 
       if (doc.endTime) {
-        schedule.scheduleJob("end:" + doc.slug, doc.endTime, function(slug) {
+        schedule.scheduleJob("end:" + doc.slug, doc.endTime, function() {
           co(function* () {
-            yield calculateResults(slug);
-          }).catch(function(e) {
-            console.error("Failed to save results for '" + slug + "'.");
+            console.log("Starting job: " + this.name);
+            yield calculateResults(doc.slug);
+            console.log("Finished job: " + this.name);
+          }.bind(this)).catch(function(e) {
+            console.error("Failed to save results for '" + doc.slug + "'.");
             console.error(e.stack);
           });
-        }.bind(null, doc.slug));
+        });
 
         console.log("Scheduled end of '" + doc.slug +  "' for " + doc.endTime.toISOString());
       }
