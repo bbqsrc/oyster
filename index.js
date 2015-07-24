@@ -12,7 +12,8 @@ var app = require('koa')(),
     passport = require('koa-passport'),
     co = require('co');
 
-var models = require('./models'),
+var config = require('./config'),
+    models = require('./models'),
     util = require('./util'),
     router = Router(),
     secured = Router();
@@ -29,10 +30,16 @@ app.use(views('assets/views', {
 app.use(helmet.defaults());
 
 console.log('Connecting to mongodb...');
-mongoose.connect('mongodb://localhost/oyster');
+mongoose.connect(config.mongoURL);
 var db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
+
+require('./auth');
+
+app.use(session(app))
+  .use(passport.initialize())
+  .use(passport.session());
 
 // Routes
 
@@ -72,7 +79,8 @@ router
   })
   .get('/poll/:poll/:token', function *(next) {
     yield this.render('form', {
-      content: this.poll.content
+      content: this.poll.content,
+      flags: this.ballot.flags
     });
   })
   .post('/poll/:poll/:token', bodyParser(), function *(next) {
@@ -109,26 +117,24 @@ router
 
 
 function *isAdmin (next) {
-  if (this.user) {
-    if (this.user.isAdmin()) {
+  if (this.req.user) {
+    if (this.req.user.isAdmin()) {
       yield next;
     } else {
       return this.status = 403;
     }
   } else {
-    this.request.query.r = encodeURIComponent(this.request.originalUrl);
-    this.redirect('login');
+    this.redirect('/admin/login?r=' + encodeURIComponent(this.request.originalUrl)); // TODO dehardcode
   }
 }
 
-require('./auth');
-
 secured
-  .use(session(app))
-  .use(passport.initialize())
-  .use(passport.session())
+  .get('logout', '/logout', function* (next) {
+    this.logout();
+    this.redirect('/admin/login');
+  })
   .get('login', '/login', function* (next) {
-    if (this.user) {
+    if (this.req.user) {
       return this.body = "Already logged in.";
     } else {
       yield this.render('admin-login', {
@@ -137,16 +143,80 @@ secured
       });
     }
   })
-  .post('/login', bodyParser(), passport.authenticate('local'), function* (next) {
-    if (this.user) {
+  .post('/login', bodyParser(), function* (next) {
+    let self = this;
+
+    if (this.req.user) {
       return this.body = "Already logged in.";
     }
 
-    if (this.request.query.r) {
-      this.redirect(this.request.query.r);
-    } else {
-      this.redirect('/admin');
+    yield passport.authenticate('local', function* (err, user, info) {
+      if (err) throw err;
+
+      if (user === false) {
+        self.status = 401;
+        self.redirect('login');
+      } else {
+        yield self.login(user);
+
+        if (self.request.query.r) {
+          self.redirect(self.request.query.r);
+        } else {
+          self.redirect('/admin');
+        }
+      }
+    }).call(this, next);
+  })
+  .get('/', isAdmin, function* (next) {
+    yield this.render('admin-index', { title: 'Index' });
+  })
+  .get('/polls', isAdmin, function* (next) {
+    // TODO pagination!!
+
+    let polls = yield models.Poll.find({}).exec();
+
+    yield this.render('admin-polls', {
+      polls: polls
+    });
+  })
+  .get('/polls/new', isAdmin, function* (next) {
+    let participantGroups = yield models.ParticipantGroup.find({}).exec();
+
+    yield this.render('admin-new-poll', {
+      participants: participantGroups
+    });
+  })
+  .post('/polls/new', isAdmin, bodyParser(), function* (next) {
+    this.request.body.pollData = JSON.parse(this.request.body.pollData);
+    this.body = JSON.stringify(this.request.body, null, 2);
+  })
+  .param('poll', function *(slug, next) {
+    this.poll = yield models.Poll.findBySlug(slug);
+
+    if (!this.poll) {
+      return this.status = 404;
     }
+
+    yield next;
+  })
+  .get('/poll/:poll', isAdmin, function* (next) {
+    yield this.render('admin-poll', {
+      poll: this.poll
+    });
+  })
+  .get('/poll/:poll/edit', isAdmin, function* (next) {
+    let isEditable = this.poll.startTime > Date.now();
+
+    return this.body = "TODO.";
+  })
+  .post('/poll/:poll/edit', isAdmin, function* (next) {
+    let isEditable = this.poll.startTime > Date.now();
+
+    return this.body = "TODO.";
+  })
+  .get('/poll/:poll/ballots', isAdmin, function* (next) {
+    // TODO
+    return this.body = "TODO.";
   });
 
 secured.prefix('/admin');
@@ -156,10 +226,9 @@ app
   .use(secured.routes())
   .use(router.allowedMethods());
 
-console.log(router.stack.map(function(x) { return [ x.methods,  x.path ] }));
-console.log(secured.stack.map(function(x) { return [ x.methods,  x.path ] }));
 // Post-routing
 
+// TODO move into models.
 function calculateResults(slug) {
   return new Promise(function(resolve, reject) {
     co(function*() {
@@ -200,10 +269,23 @@ function startResultsScheduler() {
 
     stream.on('data', function(doc) {
       // TODO schedule beginning
+      if (doc.startTime) {
+        schedule.scheduleJob("start:" + doc.slug, doc.startTime, function() {
+          co(function* () {
+            yield doc.sendEmails();
+          }).catch(function(e) {
+            console.error("Failed to send emails for '" + slug + "'.");
+            console.error(e.stack);
+          });
+        });
+
+        console.log("Scheduled start of '" + doc.slug +  "' for " + doc.startTime.toISOString());
+      }
+
       if (doc.endTime) {
         schedule.scheduleJob("end:" + doc.slug, doc.endTime, function(slug) {
           co(function* () {
-            return yield calculateResults(slug);
+            yield calculateResults(slug);
           }).catch(function(e) {
             console.error("Failed to save results for '" + slug + "'.");
             console.error(e.stack);
@@ -222,12 +304,12 @@ function startResultsScheduler() {
 
 db.once('open', function() {
   console.log('db connected.');
-
-  console.log('starting results scheduler.');
-  startResultsScheduler();
-
-  // TODO sanity check: ensure hasResults matches actual results collection
-
-  app.listen(3000);
-  console.log('listening on port 3000');
+  co(function*() {
+    console.log('starting results scheduler.');
+    // TODO sanity check: ensure hasResults matches actual results collection
+    yield startResultsScheduler();
+  }).then(function() {
+    app.listen(config.port);
+    console.log('listening on port ' + config.port);
+  });
 });

@@ -1,0 +1,21 @@
+extend layout
+block content
+  .page-header
+    h1= title
+  table.table.polls
+    thead
+      tr
+        th Title
+        th Participants
+        th Start Time
+        th End Time
+    tbody
+      each poll in polls
+        tr
+          td
+            a(href="/admin/poll/" + poll.slug)= poll.title
+          //td= poll.participants
+          td= poll.startTime
+          td= poll.endTime
+
+

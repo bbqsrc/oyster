@@ -1,0 +1,183 @@
+extend layout
+block content
+  .page-header
+    h1= title
+
+  form.col-sm-8.col-sm-offset-2#form(method="POST")
+    h2 Poll Details
+    .form-group
+      label.control-label(for='fld1') Poll Name
+      input.form-control(placeholder='Best Election', type='text', name='title', id='fld1')
+    .form-group
+      label.control-label(for='fld2') Slug
+      input.form-control(placeholder='best-election', type='text', name='slug', id='fld2')
+    .checkbox
+      label
+        input(type='checkbox', name='isPublic', checked)
+        | Make public?
+      .help-block Public means the results will be accessible from the main page.
+
+    .row
+      h2 Date and Time
+    .row
+      .form-group.col-sm-6
+        label.control-label(for='startDate') Start Date
+        .input-group
+          input.form-control(placeholder='2014-12-31', type='date', name='startDate', id='startDate')
+          span.input-group-btn
+            button.btn.btn-primary.btn-start-date-today(type='button', style='width: 6em') Today
+      .form-group.col-sm-6
+        label.control-label(for='startTime') Start Time
+        .input-group
+          input.form-control(placeholder='23:59', type='time', name='startTime', id='startTime')
+          span.input-group-btn
+            button.btn.btn-primary.btn-start-time-now(type='button', style='width: 6em') Now
+    .row
+      .form-group.col-sm-6
+        label.control-label(for='endDate') End Date
+        .input-group
+          input.form-control(placeholder='2015-01-31', type='date', name='endDate', id='endDate')
+          span.input-group-btn
+            button.btn.btn-primary.btn-end-date-7days(type='button', style='width: 6em') +7 Days
+      .form-group.col-sm-6
+        label.control-label(for='endTime') End Time
+        .input-group
+          input.form-control(placeholder='23:59', type='time', name='endTime', id='endTime')
+          span.input-group-btn
+            button.btn.btn-primary.btn-end-time-6pm(type='button', style='width: 6em') 6:00 pm
+     .row
+       .form-group.col-sm-6.col-sm-offset-6
+         label.control-label(for='timezone') Timezone
+         input(type='hidden', name='timezone', id='timezone')
+         .timezone-human
+         .help-block Please set your date and time relative to this timezone.
+    h2 Poll Content
+    .form-group
+      label.control-label(for='poll-data') Poll Data
+      textarea.form-control(name='pollData', id='poll-data', rows='8', style='display: none')
+      pre#poll-data-editor(style='height: 300px').
+        pageTitle = "Page Title (in the &lt;head&gt;)"
+        title = "Title on the page"
+        info = """
+        #### Comments!
+
+        Here goes markdown explaining all the necessities
+        """
+
+        [[sections]]
+
+        type = "motion"
+        threshold = "two-thirds"
+        title = "A Motions Section"
+        info = """
+        More info?
+        """
+
+        [[sections.fields]]
+
+        id = "motion id"
+        title = "Human readable title, whatever"
+        body = """
+        Here is the motion, humanoid.
+        """
+
+        [[sections]]
+
+        type = "election"
+        method = "schulze"
+        title = "An Elections Section"
+        info = """
+        Explain how to vote or whatever.
+        """
+
+        [[sections.fields]]
+
+        id = "Position up for election"
+        candidates = ["Candidate A", "Candidate B"]
+
+        [[sections.fields]]
+
+        id = "Position up for election"
+        candidates = ["Candidate A", "Candidate B", "Candidate C"]
+        winners = 2 # For multiple winner elections, where supported
+
+      .help-block This is the raw poll data in TOML format.
+    .form-group
+      label.control-label(for='participant-groups') Participant Groups
+      select.form-control(multiple, placeholder='foo@bar.lol', name='participants', id='participant-groups', rows='8')
+        for p in participants
+          option(value=p.name)= p.name
+    h3 Email
+    .form-group
+      label.control-label(for='fld-email1') From
+      input.form-control(placeholder='Test Person (Organisation) <email@place.lol>', type='text', name='emailFrom', id='fld-email1')
+    .form-group
+      label.control-label(for='fld-email2') Subject
+      input.form-control(placeholder='Voting Token Inside!', type='text', name='emailSubject', id='fld-email2')
+    .form-group
+      label.control-label(for='fld-email3') Body
+      textarea.form-control(name='emailBody', id='fld-email3', rows='8').
+        Dear person,
+
+        Vote here: {url}
+
+        Signed,
+        Election Team
+      .help-block Body must include the {url} token or people won't be able to access the voting page!
+
+    button.btn.btn-success(type='submit') Create Poll
+
+    hr
+
+    script(src='/static/js/toml.js')
+    script(src='/static/ace/ace.js')
+    script.
+      var editor = ace.edit('poll-data-editor');
+      editor.setTheme('ace/theme/monokai');
+      editor.getSession().setMode('ace/mode/toml');
+
+      var dateVal = new Date().getTimezoneOffset() * 100 / -60;
+
+      $("#timezone").val(dateVal);
+      $('.timezone-human').text('UTC' + (dateVal >= 0 ? "+" : "-") + (dateVal / 100));
+
+      $(".btn-start-date-today").on('click', function() {
+          var date = new Date().toISOString().split("T")[0];
+          $("#startDate")[0].value = date;
+      });
+
+      $(".btn-start-time-now").on('click', function() {
+          var time = new Date(),
+              m = time.getMinutes(),
+              h = time.getHours();
+          time = (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+          $("#startTime")[0].value = time;
+      });
+
+      $(".btn-end-date-7days").on('click', function() {
+          var date = new Date;
+          date.setDate(date.getDate() + 7);
+          date = date.toISOString().split("T")[0];
+          $("#endDate")[0].value = date;
+      });
+
+      $(".btn-end-time-6pm").on('click', function() {
+          $("#endTime")[0].value = "18:00";
+      });
+
+      $("#form").on('submit', function(e) {
+        var data;
+
+        e.preventDefault();
+
+        try {
+          data = toml.parse(editor.getValue());
+        } catch (err) {
+          alert(err);
+          return;
+        }
+
+        $("#poll-data").val(JSON.stringify(data));
+
+        this.submit();
+      });

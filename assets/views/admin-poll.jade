@@ -1,0 +1,44 @@
+extend layout
+block content
+  .page-header
+    h1= poll.title
+
+  ul
+    each value, key in poll.toObject()
+      if key == "email"
+        each v, k in value
+          if k == "content"
+            li
+              strong
+                | Email
+                = k
+                | :
+              pre= v
+           else
+             li
+               strong
+                 | Email
+                 = k
+                 | :
+               span=v
+      else
+        li
+          strong
+            = key
+            | :
+          if Array.isArray(value)
+            span= value.length
+          else
+            span= value
+
+  if poll.testToken
+    a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/test').
+      Test Ballot
+
+  a.btn.btn-primary(href="/admin/poll/" + poll.slug + '/ballots').
+    Ballots
+
+  a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/results').
+    Results
+
+

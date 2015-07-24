@@ -2,18 +2,18 @@
 
 var crypto = require('crypto'),
     mongoose = require('mongoose'),
+    moment = require('moment'),
+    uuid = require('node-uuid'),
     co = require('co'),
+    config = require('./config'),
     Schema = mongoose.Schema;
 
 var pollSchema = new Schema({
   slug: { type: String, unique: true },
   title: String,
-  content: Schema.Types.Mixed,
   isPublic: { type: Boolean, default: true },
-  participants: [{
-    email: String,
-    ballotSent: { type: Boolean, default: false }
-  }],
+  participantGroups: Array,
+  emailsSent: { type: Array, default: [] },
   email: {
     from: String,
     subject: String,
@@ -21,8 +21,48 @@ var pollSchema = new Schema({
   },
   startTime: Date,
   endTime: Date,
-  hasResults: { type: Boolean, default: false }
+  hasResults: { type: Boolean, default: false },
+  content: Schema.Types.Mixed
 });
+
+pollSchema.statics.createPoll = function(o) {
+  let self = this;
+
+  return new Promise(function(resolve, reject) {
+    co(function*() {
+      let dateFormat = "YYYY-MM-DDhh:mmZ",
+          timezone = (parseInt(o.timezone, 10) >= 0 ? "+" : "-") + o.timezone,
+          startTime = moment(o.startDate + o.startTime +
+                             timezone, dateFormat).toDate(),
+          endTime = moment(o.endDate + o.endTime +
+                           timezone, dateFormat).toDate(),
+          participants = o.participants,
+          pollData = JSON.parse(pollData);
+
+      if (typeof participants == "string") {
+          participants = [participants];
+      }
+
+      let poll = new self.model('Poll')({
+        slug: o.slug,
+        title: o.title,
+        isPublic: o.isPublic === "on",
+        participantGroups: participants,
+        email: {
+          from: o.emailFrom,
+          subject: o.emailSubject,
+          content: o.emailBody
+        },
+        startTime: startTime,
+        endTime: endTime,
+        content: pollData
+      });
+
+      yield poll.save();
+      resolve();
+    }).catch(reject);
+  });
+}
 
 pollSchema.statics.findBySlug = /* async */ function(slug) {
   return this.findOne({ slug: slug }).exec();
@@ -34,13 +74,68 @@ pollSchema.methods.getBallots = /* async */ function() {
 
 pollSchema.methods.findBallot = /* async */ function(token) {
   return this.model('Ballot').findOne({ poll: this.slug, token: token }).exec();
-}
+};
+
+pollSchema.methods.sendEmails = function() {
+  let self = this;
+
+  return new Promise(function(resolve, reject) {
+    co(function*() {
+      let pgs = yield self.Model('ParticipantGroup').find({ name: {
+        $in : self.participantGroups } });
+
+      if (pgs.length !== self.participantGroups.length) {
+        return reject(new Error('Incorrect number of participant groups returned.'));
+      }
+
+      let baseUrl = config.host;
+      let mailer = config.createMailer();
+
+      for (let pg of pgs) {
+        // TODO immediately finish generating the UUIDs, add the flags to the ballot,
+        // create the empty ballot.
+        for (let email of pg.emails) {
+          if (self.emailsSent.indexOf(email) > -1) {
+            continue;
+          }
+
+          let token = uuid.v4().replace(/-/g, '');
+
+          let ballot = new self.model('Ballot')({
+            token: token,
+            poll: self.slug,
+            flags: pg.flags
+          });
+
+          yield ballot.save();
+
+          let url = "https://" + baseUrl + "/poll/" + self.slug + "/" + token;
+          let text = self.email.content.replace("{url}", url);
+
+          yield mailer.sendMail({
+            from: self.email.from,
+            to: email,
+            subject: self.email.subject,
+            text: text
+          });
+
+          self.emailsSent.push(email);
+          self.markModified('emailsSent');
+          yield self.save();
+        }
+      }
+
+      resolve();
+    }).catch(reject);
+  });
+};
 
 exports.Poll = mongoose.model('Poll', pollSchema);
 
 var ballotSchema = new Schema({
   token: String,
   poll: String,
+  flags: Array,
   data: { type: Schema.Types.Mixed, default: null }
 });
 
@@ -130,6 +225,7 @@ userSchema.statics.createUser = function(username, password, options) {
 
 userSchema.statics.authenticate = function(username, password) {
   var self = this;
+
   return new Promise(function(resolve, reject) {
     self.model('User').findOne({username: username}, function(err, doc) {
       if (err) { return reject(err); }
@@ -139,7 +235,7 @@ userSchema.statics.authenticate = function(username, password) {
       }
 
       doc.verifyPassword(password).then(function(success) {
-        resolve(success);
+        resolve(doc);
       }).catch(function(err) {
         reject(err);
       });
@@ -164,3 +260,11 @@ userSchema.methods.isAdmin = function() {
 }
 
 exports.User = mongoose.model('User', userSchema);
+
+var participantGroupSchema = new Schema({
+  name: { type: String, unique: true },
+  emails: { type: Array, default: [] },
+  flags: { type: Array, default: [] }
+});
+
+exports.ParticipantGroup = mongoose.model('ParticipantGroup', participantGroupSchema);

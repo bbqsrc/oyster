@@ -7,11 +7,11 @@ var co = require('co'),
 var models = require('./models');
 
 passport.serializeUser(function(user, done) {
-  done(null, user);
+  done(null, user.id);
 });
 
-passport.deserializeUser(function(user, done) {
-  done(null, user);
+passport.deserializeUser(function(id, done) {
+  models.User.findById(id, done);
 });
 
 passport.use(new LocalStrategy(function(username, password, done) {
