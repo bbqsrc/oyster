@@ -235,7 +235,11 @@ userSchema.statics.authenticate = function(username, password) {
       }
 
       doc.verifyPassword(password).then(function(success) {
-        resolve(doc);
+        if (success) {
+          resolve(doc);
+        } else {
+          resolve(false);
+        }
       }).catch(function(err) {
         reject(err);
       });
