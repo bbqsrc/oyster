@@ -4,6 +4,7 @@ var crypto = require('crypto'),
     mongoose = require('mongoose'),
     moment = require('moment'),
     uuid = require('node-uuid'),
+    schedule = require('node-schedule'),
     co = require('co'),
     config = require('./config'),
     Schema = mongoose.Schema;
@@ -59,6 +60,9 @@ pollSchema.statics.createPoll = function(o) {
       });
 
       yield poll.save();
+
+      poll.schedule();
+
       resolve(poll);
     }).catch(reject);
   });
@@ -66,6 +70,46 @@ pollSchema.statics.createPoll = function(o) {
 
 pollSchema.statics.findBySlug = /* async */ function(slug) {
   return this.findOne({ slug: slug }).exec();
+};
+
+pollSchema.methods.schedule = function() {
+  let doc = this;
+
+  let jobStartName = "start:" + doc.slug,
+      jobEndName = "end:" + doc.slug;
+
+  schedule.cancelJob(jobStartName);
+  schedule.cancelJob(jobEndName);
+
+  if (doc.startTime) {
+    schedule.scheduleJob(jobStartName, doc.startTime, function() {
+      co(function* () {
+        console.log("Starting job: " + this.name);
+        yield doc.sendEmails();
+        console.log("Finished job: " + this.name);
+      }.bind(this)).catch(function(e) {
+        console.error("Failed to send emails for '" + doc.slug + "'.");
+        console.error(e.stack);
+      });
+    });
+
+    console.log("Scheduled start of '" + doc.slug +  "' for " + doc.startTime.toISOString());
+  }
+
+  if (doc.endTime) {
+    schedule.scheduleJob(jobEndName, doc.endTime, function() {
+      co(function* () {
+        console.log("Starting job: " + this.name);
+        yield calculateResults(doc.slug);
+        console.log("Finished job: " + this.name);
+      }.bind(this)).catch(function(e) {
+        console.error("Failed to save results for '" + doc.slug + "'.");
+        console.error(e.stack);
+      });
+    });
+
+    console.log("Scheduled end of '" + doc.slug +  "' for " + doc.endTime.toISOString());
+  }
 };
 
 pollSchema.methods.sendEmails = function() {

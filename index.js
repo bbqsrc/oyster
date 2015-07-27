@@ -1,7 +1,6 @@
 "use strict";
 
 var app = require('koa')(),
-    schedule = require('node-schedule'),
     Router = require('koa-router'),
     bodyParser = require('koa-bodyparser'),
     mongoose = require('mongoose'),
@@ -316,36 +315,7 @@ function startResultsScheduler() {
     let stream = models.Poll.find({ hasResults: { $ne : true } }).stream();
 
     stream.on('data', function(doc) {
-      // TODO schedule beginning
-      if (doc.startTime) {
-        schedule.scheduleJob("start:" + doc.slug, doc.startTime, function() {
-          co(function* () {
-            console.log("Starting job: " + this.name);
-            yield doc.sendEmails();
-            console.log("Finished job: " + this.name);
-          }.bind(this)).catch(function(e) {
-            console.error("Failed to send emails for '" + doc.slug + "'.");
-            console.error(e.stack);
-          });
-        });
-
-        console.log("Scheduled start of '" + doc.slug +  "' for " + doc.startTime.toISOString());
-      }
-
-      if (doc.endTime) {
-        schedule.scheduleJob("end:" + doc.slug, doc.endTime, function() {
-          co(function* () {
-            console.log("Starting job: " + this.name);
-            yield calculateResults(doc.slug);
-            console.log("Finished job: " + this.name);
-          }.bind(this)).catch(function(e) {
-            console.error("Failed to save results for '" + doc.slug + "'.");
-            console.error(e.stack);
-          });
-        });
-
-        console.log("Scheduled end of '" + doc.slug +  "' for " + doc.endTime.toISOString());
-      }
+      doc.schedule();
     })
     .on('error', reject)
     .on('close', function() {
