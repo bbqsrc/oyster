@@ -13,6 +13,7 @@ var app = require('koa')(),
     co = require('co');
 
 var config = require('./config'),
+    logging = require('./logging'),
     models = require('./models'),
     util = require('./util'),
     router = Router(),
@@ -20,7 +21,7 @@ var config = require('./config'),
 
 // Pre-routing
 
-app.keys = ['lol sekrets are hawt'];
+app.keys = [config.cookieSecret];
 
 app.use(logger());
 app.use(views('assets/views', {
@@ -35,9 +36,23 @@ var db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
 
+// Catch all the errors.
+app.use(function *(next) {
+  try {
+    yield next;
+  } catch (err) {
+    this.status = err.status || 500;
+    this.body = err.message;
+    this.app.emit('error', err, this);
+  };
+});
+
 require('./auth');
 
-app.use(session(app))
+app.use(session({
+    key: config.cookieName,
+    maxAge: config.cookieMaxAge
+  }, app))
   .use(passport.initialize())
   .use(passport.session());
 
@@ -74,8 +89,14 @@ router
     }
 
     if (this.ballot.data != null) {
-      this.body = "You have already responded.";
-      return this.status = 403;
+      this.status = 403;
+
+      return yield this.render('success', {
+        message: "You have already responded to this poll.",
+        pageTitle: this.poll.content.pageTitle,
+        title: this.poll.content.title,
+        ballot: util.reverseObject(this.ballot.data)
+      });
     }
 
     yield next;
@@ -87,19 +108,31 @@ router
     });
   })
   .post('/poll/:poll/:token', bodyParser(), function *(next) {
-    this.ballot.set('data', util.parseNestedKeys(this.request.body));
+    let data = util.parseNestedKeys(this.request.body);
+
+    this.ballot.set('data', data);
     this.ballot.markModified('data');
+
     try {
       yield this.ballot.save();
     } catch(e) {
-      console.error(e);
+      console.error(e.stack);
       this.status = 500;
       return yield this.render('error', {
-        message: "???" // TODO
+        pageTitle: this.poll.content.pageTitle,
+        title: this.poll.content.title,
+        message: "For some reason, your ballot could not be saved. An error has been logged. Please try again in a few minutes, or contact the administrator."
       });
     }
 
-    yield this.render('success');
+    yield this.render('success', {
+      pageTitle: this.poll.content.pageTitle,
+      title: this.poll.content.title,
+      ballot: data
+    });
+  })
+  .get('/results/:poll/export', function *(next) {
+    // Only if ended, and if public.
   })
   .get('/results/:poll', function *(next) {
     // Check if poll allows router results

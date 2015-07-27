@@ -1,0 +1,38 @@
+doctype html
+html(lang="en")
+  head
+    title= pageTitle
+    base(target="_blank")
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(href="/static/css/bootstrap.min.css", rel="stylesheet")
+    link(href="/static/css/style.css", rel="stylesheet")
+    <!--[if lt IE 10]>
+    <script src="es5-shim.min.js"></script>
+    <script src="html5shiv.min.js"></script>
+    <![endif]-->
+  body
+    .container
+      .row
+        .col-md-12
+          .div
+            div.aside.privacy.alert.alert-success.pull-right
+              | This form is hosted on a server in 
+              a(rel='nofollow', href="http://digitalocean.com").
+                the Netherlands
+              | , and is being accessed over a secure SSL link.
+            h1
+              a.logo(href="http://pirateparty.org.au")
+                div
+                  span.logo-bold-blue pirate
+                  | party
+                div.logo-australia= title
+          .hr
+
+          .div.alert.alert-danger= message
+
+    footer.powered-by-oyster
+      | Powered by 
+      a(rel='nofollow', href="https://bbqsrc.github.io/oyster") Oyster
+      | .
+

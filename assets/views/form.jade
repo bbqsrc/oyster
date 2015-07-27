@@ -7,6 +7,8 @@ html(lang="en")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     link(href="/static/css/bootstrap.min.css", rel="stylesheet")
     link(href="/static/css/style.css", rel="stylesheet")
+    script.
+      var data = !{JSON.stringify(content)};
     <!--[if lt IE 10]>
     <script src="es5-shim.min.js"></script>
     <script src="html5shiv.min.js"></script>
@@ -67,7 +69,7 @@ html(lang="en")
       <footer class='smile'>:)</footer>
     script(id="_election", type="text/x-handlebars").
       <div {{bind-attr class=class}}>
-        <h2>{{name}}</h2>
+        <h2>{{title}}</h2>
         {{#if info}}
           <div class='alert alert-info'>{{markdown info}}</div>
         {{/if}}
@@ -91,7 +93,7 @@ html(lang="en")
       </div>
     script(id="_motion", type="text/x-handlebars").
       <div>
-        <h2>{{name}}</h2>
+        <h2>{{title}}</h2>
         {{#if info}}
           <div class='alert alert-info'>{{markdown info}}</div>
         {{/if}}
@@ -122,14 +124,5 @@ html(lang="en")
           </div>
         </div>
       </div>
-    script(src="/static/js/underscore.min.js")
-    script(src="/static/js/jquery.min.js")
-    script(src="/static/js/bootstrap.min.js")
-    script(src="/static/js/handlebars.js")
-    script(src="/static/js/ember.min.js")
-    script(src="/static/js/markdown.min.js")
-    //script(src="/static/js/data.js")
-    script.
-      var data = !{JSON.stringify(content)};
-    script(src="/static/js/app.js")
+    script(src="/static/js/compiled.js")
 
