@@ -221,6 +221,7 @@ secured
     let polls = yield models.Poll.find({}).exec();
 
     yield this.render('admin-polls', {
+      title: "All Polls",
       polls: polls
     });
   })
@@ -228,6 +229,7 @@ secured
     let participantGroups = yield models.ParticipantGroup.find({}).exec();
 
     yield this.render('admin-new-poll', {
+      title: "New Poll",
       participants: participantGroups
     });
   })
@@ -246,6 +248,7 @@ secured
   })
   .get('/poll/:poll', isAdmin, function* (next) {
     yield this.render('admin-poll', {
+      title: "Poll " + this.poll.slug,
       poll: this.poll
     });
   })
