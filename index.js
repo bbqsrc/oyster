@@ -19,7 +19,9 @@ var config = require('./config'),
 
 // Pre-routing
 
+app.name = "oyster";
 app.keys = [config.cookieSecret];
+app.proxy = config.proxy || true;
 
 app.use(logger());
 app.use(views('assets/views', {
@@ -271,6 +273,14 @@ app
   .use(router.routes())
   .use(secured.routes())
   .use(router.allowedMethods());
+
+app.on('error', function(err, ctx) {
+  if (ctx) {
+    console.error('server error', err, ctx);
+  } else {
+    console.error('server error', err);
+  }
+});
 
 // Post-routing
 
