@@ -12,7 +12,6 @@ var app = require('koa')(),
     co = require('co');
 
 var config = require('./config'),
-    logging = require('./logging'),
     models = require('./models'),
     util = require('./util'),
     router = Router(),
