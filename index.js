@@ -274,41 +274,6 @@ app
 
 // Post-routing
 
-// TODO move into models.
-function calculateResults(slug) {
-  return new Promise(function(resolve, reject) {
-    co(function*() {
-      let poll = yield models.Poll.findBySlug(slug);
-
-      let results = Object.create(null);
-
-      let ballotStream = models.Ballot.find({ slug: slug }).stream();
-
-      ballotStream.on('data', function (doc) {
-        // TODO: generate the results
-      })
-      .on('error', reject)
-      .on('close', function() {
-        co(function*() {
-          let resultsRecord = new models.Results({
-            slug: slug,
-            results: results
-          });
-
-          poll.set('hasResults', true);
-
-          yield resultsRecord.save();
-          yield poll.save();
-
-          console.log("Saved results for '" + slug + "'.");
-
-          resolve();
-        }).catch(reject);
-      });
-    }).catch(reject);
-  });
-}
-
 function startResultsScheduler() {
   return new Promise(function(resolve, reject) {
     let stream = models.Poll.find({ hasResults: { $ne : true } }).stream();

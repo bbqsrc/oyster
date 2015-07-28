@@ -199,6 +199,44 @@ var resultsSchema = new Schema({
   results: Schema.Types.Mixed
 });
 
+resultsSchema.statics.createResults = function(poll) {
+  let self = this;
+
+  return new Promise(function(resolve, reject) {
+    co(function*() {
+      if (poll.hasResults) {
+        throw new Error("This poll already has results.");
+      }
+
+      let results = Object.create(null);
+
+      let ballotStream = self.model('Ballot').find({ slug: poll.slug }).stream();
+
+      ballotStream.on('data', function (doc) {
+        // TODO: generate the results
+      })
+      .on('error', reject)
+      .on('close', function() {
+        co(function*() {
+          let resultsRecord = new models.Results({
+            slug: slug,
+            results: results
+          });
+
+          poll.set('hasResults', true);
+
+          yield resultsRecord.save();
+          yield poll.save();
+
+          console.log("Saved results for '" + slug + "'.");
+
+          resolve(resultsRecord);
+        }).catch(reject);
+      });
+    }).catch(reject);
+  });
+}
+
 exports.Results = mongoose.model('Results', resultsSchema);
 
 var userSchema = new Schema({
