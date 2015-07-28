@@ -210,7 +210,9 @@ resultsSchema.statics.createResults = function(poll) {
 
       let results = Object.create(null);
 
-      let ballotStream = self.model('Ballot').find({ slug: poll.slug }).stream();
+      let slug = poll.slug;
+
+      let ballotStream = self.model('Ballot').find({ slug: slug }).stream();
 
       ballotStream.on('data', function (doc) {
         // TODO: generate the results
