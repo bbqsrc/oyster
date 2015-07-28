@@ -218,7 +218,7 @@ resultsSchema.statics.createResults = function(poll) {
       .on('error', reject)
       .on('close', function() {
         co(function*() {
-          let resultsRecord = new models.Results({
+          let resultsRecord = new (self.model('Results'))({
             slug: slug,
             results: results
           });
