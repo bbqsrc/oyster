@@ -100,7 +100,7 @@ pollSchema.methods.schedule = function() {
     schedule.scheduleJob(jobEndName, doc.endTime, function() {
       co(function* () {
         console.log("Starting job: " + this.name);
-        yield calculateResults(doc.slug);
+        yield doc.model('Results').createResults(doc);
         console.log("Finished job: " + this.name);
       }.bind(this)).catch(function(e) {
         console.error("Failed to save results for '" + doc.slug + "'.");

@@ -71,9 +71,23 @@ router
     let now = +Date.now();
 
     // Let us be only serving if within the good period of time oh yes.
-    if (+this.poll.startTime > now ||
-        +this.poll.endTime < now) {
-      return this.status = 403;
+    if (+this.poll.startTime > now) {
+      this.status = 403;
+
+      return yield this.render('error', {
+        pageTitle: this.poll.content.pageTitle,
+        title: this.poll.content.title,
+        message: "This poll has not yet begun."
+      });
+    }
+    if (+this.poll.endTime < now) {
+      this.status = 403;
+
+      return yield this.render('error', {
+        pageTitle: this.poll.content.pageTitle,
+        title: this.poll.content.title,
+        message: "This poll has finished."
+      });
     }
 
     yield next;
