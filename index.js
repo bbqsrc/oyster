@@ -101,6 +101,14 @@ router
 
     yield next;
   })
+  .get('/', function *(next) {
+    // TODO stub
+    return this.body = "<!doctype html><html><head><title>Oyster voting server</title>" +
+        "<style>body { font-family: sans-serif; }</style></head>" +
+        "<body><h1>The server is up!</h1>" +
+        "<footer><small>Powered by <a href='https://bbqsrc.github.io/oyster'>Oyster</a>.</small></footer>" +
+        "</body></html>";
+  })
   .get('/poll/:poll/:token', function *(next) {
     yield this.render('form', {
       content: this.poll.content,
