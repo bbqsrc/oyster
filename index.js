@@ -274,26 +274,12 @@ app
 
 // Post-routing
 
-function startResultsScheduler() {
-  return new Promise(function(resolve, reject) {
-    let stream = models.Poll.find({ hasResults: { $ne : true } }).stream();
-
-    stream.on('data', function(doc) {
-      doc.schedule();
-    })
-    .on('error', reject)
-    .on('close', function() {
-      resolve();
-    });
-  });
-}
-
 db.once('open', function() {
   console.log('db connected.');
   co(function*() {
     console.log('starting results scheduler.');
     // TODO sanity check: ensure hasResults matches actual results collection
-    yield startResultsScheduler();
+    yield models.Results.startScheduler();
   }).then(function() {
     app.listen(config.port);
     console.log('listening on port ' + config.port);

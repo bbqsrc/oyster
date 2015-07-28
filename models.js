@@ -235,7 +235,23 @@ resultsSchema.statics.createResults = function(poll) {
       });
     }).catch(reject);
   });
-}
+};
+
+resultsSchema.statics.startScheduler = function() {
+  let self = this;
+
+  return new Promise(function(resolve, reject) {
+    let stream = self.model('Poll').find({ hasResults: { $ne : true } }).stream();
+
+    stream.on('data', function(doc) {
+      doc.schedule();
+    })
+    .on('error', reject)
+    .on('close', function() {
+      resolve();
+    });
+  });
+};
 
 exports.Results = mongoose.model('Results', resultsSchema);
 
