@@ -81,19 +81,24 @@ pollSchema.methods.schedule = function() {
   schedule.cancelJob(jobStartName);
   schedule.cancelJob(jobEndName);
 
-  if (doc.startTime) {
-    schedule.scheduleJob(jobStartName, doc.startTime, function() {
-      co(function* () {
-        console.log("Starting job: " + this.name);
-        yield doc.sendEmails();
-        console.log("Finished job: " + this.name);
-      }.bind(this)).catch(function(e) {
-        console.error("Failed to send emails for '" + doc.slug + "'.");
-        console.error(e.stack);
-      });
-    });
+  let now = +Date.now();
 
-    console.log("Scheduled start of '" + doc.slug +  "' for " + doc.startTime.toISOString());
+  if (doc.startTime) {
+    // Don't bother if already ended.
+    if (!(doc.endTime && +doc.endTime < now)) {
+      schedule.scheduleJob(jobStartName, doc.startTime, function() {
+        co(function* () {
+          console.log("Starting job: " + this.name);
+          yield doc.sendEmails();
+          console.log("Finished job: " + this.name);
+        }.bind(this)).catch(function(e) {
+          console.error("Failed to send emails for '" + doc.slug + "'.");
+          console.error(e.stack);
+        });
+      });
+
+      console.log("Scheduled start of '" + doc.slug +  "' for " + doc.startTime.toISOString());
+    }
   }
 
   if (doc.endTime) {
