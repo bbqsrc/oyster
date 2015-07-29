@@ -248,7 +248,7 @@ secured
     });
   })
   .get('/participant/:pgId', isAdmin, function* (next) {
-    let pg = yield models.ParticipantGroup.findOne(this.params.pgId).exec();
+    let pg = yield models.ParticipantGroup.findById(this.params.pgId).exec();
 
     if (!pg) {
       return this.status = 404;
