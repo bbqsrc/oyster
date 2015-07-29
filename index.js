@@ -42,8 +42,10 @@ app.use(function *(next) {
     yield next;
   } catch (err) {
     this.status = err.status || 500;
-    this.body = err.message;
+    //this.body = err.message;
+    this.body = "Internal server error. Please contact an administrator.";
     this.app.emit('error', err, this);
+    console.error(err.stack);
   };
 });
 
@@ -236,6 +238,24 @@ secured
   })
   .get('/', isAdmin, function* (next) {
     yield this.render('admin-index', { title: 'Index' });
+  })
+  .get('/participants', isAdmin, function* (next) {
+    let pgs = yield models.ParticipantGroup.find({}).exec();
+
+    yield this.render('admin-participants', {
+      titles: "All Participants",
+      participants: pgs
+    });
+  })
+  .get('/participant/:pgId', isAdmin, function* (next) {
+    let pg = yield models.ParticipantGroup.findOne(this.params.pgId).exec();
+
+    if (!pg) {
+      return this.status = 404;
+    }
+
+    // TODO themes.
+    return this.body = JSON.stringify(pg.toObject(), null, 2);
   })
   .get('/polls', isAdmin, function* (next) {
     // TODO pagination!!

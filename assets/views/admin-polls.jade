@@ -14,7 +14,10 @@ block content
         tr
           td
             a(href="/admin/poll/" + poll.slug)= poll.title
-          //td= poll.participants
+          td
+            ul
+              each p in poll.participantGroups
+                li= p
           td= poll.startTime
           td= poll.endTime
 
