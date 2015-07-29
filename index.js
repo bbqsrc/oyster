@@ -68,28 +68,6 @@ router
       return this.status = 404;
     }
 
-    let now = +Date.now();
-
-    // Let us be only serving if within the good period of time oh yes.
-    if (+this.poll.startTime > now) {
-      this.status = 403;
-
-      return yield this.render('error', {
-        pageTitle: this.poll.content.pageTitle,
-        title: this.poll.content.title,
-        message: "This poll has not yet begun."
-      });
-    }
-    if (+this.poll.endTime < now) {
-      this.status = 403;
-
-      return yield this.render('error', {
-        pageTitle: this.poll.content.pageTitle,
-        title: this.poll.content.title,
-        message: "This poll has finished."
-      });
-    }
-
     yield next;
   })
   .param('token', function *(token, next) {
@@ -110,6 +88,28 @@ router
         pageTitle: this.poll.content.pageTitle,
         title: this.poll.content.title,
         ballot: util.reverseObject(this.ballot.data)
+      });
+    }
+
+    let now = +Date.now();
+
+    // Let us be only serving if within the good period of time oh yes.
+    if (+this.poll.startTime > now) {
+      this.status = 403;
+
+      return yield this.render('error', {
+        pageTitle: this.poll.content.pageTitle,
+        title: this.poll.content.title,
+        message: "This poll has not yet begun."
+      });
+    }
+    if (+this.poll.endTime < now) {
+      this.status = 403;
+
+      return yield this.render('error', {
+        pageTitle: this.poll.content.pageTitle,
+        title: this.poll.content.title,
+        message: "This poll has finished."
       });
     }
 
