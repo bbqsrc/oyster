@@ -1,44 +1,52 @@
 extend layout
 block content
   .page-header
-    h1= poll.title
-
-  ul
-    each value, key in poll.toObject()
-      if key == "email"
-        each v, k in value
-          if k == "content"
-            li
-              strong
-                | Email
-                = k
-                | :
-              pre= v
-           else
-             li
-               strong
-                 | Email
-                 = k
-                 | :
-               span=v
-      else
-        li
-          strong
-            = key
-            | :
-          if Array.isArray(value)
-            span= value.length
-          else
-            span= value
-
-  if poll.testToken
+    h1
+      = poll.title 
+      small  (#{poll.slug})
+    if poll.isPublic
+      strong Public
+  .well
     a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/test').
       Test Ballot
+    | 
+    a.btn.btn-primary(href="/admin/poll/" + poll.slug + '/ballots').
+      Ballots
+    | 
+    a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/results').
+      Results
+  .row
+    .col-md-6
+      p
+        strong Start: 
+      p
+        time(datetime="#{poll.startTime.toISOString()}")= poll.startTime
+      p
+        strong End: 
+      p
+        time(datetime="#{poll.endTime.toISOString()}")= poll.endTime
+      div
+        strong Content:
+        pre !{JSON.stringify(poll.content, null, 2)}
+    .col-md-6
+      div
+        strong Participant Groups:
+        ul
+          each participant in poll.participantGroups
+            li= participant
+      div
+        p
+          strong Email
+        p
+          | From: 
+          em= poll.email.from
+        p
+          | Subject: 
+          em= poll.email.subject
+        pre= poll.email.content
+        p
+          strong Emails sent: 
+          | #{poll.emailsSent.length}
 
-  a.btn.btn-primary(href="/admin/poll/" + poll.slug + '/ballots').
-    Ballots
-
-  a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/results').
-    Results
 
 
