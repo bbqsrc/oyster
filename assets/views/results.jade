@@ -1,0 +1,87 @@
+extend layout-noheader
+block head
+  link(href='/static/css/table.css', rel='stylesheet')
+  script(src='/static/js/react.min.js')
+  script(src='/static/js/table.js')
+  style.
+    .results-table th,
+    .results-table td {
+      text-align: center;
+    }
+    .results-table td {
+      width: 33%;
+    }
+    
+block content
+  .page-header
+    h1
+      span.pull-right.dropdown
+        button.btn.btn-primary.dropdown-toggle(type='button', data-toggle="dropdown", 
+                aria-haspopup="true", aria-expanded="false", id='advanced-menu')
+          span.glyphicon.glyphicon-cloud-download
+          .sr-only Download data
+        ul.dropdown-menu(aria-labelledby="advanced-menu")
+          li
+            a(href='/export/#{poll.slug}/results')
+              | Download results
+              | 
+              small (JSON)
+          li 
+            a(href='/export/#{poll.slug}/ballots')
+              | Download ballots
+              | 
+              small (JSON)
+      | Results of 
+      = poll.title
+
+  .row
+    .col-md-12
+      h2 Motions
+      table.table
+        thead
+          tr
+            th Motion
+            th For
+            th Against
+            th Abstain
+            th Threshold
+            th % in favour
+            th Result
+        tbody
+          each motion in results.motions
+            tr
+              td
+                strong= motion.id
+              td.text-success= motion.counts.aye
+              td.text-danger= motion.counts.nay
+              td.text-warning= motion.counts.abstain
+              td= motion.threshold
+              td= motion.result.percentage
+              if motion.result.success
+                td.success Carried
+              else
+                td.danger Lapsed
+      h2 Elections
+      each election in results.elections
+        .panel.panel-default
+          .panel-heading
+            h3.panel-title= election.id
+          .panel-body
+            .row
+              .col-md-6
+                div(data-election=election.id)
+                script.
+                  React.render(React.createElement(SchulzeTable, {data: {
+                    candidates: !{JSON.stringify(election.candidates)},
+                    values: !{JSON.stringify(election.data.scores)}
+                  }}), $("[data-election='#{election.id}']")[0]);
+              .col-md-6
+                h4 Rankings
+                ol
+                  each c in election.order
+                    li= c
+                h4(style='display: inline') Method: 
+                span= election.method
+       div
+         .alert.alert-info.text-center
+           strong End of results.

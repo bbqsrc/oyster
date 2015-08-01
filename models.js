@@ -7,6 +7,7 @@ var crypto = require('crypto'),
     schedule = require('node-schedule'),
     co = require('co'),
     config = require('./config'),
+    counters = require('./counters'),
     Schema = mongoose.Schema;
 
 var pollSchema = new Schema({
@@ -133,8 +134,6 @@ pollSchema.methods.sendEmails = function() {
       let mailer = config.createMailer();
 
       for (let pg of pgs) {
-        // TODO immediately finish generating the UUIDs, add the flags to the ballot,
-        // create the empty ballot.
         for (let email of pg.emails) {
           if (self.emailsSent.indexOf(email) > -1) {
             continue;
@@ -170,6 +169,99 @@ pollSchema.methods.sendEmails = function() {
   });
 };
 
+pollSchema.methods.preparePollData = function() {
+  let doc = this;
+
+  let slug = doc.slug;
+  let content = doc.content;
+
+  let motions = [];
+  let elections = [];
+
+  for (let section of content.sections) {
+    let type = section.type;
+
+    if (type === "motion") {
+      let thresholdType = section.threshold || "majority";
+
+      for (let field of section.fields) {
+        motions.push({
+          id: field.id,
+          threshold: thresholdType
+        });
+      }
+    } else if (type === "election") {
+      let method = section.method || "schulze";
+      let winners = section.winners || 1;
+
+      for (let field of section.fields) {
+        elections.push({
+          id: field.id,
+          candidates: field.candidates,
+          winners: field.winners || winners,
+          method: method
+        });
+      }
+    }
+  }
+
+  return {
+    elections: elections,
+    motions: motions
+  };
+}
+
+pollSchema.methods.generateResults = function() {
+  return co(function*() {
+    let pollData = this.preparePollData();
+
+    let mCounters = {};
+    let eCounters = {};
+
+    // Create counters for all motions
+    for (let motion of pollData.motions) {
+      mCounters[motion.id] = new counters.MotionCounter(
+        motion.id, motion.threshold);
+    }
+
+    for (let election of pollData.elections) {
+      eCounters[election.id] = counters.createElectionCounter(
+        election.id, election.method, election.candidates, election.winners);
+    }
+
+    // Count errthang
+    yield exports.Ballot.eachForSlug(this.slug, function(ballot) {
+      if (ballot.data.motions) {
+        for (let m of pollData.motions) {
+          mCounters[m.id].insert(ballot.data.motions[m.id]);
+        }
+      }
+
+      if (ballot.data.elections) {
+        for (let e of pollData.elections) {
+          eCounters[e.id].insert(ballot.data.elections[e.id]);
+        }
+      }
+    });
+
+    // Output the objects
+    let results = {
+      motions: [],
+      elections: []
+    };
+
+    for (let id in mCounters) {
+      results.motions.push(mCounters[id].toObject());
+    }
+
+    for (let id in eCounters) {
+      results.elections.push(eCounters[id].toObject());
+    }
+
+    return results;
+  }.bind(this));
+};
+
 exports.Poll = mongoose.model('Poll', pollSchema);
 
 var ballotSchema = new Schema({
@@ -197,6 +289,26 @@ ballotSchema.methods.getPoll = /* async */ function() {
   return this.model('Poll').findOne({ slug: this.poll }).exec();
 };
 
+ballotSchema.statics.eachForSlug = function(slug, eachFn) {
+  return new Promise(function(resolve, reject) {
+    let stream = exports.Ballot.find({
+      poll: slug,
+      data: { $exists: true }
+    }).stream();
+
+    stream
+      .on('data', function() {
+        try {
+          eachFn.apply(this, arguments);
+        } catch(err) {
+          return reject(err);
+        }
+      })
+      .on('error', reject)
+      .on('end', resolve);
+  });
+};
+
 exports.Ballot = mongoose.model('Ballot', ballotSchema);
 
 var resultsSchema = new Schema({
@@ -207,40 +319,26 @@ var resultsSchema = new Schema({
 resultsSchema.statics.createResults = function(poll) {
   let self = this;
 
-  return new Promise(function(resolve, reject) {
-    co(function*() {
-      if (poll.hasResults) {
-        throw new Error("This poll already has results.");
-      }
+  return co(function*() {
+    if (poll.hasResults) {
+      throw new Error("This poll already has results.");
+    }
 
-      let results = Object.create(null);
+    let results = yield poll.generateResults();
 
-      let slug = poll.slug;
+    let resultsRecord = new exports.Results({
+      poll: poll.slug,
+      results: results
+    });
 
-      let ballotStream = self.model('Ballot').find({ slug: slug }).stream();
+    poll.set('hasResults', true);
 
-      ballotStream.on('data', function (doc) {
-        // TODO: generate the results
-      })
-      .on('error', reject)
-      .on('close', function() {
-        co(function*() {
-          let resultsRecord = new (self.model('Results'))({
-            slug: slug,
-            results: results
-          });
+    yield resultsRecord.save();
+    yield poll.save();
 
-          poll.set('hasResults', true);
+    console.log("Saved results for '" + slug + "'.");
 
-          yield resultsRecord.save();
-          yield poll.save();
-
-          console.log("Saved results for '" + slug + "'.");
-
-          resolve(resultsRecord);
-        }).catch(reject);
-      });
-    }).catch(reject);
+    return resultsRecord;
   });
 };
 

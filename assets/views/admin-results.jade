@@ -1,0 +1,82 @@
+extend layout
+block content
+  .page-header
+    h1
+      = poll.title
+      | 
+      small
+        | (#{poll.slug})
+        | 
+        if poll.isPublic
+          span.label.label-success Public
+        else
+          span.label.label-warning Private
+  .well
+    a.btn.btn-primary(href="/results/#{poll.slug}") Public Results
+    | 
+    a.btn.btn-primary(href='export/results') Export (JSON)
+  .row
+    .col-md-12
+      h2 Motions
+      
+      table.table
+        thead
+          tr
+            th ID
+            th Threshold
+            th Ayes
+            th Nays
+            th Abstains
+            th Invalids
+            th %
+            th Carried?
+        tbody
+          each m in results.motions
+            tr
+              td
+                strong= m.id
+              td= m.threshold
+              td.text-right= m.counts.aye
+              td.text-right= m.counts.nay
+              td.text-right= m.counts.abstain
+              td.text-right= m.counts.invalid
+              td.text-right= m.result.percentage
+              if m.result.success
+                td.success Carried
+              else
+                td.danger Lapsed
+      
+      h2 Elections
+      
+      table.table
+        thead
+          tr
+            th Position
+            th Method
+            th Candidates
+            th Winners
+            th Data
+            th Order
+        tbody
+          each el in results.elections
+            tr
+              td= el.id
+              td= el.method
+              td
+                ul
+                  each c in el.candidates
+                    li= c
+              td.text-right= el.winners
+              td
+                if el.method === "schulze"
+                  a.btn.btn-primary(role='button', data-toggle='collapse', 
+                          data-target='#data-#{el.id.replace(/ /g, "_")}', 
+                          href='#data-#{el.id.replace(/ /g, "_")}').
+                    Show
+                  div.collapse(id='data-#{el.id.replace(/ /g, "_")}')
+                    pre !{JSON.stringify(el.data, null, 2)}
+              td
+                ol
+                  each c in el.order
+                    li= c
+

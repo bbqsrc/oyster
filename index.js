@@ -1,6 +1,7 @@
 "use strict";
 
-var app = require('koa')(),
+var process = require('process'),
+    app = require('koa')(),
     Router = require('koa-router'),
     bodyParser = require('koa-bodyparser'),
     mongoose = require('mongoose'),
@@ -155,7 +156,7 @@ router
       ballot: data
     });
   })
-  .get('/results/:poll/export', function *(next) {
+  .get('/export/:poll/results', function *(next) {
     // Only if ended, and if public.
   })
   .get('/results/:poll', function *(next) {
@@ -175,10 +176,16 @@ router
     }
 
     // TODO: instance method on Poll
-    let results = yield models.Results.findOne({ poll: this.poll.slug });
+    //let results = yield models.Results.findOne({ poll: this.poll.slug });
+    let data = yield this.poll.generateResults();
+    let results = { data: data };
 
     if (results) {
-      return yield this.render('results', { data: results.data });
+      return yield this.render('results', {
+        title: "Results - " + this.poll.title,
+        poll: this.poll,
+        results: results.data
+      });
     } else {
       return this.body = "The results have not finished generating yet. Please try again later.";
     }
@@ -290,7 +297,7 @@ secured
   })
   .get('/poll/:poll', isAdmin, function* (next) {
     yield this.render('admin-poll', {
-      title: "Poll " + this.poll.slug,
+      title: "Poll - " + this.poll.slug,
       poll: this.poll
     });
   })
@@ -307,7 +314,20 @@ secured
   .get('/poll/:poll/ballots', isAdmin, function* (next) {
     // TODO
     return this.body = "TODO.";
-  });
+  })
+  .get('/poll/:poll/results', isAdmin, function* (next) {
+    let results = yield this.poll.generateResults();
+
+    yield this.render('admin-results', {
+      title: "Results - " + this.poll.slug,
+      poll: this.poll,
+      results: results
+    });
+  })
+  .get('/poll/:poll/export/results', isAdmin, function* (next) {
+    return this.body = JSON.stringify(yield this.poll.generateResults(), null, 2);
+  })
+  .get('/*', isAdmin);
 
 secured.prefix('/admin');
 
@@ -325,6 +345,9 @@ app.on('error', function(err, ctx) {
 });
 
 // Post-routing
+process.on('unhandledRejection', function(reason, p) {
+    console.error("Unhandled Rejection at: Promise ", p, " reason: ", reason);
+});
 
 db.once('open', function() {
   console.log('db connected.');

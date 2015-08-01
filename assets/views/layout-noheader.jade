@@ -5,13 +5,22 @@ html(lang="en")
     title
       | Oyster | 
       = title
+    <!--[if lt IE 10]>
+    <script src="/static/js/es5-shim.min.js"></script>
+    <script src="/static/js/html5shiv.min.js"></script>
+    <![endif]-->
     script(src="/static/js/jquery.min.js")
     script(src="/static/js/bootstrap.min.js")
     link(href="/static/css/bootstrap.min.css", rel="stylesheet")
     link(href="/static/css/admin.css", rel="stylesheet")
     style.
       body { padding-top: 0 }
+    block head
 
   body
     .container
       block content
+    footer.powered-by-oyster
+      | Powered by 
+      a(href='https://bbqsrc.github.io/oyster') Oyster
+      | .
