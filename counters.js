@@ -194,6 +194,8 @@ class SchulzeElection {
     let ranks = this.determineRankings(paths);
     // TODO break ties.
     let order = this.determineOrder(ranks);
+    let orderedScores = SchulzeElection.reorderScores(
+      this.candidates, order, this._scores);
 
     return {
       id: this.id,
@@ -203,12 +205,38 @@ class SchulzeElection {
       data: {
         scores: this._scores,
         paths: paths,
-        ranks: ranks
+        ranks: ranks,
+        orderedScores: orderedScores
       },
       order: order
     }
   }
 }
+
+SchulzeElection.reorderScores = function(originalCands, newCands, scores) {
+  console.log(originalCands);
+  console.log(newCands);
+
+  let newOrder = [];
+  for (let c of newCands) {
+    newOrder.push(originalCands.indexOf(c));
+  }
+
+  let newScores = [];
+  for (let i = 0; i < newOrder.length; ++i) {
+    let newRow = [];
+    let currRow = scores[newOrder[i]];
+
+    for (let j = 0; j < newOrder.length; ++j) {
+      newRow.push(currRow[newOrder[j]]);
+    }
+
+    newScores.push(newRow);
+  }
+
+  return newScores;
+};
+
 exports.SchulzeElection = SchulzeElection;
 
 function createScoreMatrix(size) {

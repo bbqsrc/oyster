@@ -90,8 +90,8 @@ block content
                   div(style='display: inline-block', data-election=election.id)
                   script.
                     React.render(React.createElement(SchulzeTable, {data: {
-                      candidates: !{JSON.stringify(election.candidates)},
-                      values: !{JSON.stringify(election.data.scores)}
+                      candidates: !{JSON.stringify(election.order)},
+                      values: !{JSON.stringify(election.data.orderedScores)}
                     }}), $("[data-election='#{election.id}']")[0]);
        div
          .alert.alert-info.text-center
