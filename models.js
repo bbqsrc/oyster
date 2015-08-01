@@ -23,8 +23,8 @@ var pollSchema = new Schema({
   },
   startTime: Date,
   endTime: Date,
-  hasResults: { type: Boolean, default: false },
-  content: Schema.Types.Mixed
+  content: Schema.Types.Mixed,
+  results: Schema.Types.Mixed
 });
 
 pollSchema.statics.createPoll = function(o) {
@@ -102,7 +102,7 @@ pollSchema.methods.schedule = function() {
     schedule.scheduleJob(jobEndName, doc.endTime, function() {
       co(function* () {
         console.log("Starting job: " + this.name);
-        yield doc.model('Results').createResults(doc);
+        yield doc.saveResults();
         console.log("Finished job: " + this.name);
       }.bind(this)).catch(function(e) {
         console.error("Failed to save results for '" + doc.slug + "'.");
@@ -206,6 +206,8 @@ pollSchema.methods.preparePollData = function() {
 
 pollSchema.methods.generateResults = function() {
   return co(function*() {
+    let beginGen = new Date;
+
     let pollData = this.preparePollData();
 
     let mCounters = {};
@@ -251,7 +253,41 @@ pollSchema.methods.generateResults = function() {
       results.elections.push(eCounters[id].toObject());
     }
 
+    let endGen = new Date;
+
+    results.ts = { start: beginGen, finish: endGen };
+
     return results;
+  }.bind(this));
+};
+
+pollSchema.methods.saveResults = function() {
+  return co(function*() {
+    if (this.results) {
+      throw new Error("This poll already has results.");
+    }
+
+    let results = yield this.generateResults();
+    this.set('results', results);
+    yield this.save();
+
+    console.log("Saved results for '" + this.slug + "'.");
+
+    return this.results;
+  }.bind(this));
+};
+
+pollSchema.statics.startScheduler = function() {
+  return new Promise(function(resolve, reject) {
+    let stream = this.find({ results: { $exists: false } }).stream();
+
+    stream.on('data', function(doc) {
+      doc.schedule();
+    })
+    .on('error', reject)
+    .on('close', function() {
+      resolve();
+    });
   }.bind(this));
 };
 
@@ -312,50 +348,6 @@ ballotSchema.statics.eachForSlug = function(slug, eachFn) {
 
 exports.Ballot = mongoose.model('Ballot', ballotSchema);
 
-var resultsSchema = new Schema({
-  poll: { type: String, unique: true },
-  results: Schema.Types.Mixed
-});
-
-resultsSchema.statics.createResults = function(poll) {
-  return co(function*() {
-    if (poll.hasResults) {
-      throw new Error("This poll already has results.");
-    }
-
-    let results = yield poll.generateResults();
-
-    let resultsRecord = new exports.Results({
-      poll: poll.slug,
-      results: results
-    });
-
-    poll.set('hasResults', true);
-
-    yield resultsRecord.save();
-    yield poll.save();
-
-    console.log("Saved results for '" + slug + "'.");
-
-    return resultsRecord;
-  }.bind(this));
-};
-
-resultsSchema.statics.startScheduler = function() {
-  return new Promise(function(resolve, reject) {
-    let stream = exports.Poll.find({ hasResults: { $ne : true } }).stream();
-
-    stream.on('data', function(doc) {
-      doc.schedule();
-    })
-    .on('error', reject)
-    .on('close', function() {
-      resolve();
-    });
-  }.bind(this));
-};
-
-exports.Results = mongoose.model('Results', resultsSchema);
 
 var userSchema = new Schema({
   username: { type: String, unique: true }, // TODO ENFORCE LOWERCASE

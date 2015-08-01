@@ -10,6 +10,7 @@ var process = require('process'),
     helmet = require('koa-helmet'),
     session = require('koa-session'),
     passport = require('koa-passport'),
+    moment = require('moment'),
     co = require('co');
 
 var config = require('./config'),
@@ -58,6 +59,13 @@ app.use(session({
   }, app))
   .use(passport.initialize())
   .use(passport.session());
+
+app.use(function *(next) {
+  this.state = {
+    moment: moment
+  };
+  yield next;
+});
 
 // Routes
 
@@ -175,16 +183,11 @@ router
       return this.body = "The poll hasn't ended yet.";
     }
 
-    // TODO: instance method on Poll
-    //let results = yield models.Results.findOne({ poll: this.poll.slug });
-    let data = yield this.poll.generateResults();
-    let results = { data: data };
-
-    if (results) {
+    if (this.poll.results) {
+      console.log(this.poll.results);
       return yield this.render('results', {
         title: "Results - " + this.poll.title,
-        poll: this.poll,
-        results: results.data
+        poll: this.poll
       });
     } else {
       return this.body = "The results have not finished generating yet. Please try again later.";
@@ -354,7 +357,7 @@ db.once('open', function() {
   co(function*() {
     console.log('starting results scheduler.');
     // TODO sanity check: ensure hasResults matches actual results collection
-    yield models.Results.startScheduler();
+    yield models.Poll.startScheduler();
   }).then(function() {
     app.listen(config.port);
     console.log('listening on port ' + config.port);
