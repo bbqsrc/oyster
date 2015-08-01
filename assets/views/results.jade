@@ -65,23 +65,32 @@ block content
       each election in results.elections
         .panel.panel-default
           .panel-heading
-            h3.panel-title= election.id
+            .row
+              h3.col-md-6.panel-title= election.id
+              div.col-md-6.text-right
+                ul.list-inline(style='margin: 0')
+                  li
+                    small
+                      strong Method: 
+                      span= election.method
+                  li
+                    small
+                      strong Winners: 
+                      span= election.winners
           .panel-body
             .row
-              .col-md-6
-                div(data-election=election.id)
-                script.
-                  React.render(React.createElement(SchulzeTable, {data: {
-                    candidates: !{JSON.stringify(election.candidates)},
-                    values: !{JSON.stringify(election.data.scores)}
-                  }}), $("[data-election='#{election.id}']")[0]);
               .col-md-6
                 h4 Rankings
                 ol
                   each c in election.order
                     li= c
-                h4(style='display: inline') Method: 
-                span= election.method
+              .col-md-6.text-right
+                div(style='display: inline-block', data-election=election.id)
+                script.
+                  React.render(React.createElement(SchulzeTable, {data: {
+                    candidates: !{JSON.stringify(election.candidates)},
+                    values: !{JSON.stringify(election.data.scores)}
+                  }}), $("[data-election='#{election.id}']")[0]);
        div
          .alert.alert-info.text-center
            strong End of results.
