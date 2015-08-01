@@ -184,7 +184,6 @@ router
     }
 
     if (this.poll.results) {
-      console.log(this.poll.results);
       return yield this.render('results', {
         title: "Results - " + this.poll.title,
         poll: this.poll
