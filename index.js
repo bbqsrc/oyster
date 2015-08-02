@@ -2,6 +2,7 @@
 
 var process = require('process'),
     app = require('koa')(),
+    Log = require('huggare'),
     Router = require('koa-router'),
     bodyParser = require('koa-bodyparser'),
     mongoose = require('mongoose'),
@@ -17,11 +18,12 @@ var config = require('./config'),
     models = require('./models'),
     util = require('./util'),
     router = Router(),
-    secured = Router();
+    secured = Router(),
+    TAG = "oyster";
 
 // Pre-routing
 
-app.name = "oyster";
+app.name = TAG;
 app.keys = [config.cookieSecret];
 app.proxy = config.proxy || true;
 
@@ -32,7 +34,7 @@ app.use(views('assets/views', {
 }));
 app.use(helmet.defaults());
 
-console.log('Connecting to mongodb...');
+Log.i(TAG, 'Connecting to mongodb...');
 mongoose.connect(config.mongoURL);
 var db = mongoose.connection;
 
@@ -47,7 +49,7 @@ app.use(function *(next) {
     //this.body = err.message;
     this.body = "Internal server error. Please contact an administrator.";
     this.app.emit('error', err, this);
-    console.error(err.stack);
+    Log.e(TAG, this.body, err);
   };
 });
 
@@ -149,7 +151,7 @@ router
     try {
       yield this.ballot.save();
     } catch(e) {
-      console.error(e.stack);
+      Log.e(TAG, 'failure to save ballot', e);
       this.status = 500;
       return yield this.render('error', {
         pageTitle: this.poll.content.pageTitle,
@@ -339,26 +341,25 @@ app
   .use(router.allowedMethods());
 
 app.on('error', function(err, ctx) {
+  Log.e(TAG, 'server error', err);
   if (ctx) {
-    console.error('server error', err, ctx);
-  } else {
-    console.error('server error', err);
+    Log.e(TAG, 'server ctx:', ctx);
   }
 });
 
 // Post-routing
 process.on('unhandledRejection', function(reason, p) {
-    console.error("Unhandled Rejection at: Promise ", p, " reason: ", reason);
+  Log.e(TAG, "Unhandled Rejection at: Promise " + p + " reason: " + reason);
 });
 
 db.once('open', function() {
-  console.log('db connected.');
+  Log.i(TAG, 'db connected.');
   co(function*() {
-    console.log('starting results scheduler.');
+    Log.i(TAG, 'starting results scheduler.');
     // TODO sanity check: ensure hasResults matches actual results collection
     yield models.Poll.startScheduler();
   }).then(function() {
     app.listen(config.port);
-    console.log('listening on port ' + config.port);
+    Log.i(TAG, 'listening on port ' + config.port);
   });
 });

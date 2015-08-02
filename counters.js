@@ -214,9 +214,6 @@ class SchulzeElection {
 }
 
 SchulzeElection.reorderScores = function(originalCands, newCands, scores) {
-  console.log(originalCands);
-  console.log(newCands);
-
   let newOrder = [];
   for (let c of newCands) {
     newOrder.push(originalCands.indexOf(c));

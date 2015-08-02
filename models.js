@@ -8,7 +8,10 @@ var crypto = require('crypto'),
     co = require('co'),
     config = require('./config'),
     counters = require('./counters'),
-    Schema = mongoose.Schema;
+    Schema = mongoose.Schema,
+    Log = require('huggare');
+
+var TAG = "oyster/models";
 
 var pollSchema = new Schema({
   slug: { type: String, unique: true },
@@ -85,32 +88,30 @@ pollSchema.methods.schedule = function() {
     if (!(doc.endTime && +doc.endTime < now)) {
       schedule.scheduleJob(jobStartName, doc.startTime, function() {
         co(function* () {
-          console.log("Starting job: " + this.name);
+          Log.i(TAG, "Starting job: " + this.name);
           yield doc.sendEmails();
-          console.log("Finished job: " + this.name);
+          Log.i(TAG, "Finished job: " + this.name);
         }.bind(this)).catch(function(e) {
-          console.error("Failed to send emails for '" + doc.slug + "'.");
-          console.error(e.stack);
+          Log.e(TAG, "Failed to send emails for '" + doc.slug + "'.", e);
         });
       });
 
-      console.log("Scheduled start of '" + doc.slug +  "' for " + doc.startTime.toISOString());
+      Log.i(TAG, "Scheduled start of '" + doc.slug +  "' for " + doc.startTime.toISOString());
     }
   }
 
   if (doc.endTime) {
     schedule.scheduleJob(jobEndName, doc.endTime, function() {
       co(function* () {
-        console.log("Starting job: " + this.name);
+        Log.i(TAG, "Starting job: " + this.name);
         yield doc.saveResults();
-        console.log("Finished job: " + this.name);
+        Log.i(TAG, "Finished job: " + this.name);
       }.bind(this)).catch(function(e) {
-        console.error("Failed to save results for '" + doc.slug + "'.");
-        console.error(e.stack);
+        Log.e(TAG, "Failed to save results for '" + doc.slug + "'.", e);
       });
     });
 
-    console.log("Scheduled end of '" + doc.slug +  "' for " + doc.endTime.toISOString());
+    Log.i(TAG, "Scheduled end of '" + doc.slug +  "' for " + doc.endTime.toISOString());
   }
 };
 
@@ -271,7 +272,7 @@ pollSchema.methods.saveResults = function() {
     this.set('results', results);
     yield this.save();
 
-    console.log("Saved results for '" + this.slug + "'.");
+    Log.i(TAG, "Saved results for '" + this.slug + "'.");
 
     return this.results;
   }.bind(this));
