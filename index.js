@@ -36,7 +36,9 @@ app.name = TAG;
 app.keys = [config.cookieSecret];
 app.proxy = config.proxy || true;
 
-app.use(logger());
+app.use(logger({
+  exclude: /^\/static/
+}));
 app.use(views('assets/views', {
   map: { html: 'jade' },
   default: 'jade'
