@@ -4,6 +4,8 @@ var Log = require('huggare'),
     fs = require('fs');
 
 var FlatFileFormatter = function(opts) {
+  var TAG = "FlatFileFormatter";
+
   opts = opts || {};
 
   if (!opts.path) {
@@ -13,6 +15,10 @@ var FlatFileFormatter = function(opts) {
   var stream = fs.createWriteStream(opts.path, {
     flags: 'a',
     encoding: 'utf8'
+  });
+
+  stream.on('error', function(err) {
+    Log.wtf(TAG, 'stream has had a write error', err);
   });
 
   var p = [,,'V','D','I','W','E','A'];
@@ -47,7 +53,7 @@ var FlatFileFormatter = function(opts) {
         }
         break;
       default:
-        Log.wtf("FlatFileFormatter", "invalid priority specified: " + prio + ", logging as error.");
+        Log.wtf(TAG, "invalid priority specified: " + prio + ", logging as error.");
         Log.e(tag, msg, tr);
     }
   };
