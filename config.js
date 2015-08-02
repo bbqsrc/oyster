@@ -36,6 +36,8 @@ var config = _.defaults({}, baseConfig, {
     },
     mailerConfig: {},
 
+    logPath: null,
+
     cookieSecret: crypto.randomBytes(64).toString(),
     cookieName: "oyster.id",
     cookieMaxAge: 900000,

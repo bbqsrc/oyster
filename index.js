@@ -17,11 +17,20 @@ var process = require('process'),
 var config = require('./config'),
     models = require('./models'),
     util = require('./util'),
+    loggers = require('./loggers'),
     router = Router(),
     secured = Router(),
     TAG = "oyster";
 
 // Pre-routing
+
+if (config.logPath) {
+  Log.addFormatter(loggers.FlatFileFormatter({
+    path: config.logPath
+  }));
+} else {
+  Log.w(TAG, "no logPath specified; logging only to console.");
+}
 
 app.name = TAG;
 app.keys = [config.cookieSecret];
