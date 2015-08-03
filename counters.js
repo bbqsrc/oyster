@@ -50,11 +50,113 @@ class MotionCounter {
 }
 exports.MotionCounter = MotionCounter;
 
-class SchulzeElection {
-  constructor(id, candidates, winners) {
+class RangeElection {
+  constructor(id, candidates, opts) {
     this.id = id;
     this.candidates = candidates;
-    this.winners = winners;
+
+    this.minScore = opts.min || 0;
+    this.maxScore = opts.max || 9;
+    this.winners = opts.winners || 1;
+
+    this.scores = {};
+    for (let c in candidates) {
+      this.scores[c] = 0;
+    }
+  }
+
+  parse(ballot) {
+    let clean = {};
+
+    for (let c of this.candidates) {
+      let v = ballot[c];
+
+      if (!/^\s*[0-9]+\s*$/.test(v)) {
+        return null;
+      }
+
+      v = v.trim();
+      if (v === '') {
+        v = 0;
+      } else {
+        v = parseInt(v, 10);
+      }
+
+      if (v < this.minScore || v > this.maxScore || v !== v) {
+        return null;
+      }
+
+      clean[c] = v;
+    }
+
+    return clean;
+  }
+
+  insert(ballot) {
+    ballot = this.parse(ballot);
+
+    if (ballot == null) {
+      return null; // TODO throw?
+    }
+
+    for (let c of this.candidates) {
+      this.scores[c] += ballot[c];
+    }
+  }
+
+  determineWinners() {
+    let rankList = [];
+    for (let cand in this.candidats) {
+      rankList.push([this.scores[cand], cand]);
+    }
+    rankList.sort();
+
+    let order = [];
+
+    while (rankList.length) {
+      order.push(rankList.pop()[1]);
+    }
+
+    return order;
+  }
+
+  toObject() {
+    return {
+      id: this.id,
+      method: 'range',
+      candidates: this.candidates,
+      winners: this.winners,
+      data: {
+        minScore: this.minScore,
+        maxScore: this.maxScore,
+        scores: this.scores
+      },
+      order: this.determineWinners()
+    };
+  }
+}
+exports.RangeElection = RangeElection;
+
+class ApprovalElection extends RangeElection {
+  constructor(id, candidates, opts) {
+    opts.minScore = 0;
+    opts.maxScore = 1;
+    super(id, candidates, opts);
+  }
+
+  toObject() {
+    let o = super();
+    o.method = 'approval';
+    return o;
+  }
+}
+exports.ApprovalElection = ApprovalElection;
+
+class SchulzeElection {
+  constructor(id, candidates, opts) {
+    this.id = id;
+    this.candidates = candidates;
+    this.winners = opts.winners || 1;
 
     this._scores = createScoreMatrix(candidates.length);
   }
@@ -211,29 +313,28 @@ class SchulzeElection {
       order: order
     };
   }
-}
 
-SchulzeElection.reorderScores = function(originalCands, newCands, scores) {
-  let newOrder = [];
-  for (let c of newCands) {
-    newOrder.push(originalCands.indexOf(c));
-  }
-
-  let newScores = [];
-  for (let i = 0; i < newOrder.length; ++i) {
-    let newRow = [];
-    let currRow = scores[newOrder[i]];
-
-    for (let j = 0; j < newOrder.length; ++j) {
-      newRow.push(currRow[newOrder[j]]);
+  static reorderScores(originalCands, newCands, scores) {
+    let newOrder = [];
+    for (let c of newCands) {
+      newOrder.push(originalCands.indexOf(c));
     }
 
-    newScores.push(newRow);
+    let newScores = [];
+    for (let i = 0; i < newOrder.length; ++i) {
+      let newRow = [];
+      let currRow = scores[newOrder[i]];
+
+      for (let j = 0; j < newOrder.length; ++j) {
+        newRow.push(currRow[newOrder[j]]);
+      }
+
+      newScores.push(newRow);
+    }
+
+    return newScores;
   }
-
-  return newScores;
-};
-
+}
 exports.SchulzeElection = SchulzeElection;
 
 function createScoreMatrix(size) {
