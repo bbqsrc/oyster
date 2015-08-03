@@ -17,8 +17,10 @@ class MotionCounter {
         v === 'nay' ||
         v === 'abstain') {
       this.c[v]++;
+      return v;
     } else {
       this.c.invalid++;
+      return null;
     }
   }
 
@@ -98,12 +100,14 @@ class RangeElection {
 
     if (ballot == null) {
       this.invalids++;
-      return;
+      return null;
     }
 
     for (let c of this.candidates) {
       this.scores[c] += ballot[c];
     }
+
+    return ballot;
   }
 
   determineWinners() {
@@ -196,7 +200,7 @@ class SchulzeElection {
 
     if (ballot === null) {
       this.invalids++;
-      return;
+      return null;
     }
 
     for (let i = 0; i < len; ++i) {
@@ -214,6 +218,8 @@ class SchulzeElection {
         }
       }
     }
+
+    return ballot;
   }
 
   calculateStrongestPaths() {
