@@ -58,6 +58,7 @@ class RangeElection {
     this.minScore = opts.min || 0;
     this.maxScore = opts.max || 9;
     this.winners = opts.winners || 1;
+    this.invalids = 0;
 
     this.scores = {};
     for (let c in candidates) {
@@ -96,7 +97,8 @@ class RangeElection {
     ballot = this.parse(ballot);
 
     if (ballot == null) {
-      return null; // TODO throw?
+      this.invalids++;
+      return;
     }
 
     for (let c of this.candidates) {
@@ -127,6 +129,7 @@ class RangeElection {
       candidates: this.candidates,
       winners: this.winners,
       data: {
+        invalids: this.invalids,
         minScore: this.minScore,
         maxScore: this.maxScore,
         scores: this.scores
@@ -159,6 +162,7 @@ class SchulzeElection {
     this.winners = opts.winners || 1;
 
     this._scores = createScoreMatrix(candidates.length);
+    this.invalids = 0;
   }
 
   parse(ballot) {
@@ -191,7 +195,7 @@ class SchulzeElection {
     let len = this.candidates.length;
 
     if (ballot === null) {
-      // TODO record invalid ballots?
+      this.invalids++;
       return;
     }
 
@@ -305,6 +309,7 @@ class SchulzeElection {
       candidates: this.candidates,
       winners: this.winners,
       data: {
+        invalids: this.invalids,
         scores: this._scores,
         paths: paths,
         ranks: ranks,
