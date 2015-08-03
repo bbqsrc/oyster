@@ -1,4 +1,4 @@
-"use strict";
+'use strict'; /* eslint-disable no-unused-vars */
 
 var nodemailer = require('nodemailer');
 
@@ -11,14 +11,13 @@ module.exports.createTransport = function(transporter) {
     return new Promise(function(resolve, reject) {
       _sendMail(data, function(err, info) {
         if (err) {
-          return reject(err)
-        };
+          return reject(err);
+        }
 
         return resolve(info);
       });
     });
-  }
+  };
 
   return transport;
 };
-

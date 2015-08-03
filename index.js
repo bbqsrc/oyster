@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var process = require('process'),
     app = require('koa')(),
@@ -20,7 +20,7 @@ var config = require('./config'),
     loggers = require('./loggers'),
     router = Router(),
     secured = Router(),
-    TAG = "oyster";
+    TAG = 'oyster';
 
 // Pre-routing
 
@@ -29,7 +29,7 @@ if (config.logPath) {
     path: config.logPath
   }));
 } else {
-  Log.w(TAG, "no logPath specified; logging only to console.");
+  Log.w(TAG, 'no logPath specified; logging only to console.');
 }
 
 app.name = TAG;
@@ -49,7 +49,7 @@ Log.i(TAG, 'Connecting to mongodb...');
 mongoose.connect(config.mongoURL);
 var db = mongoose.connection;
 
-db.on('error', console.error.bind(console, 'connection error:'));
+db.on('error', console.error.bind(console, 'connection error:')); // eslint-disable-line
 
 // Catch all the errors.
 app.use(function *(next) {
@@ -58,10 +58,10 @@ app.use(function *(next) {
   } catch (err) {
     this.status = err.status || 500;
     //this.body = err.message;
-    this.body = "Internal server error. Please contact an administrator.";
+    this.body = 'Internal server error. Please contact an administrator.';
     this.app.emit('error', err, this);
     Log.e(TAG, this.body, err);
-  };
+  }
 });
 
 require('./auth');
@@ -82,7 +82,7 @@ app.use(function *(next) {
 
 // Routes
 
-util.routeStatic(router, '/static', __dirname + "/assets/static");
+util.routeStatic(router, '/static', __dirname + '/assets/static');
 
 router
   .param('poll', function *(slug, next) {
@@ -108,7 +108,7 @@ router
       this.status = 403;
 
       return yield this.render('success', {
-        message: "You have already responded to this poll.",
+        message: 'You have already responded to this poll.',
         pageTitle: this.poll.content.pageTitle,
         title: this.poll.content.title,
         ballot: util.reverseObject(this.ballot.data)
@@ -124,7 +124,7 @@ router
       return yield this.render('error', {
         pageTitle: this.poll.content.pageTitle,
         title: this.poll.content.title,
-        message: "This poll has not yet begun."
+        message: 'This poll has not yet begun.'
       });
     }
     if (+this.poll.endTime < now) {
@@ -133,27 +133,27 @@ router
       return yield this.render('error', {
         pageTitle: this.poll.content.pageTitle,
         title: this.poll.content.title,
-        message: "This poll has finished."
+        message: 'This poll has finished.'
       });
     }
 
     yield next;
   })
-  .get('/', function *(next) {
+  .get('/', function *() {
     // TODO stub
-    return this.body = "<!doctype html><html><head><title>Oyster voting server</title>" +
-        "<style>body { font-family: sans-serif; }</style></head>" +
-        "<body><h1>The server is up!</h1>" +
-        "<footer><small>Powered by <a href='https://bbqsrc.github.io/oyster'>Oyster</a>.</small></footer>" +
-        "</body></html>";
+    return this.body = '<!doctype html><html><head><title>Oyster voting server</title>' +
+        '<style>body { font-family: sans-serif; }</style></head>' +
+        '<body><h1>The server is up!</h1>' +
+        '<footer><small>Powered by <a href="https://bbqsrc.github.io/oyster">Oyster</a>.</small></footer>' +
+        '</body></html>';
   })
-  .get('/poll/:poll/:token', function *(next) {
+  .get('/poll/:poll/:token', function *() {
     yield this.render('form', {
       content: this.poll.content,
       flags: this.ballot.flags
     });
   })
-  .post('/poll/:poll/:token', bodyParser(), function *(next) {
+  .post('/poll/:poll/:token', bodyParser(), function *() {
     let data = util.parseNestedKeys(this.request.body);
 
     this.ballot.set('data', data);
@@ -167,7 +167,7 @@ router
       return yield this.render('error', {
         pageTitle: this.poll.content.pageTitle,
         title: this.poll.content.title,
-        message: "For some reason, your ballot could not be saved. An error has been logged. Please try again in a few minutes, or contact the administrator."
+        message: 'For some reason, your ballot could not be saved. An error has been logged. Please try again in a few minutes, or contact the administrator.'
       });
     }
 
@@ -177,10 +177,10 @@ router
       ballot: data
     });
   })
-  .get('/export/:poll/results', function *(next) {
-    // Only if ended, and if public.
+  .get('/export/:poll/results', function *() {
+    return; // TODO Only if ended, and if public.
   })
-  .get('/results/:poll', function *(next) {
+  .get('/results/:poll', function *() {
     // Check if poll allows router results
     if (!this.poll.isPublic) {
       return this.status = 403;
@@ -189,20 +189,20 @@ router
     let now = +Date.now();
 
     if (+this.poll.startTime > now) {
-      return this.body = "The poll hasn't started yet.";
+      return this.body = 'The poll has not started yet.';
     }
 
     if (+this.poll.endTime > now) {
-      return this.body = "The poll hasn't ended yet.";
+      return this.body = 'The poll has not ended yet.';
     }
 
     if (this.poll.results) {
       return yield this.render('results', {
-        title: "Results - " + this.poll.title,
+        title: 'Results - ' + this.poll.title,
         poll: this.poll
       });
     } else {
-      return this.body = "The results have not finished generating yet. Please try again later.";
+      return this.body = 'The results have not finished generating yet. Please try again later.';
     }
   });
 
@@ -220,17 +220,17 @@ function *isAdmin (next) {
 }
 
 secured
-  .get('logout', '/logout', function* (next) {
+  .get('logout', '/logout', function* () {
     this.logout();
     this.redirect('/admin/login');
   })
-  .get('login', '/login', function* (next) {
+  .get('login', '/login', function* () {
     if (this.req.user) {
-      return this.body = "Already logged in.";
+      return this.body = 'Already logged in.';
     } else {
       yield this.render('admin-login', {
-        title: "Log in",
-        submit: "Log in"
+        title: 'Log in',
+        submit: 'Log in'
       });
     }
   })
@@ -238,10 +238,10 @@ secured
     let self = this;
 
     if (this.req.user) {
-      return this.body = "Already logged in.";
+      return this.body = 'Already logged in.';
     }
 
-    yield passport.authenticate('local', function* (err, user, info) {
+    yield passport.authenticate('local', function* (err, user) {
       if (err) throw err;
 
       if (user === false) {
@@ -258,18 +258,18 @@ secured
       }
     }).call(this, next);
   })
-  .get('/', isAdmin, function* (next) {
+  .get('/', isAdmin, function* () {
     yield this.render('admin-index', { title: 'Index' });
   })
-  .get('/participants', isAdmin, function* (next) {
+  .get('/participants', isAdmin, function* () {
     let pgs = yield models.ParticipantGroup.find({}).exec();
 
     yield this.render('admin-participants', {
-      titles: "All Participants",
+      titles: 'All Participants',
       participants: pgs
     });
   })
-  .get('/participant/:pgId', isAdmin, function* (next) {
+  .get('/participant/:pgId', isAdmin, function* () {
     let pg = yield models.ParticipantGroup.findById(this.params.pgId).exec();
 
     if (!pg) {
@@ -279,25 +279,25 @@ secured
     // TODO themes.
     return this.body = JSON.stringify(pg.toObject(), null, 2);
   })
-  .get('/polls', isAdmin, function* (next) {
+  .get('/polls', isAdmin, function* () {
     // TODO pagination!!
 
     let polls = yield models.Poll.find({}).exec();
 
     yield this.render('admin-polls', {
-      title: "All Polls",
+      title: 'All Polls',
       polls: polls
     });
   })
-  .get('/polls/new', isAdmin, function* (next) {
+  .get('/polls/new', isAdmin, function* () {
     let participantGroups = yield models.ParticipantGroup.find({}).exec();
 
     yield this.render('admin-new-poll', {
-      title: "New Poll",
+      title: 'New Poll',
       participants: participantGroups
     });
   })
-  .post('/polls/new', isAdmin, bodyParser(), function* (next) {
+  .post('/polls/new', isAdmin, bodyParser(), function* () {
     let poll = yield models.Poll.createPoll(this.request.body);
     this.redirect('/admin/poll/' + poll.slug);
   })
@@ -310,36 +310,36 @@ secured
 
     yield next;
   })
-  .get('/poll/:poll', isAdmin, function* (next) {
+  .get('/poll/:poll', isAdmin, function* () {
     yield this.render('admin-poll', {
-      title: "Poll - " + this.poll.slug,
+      title: 'Poll - ' + this.poll.slug,
       poll: this.poll
     });
   })
-  .get('/poll/:poll/edit', isAdmin, function* (next) {
-    let isEditable = +this.poll.startTime > +Date.now();
+  .get('/poll/:poll/edit', isAdmin, function* () {
+    // this.poll.isEditable()
 
-    return this.body = "TODO.";
+    return this.body = 'TODO.';
   })
-  .post('/poll/:poll/edit', isAdmin, function* (next) {
-    let isEditable = +this.poll.startTime > +Date.now();
+  .post('/poll/:poll/edit', isAdmin, function* () {
+    // this.poll.isEditable()
 
-    return this.body = "TODO.";
+    return this.body = 'TODO.';
   })
-  .get('/poll/:poll/ballots', isAdmin, function* (next) {
+  .get('/poll/:poll/ballots', isAdmin, function* () {
     // TODO
-    return this.body = "TODO.";
+    return this.body = 'TODO.';
   })
-  .get('/poll/:poll/results', isAdmin, function* (next) {
+  .get('/poll/:poll/results', isAdmin, function* () {
     let results = yield this.poll.generateResults();
 
     yield this.render('admin-results', {
-      title: "Results - " + this.poll.slug,
+      title: 'Results - ' + this.poll.slug,
       poll: this.poll,
       results: results
     });
   })
-  .get('/poll/:poll/export/results', isAdmin, function* (next) {
+  .get('/poll/:poll/export/results', isAdmin, function* () {
     return this.body = JSON.stringify(yield this.poll.generateResults(), null, 2);
   })
   .get('/*', isAdmin);
@@ -360,7 +360,7 @@ app.on('error', function(err, ctx) {
 
 // Post-routing
 process.on('unhandledRejection', function(reason, p) {
-  Log.e(TAG, "Unhandled Rejection at: Promise " + p + " reason: " + reason);
+  Log.e(TAG, 'Unhandled Rejection at: Promise ' + p + ' reason: ' + reason);
 });
 
 db.once('open', function() {

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var send = require('koa-send'),
     util = require('util'); // nodejs util.
@@ -19,7 +19,7 @@ exports.parseNestedKeys = function (obj) {
     }
 
     tmp[chunks[chunks.length-1]] = obj[key];
-  };
+  }
 
   return out;
 };
@@ -31,7 +31,7 @@ exports.routeStatic = function (router, prefix, root) {
       root: root
     });
   });
-}
+};
 
 exports.reverseObject = function reverseObject(obj) {
   let o = Object.create(null);
@@ -45,4 +45,4 @@ exports.reverseObject = function reverseObject(obj) {
   });
 
   return o;
-}
+};

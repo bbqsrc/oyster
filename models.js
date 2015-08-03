@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var crypto = require('crypto'),
     mongoose = require('mongoose'),
@@ -11,7 +11,7 @@ var crypto = require('crypto'),
     Schema = mongoose.Schema,
     Log = require('huggare');
 
-var TAG = "oyster/models";
+var TAG = 'oyster/models';
 
 var pollSchema = new Schema({
   slug: { type: String, unique: true },
@@ -32,8 +32,8 @@ var pollSchema = new Schema({
 
 pollSchema.statics.createPoll = function(o) {
   return co(function*() {
-    let dateFormat = "YYYY-MM-DDhh:mmZ",
-        timezone = (parseInt(o.timezone, 10) >= 0 ? "+" : "-") + o.timezone,
+    let dateFormat = 'YYYY-MM-DDhh:mmZ',
+        timezone = (parseInt(o.timezone, 10) >= 0 ? '+' : '-') + o.timezone,
         startTime = moment(o.startDate + o.startTime +
                            timezone, dateFormat).toDate(),
         endTime = moment(o.endDate + o.endTime +
@@ -41,14 +41,14 @@ pollSchema.statics.createPoll = function(o) {
         participants = o.participants,
         pollData = JSON.parse(o.pollData);
 
-    if (typeof participants == "string") {
-        participants = [participants];
+    if (typeof participants === 'string') {
+      participants = [participants];
     }
 
     let poll = new exports.Poll({
       slug: o.slug,
       title: o.title,
-      isPublic: o.isPublic === "on",
+      isPublic: o.isPublic === 'on',
       participantGroups: participants,
       email: {
         from: o.emailFrom,
@@ -66,7 +66,7 @@ pollSchema.statics.createPoll = function(o) {
 
     return poll;
   });
-}
+};
 
 pollSchema.statics.findBySlug = /* async */ function(slug) {
   return this.findOne({ slug: slug }).exec();
@@ -75,22 +75,22 @@ pollSchema.statics.findBySlug = /* async */ function(slug) {
 pollSchema.methods.schedule = function() {
   let doc = this;
 
-  let jobStartName = "start:" + doc.slug,
-      jobEndName = "end:" + doc.slug;
+  let jobStartName = 'start:' + doc.slug,
+      jobEndName = 'end:' + doc.slug;
 
   schedule.cancelJob(jobStartName);
   schedule.cancelJob(jobEndName);
 
-  let now = +Date.now();
+  let now = Date.now();
 
   if (doc.startTime) {
     // Don't bother if already ended.
     if (!(doc.endTime && +doc.endTime < now)) {
       schedule.scheduleJob(jobStartName, doc.startTime, function() {
         co(function* () {
-          Log.i(TAG, "Starting job: " + this.name);
+          Log.i(TAG, 'Starting job: ' + this.name);
           yield doc.sendEmails();
-          Log.i(TAG, "Finished job: " + this.name);
+          Log.i(TAG, 'Finished job: ' + this.name);
         }.bind(this)).catch(function(e) {
           Log.e(TAG, "Failed to send emails for '" + doc.slug + "'.", e);
         });
@@ -103,9 +103,9 @@ pollSchema.methods.schedule = function() {
   if (doc.endTime) {
     schedule.scheduleJob(jobEndName, doc.endTime, function() {
       co(function* () {
-        Log.i(TAG, "Starting job: " + this.name);
+        Log.i(TAG, 'Starting job: ' + this.name);
         yield doc.saveResults();
-        Log.i(TAG, "Finished job: " + this.name);
+        Log.i(TAG, 'Finished job: ' + this.name);
       }.bind(this)).catch(function(e) {
         Log.e(TAG, "Failed to save results for '" + doc.slug + "'.", e);
       });
@@ -144,8 +144,8 @@ pollSchema.methods.sendEmails = function() {
           flags: pg.flags
         });
 
-        let url = "https://" + baseUrl + "/poll/" + self.slug + "/" + token;
-        let text = self.email.content.replace("{url}", url);
+        let url = 'https://' + baseUrl + '/poll/' + self.slug + '/' + token;
+        let text = self.email.content.replace('{url}', url);
 
         yield mailer.sendMail({
           from: self.email.from,
@@ -166,7 +166,6 @@ pollSchema.methods.sendEmails = function() {
 pollSchema.methods.preparePollData = function() {
   let doc = this;
 
-  let slug = doc.slug;
   let content = doc.content;
 
   let motions = [];
@@ -175,8 +174,8 @@ pollSchema.methods.preparePollData = function() {
   for (let section of content.sections) {
     let type = section.type;
 
-    if (type === "motion") {
-      let thresholdType = section.threshold || "majority";
+    if (type === 'motion') {
+      let thresholdType = section.threshold || 'majority';
 
       for (let field of section.fields) {
         motions.push({
@@ -184,8 +183,8 @@ pollSchema.methods.preparePollData = function() {
           threshold: thresholdType
         });
       }
-    } else if (type === "election") {
-      let method = section.method || "schulze";
+    } else if (type === 'election') {
+      let method = section.method || 'schulze';
       let winners = section.winners || 1;
 
       for (let field of section.fields) {
@@ -203,7 +202,7 @@ pollSchema.methods.preparePollData = function() {
     elections: elections,
     motions: motions
   };
-}
+};
 
 pollSchema.methods.generateResults = function() {
   return co(function*() {
@@ -265,7 +264,7 @@ pollSchema.methods.generateResults = function() {
 pollSchema.methods.saveResults = function() {
   return co(function*() {
     if (this.results) {
-      throw new Error("This poll already has results.");
+      throw new Error('This poll already has results.');
     }
 
     let results = yield this.generateResults();
@@ -276,6 +275,10 @@ pollSchema.methods.saveResults = function() {
 
     return this.results;
   }.bind(this));
+};
+
+pollSchema.methods.isEditable = function() {
+  return +this.startTime > Date.now();
 };
 
 pollSchema.statics.startScheduler = function() {
@@ -349,7 +352,6 @@ ballotSchema.statics.eachForSlug = function(slug, eachFn) {
 
 exports.Ballot = mongoose.model('Ballot', ballotSchema);
 
-
 var userSchema = new Schema({
   username: { type: String, unique: true }, // TODO ENFORCE LOWERCASE
   displayName: String,
@@ -381,12 +383,12 @@ userSchema.statics.createUser = function(username, password, options) {
     let userModel = self.model('User');
 
     username = username.trim();
-    if (username === "") {
-      throw new Error("invalid username");
+    if (username === '') {
+      throw new Error('invalid username');
     }
 
-    if (password == null || password === "") {
-      throw new Error("invalid password");
+    if (password == null || password === '') {
+      throw new Error('invalid password');
     }
 
     let iterations = options.iterations || 4096;
@@ -419,11 +421,9 @@ userSchema.statics.createUser = function(username, password, options) {
       });
     });
   });
-}
+};
 
 userSchema.statics.authenticate = function(username, password) {
-  var self = this;
-
   return new Promise(function(resolve, reject) {
     exports.User.findOne({username: username}, function(err, doc) {
       if (err) { return reject(err); }
@@ -443,7 +443,7 @@ userSchema.statics.authenticate = function(username, password) {
       });
     });
   });
-}
+};
 
 userSchema.methods.verifyPassword = function(password) {
   let self = this;
@@ -459,7 +459,6 @@ userSchema.methods.verifyPassword = function(password) {
 
 userSchema.methods.isAdmin = function() {
   return this.flags.indexOf('admin') > -1;
-}
+};
 
 exports.User = mongoose.model('User', userSchema);
-

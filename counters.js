@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 class MotionCounter {
   constructor(id, threshold) {
@@ -13,9 +13,9 @@ class MotionCounter {
   }
 
   insert(v) {
-    if (v === "aye" ||
-        v === "nay" ||
-        v === "abstain") {
+    if (v === 'aye' ||
+        v === 'nay' ||
+        v === 'abstain') {
       this.c[v]++;
     } else {
       this.c.invalid++;
@@ -27,14 +27,14 @@ class MotionCounter {
     let total = this.c.aye + this.c.nay;
     let p, s, pc;
 
-    if (this.threshold === "two-thirds") {
+    if (this.threshold === 'two-thirds') {
       p = total / 3 * 2 | 0 + 1;
       s = this.c.aye >= p;
-      pc = (this.c.aye / total * 100).toFixed(2) + "%";
+      pc = (this.c.aye / total * 100).toFixed(2) + '%';
     } else { // simple majority
       p = total / 2 | 0 + 1;
       s = this.c.aye >= p;
-      pc = (this.c.aye / total * 100).toFixed(2) + "%";
+      pc = (this.c.aye / total * 100).toFixed(2) + '%';
     }
 
     return {
@@ -45,7 +45,7 @@ class MotionCounter {
         percentage: pc,
         success: s
       }
-    }
+    };
   }
 }
 exports.MotionCounter = MotionCounter;
@@ -69,7 +69,7 @@ class SchulzeElection {
         return null;
       }
 
-      if (v.trim() === "") {
+      if (v.trim() === '') {
         v = Number.MAX_SAFE_INTEGER;
       } else {
         v = parseInt(v.trim(), 10);
@@ -199,7 +199,7 @@ class SchulzeElection {
 
     return {
       id: this.id,
-      method: "schulze",
+      method: 'schulze',
       candidates: this.candidates,
       winners: this.winners,
       data: {
@@ -209,7 +209,7 @@ class SchulzeElection {
         orderedScores: orderedScores
       },
       order: order
-    }
+    };
   }
 }
 
@@ -253,7 +253,7 @@ function createScoreMatrix(size) {
 function createElectionCounter(id, method, candidates, winners) {
   // TODO bad hardcoding, bad!
 
-  if (method === "schulze") {
+  if (method === 'schulze') {
     return new SchulzeElection(id, candidates, winners);
   }
 
