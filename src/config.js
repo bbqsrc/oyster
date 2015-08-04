@@ -9,10 +9,14 @@ var baseConfig,
     transports = {
       //sendmail: require('nodemailer-sendmail-transport'),
       ses: require('nodemailer-ses-transport')
-    };
+    },
+    Log = require('huggare');
+
+var TAG = 'oyster/config';
 
 try {
-  baseConfig = require('./config.json');
+  Log.i(TAG, 'Loading config: ' + process.env.PWD + '/config.json');
+  baseConfig = require(process.env.PWD + '/config.json');
 } catch(e) {
   if (e.code !== 'MODULE_NOT_FOUND') {
     throw e;

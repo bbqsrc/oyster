@@ -1,6 +1,7 @@
 'use strict';
 
 var process = require('process'),
+    path = require('path'),
     app = require('koa')(),
     Log = require('huggare'),
     Router = require('koa-router'),
@@ -39,7 +40,7 @@ app.proxy = config.proxy || true;
 app.use(logger({
   exclude: /^\/static/
 }));
-app.use(views('assets/views', {
+app.use(views(path.resolve(__dirname, '../assets/views'), {
   map: { html: 'jade' },
   default: 'jade'
 }));
@@ -82,7 +83,7 @@ app.use(function *(next) {
 
 // Routes
 
-util.routeStatic(router, '/static', __dirname + '/assets/static');
+util.routeStatic(router, '/static', path.resolve(__dirname, '../assets/static'));
 
 router
   .param('poll', function *(slug, next) {

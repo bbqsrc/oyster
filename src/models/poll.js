@@ -1,17 +1,16 @@
 'use strict';
 
-var crypto = require('crypto'),
-    mongoose = require('mongoose'),
+var mongoose = require('mongoose'),
     moment = require('moment'),
     uuid = require('node-uuid'),
     schedule = require('node-schedule'),
     co = require('co'),
-    config = require('./config'),
-    counters = require('./counters'),
+    config = require('../config'),
+    counters = require('../counters'),
     Schema = mongoose.Schema,
     Log = require('huggare');
 
-var TAG = 'oyster/models';
+var TAG = 'oyster/models/poll';
 
 var pollSchema = new Schema({
   slug: { type: String, unique: true },
@@ -45,7 +44,7 @@ pollSchema.statics.createPoll = function(o) {
       participants = [participants];
     }
 
-    let poll = new exports.Poll({
+    let poll = new (this.model('Poll'))({
       slug: o.slug,
       title: o.title,
       isPublic: o.isPublic === 'on',
@@ -65,7 +64,7 @@ pollSchema.statics.createPoll = function(o) {
     poll.schedule();
 
     return poll;
-  });
+  }.bind(this));
 };
 
 pollSchema.statics.findBySlug = /* async */ function(slug) {
@@ -225,7 +224,7 @@ pollSchema.methods.generateResults = function() {
     }
 
     // Count errthang
-    yield exports.Ballot.eachForSlug(this.slug, function(ballot) {
+    yield this.model('Ballot').eachForSlug(this.slug, function(ballot) {
       if (ballot.data.motions) {
         for (let m of pollData.motions) {
           mCounters[m.id].insert(ballot.data.motions[m.id]);
@@ -295,172 +294,4 @@ pollSchema.statics.startScheduler = function() {
   }.bind(this));
 };
 
-exports.Poll = mongoose.model('Poll', pollSchema);
-
-var participantGroupSchema = new Schema({
-  name: { type: String, unique: true },
-  // TODO: emails should be participants, and contain objects with a required 'email' field.
-  // This allows for traceable ballots eg organisational voting with 'name' field etc.
-  emails: { type: Array, default: [] },
-  flags: { type: Array, default: [] }
-});
-
-exports.ParticipantGroup = mongoose.model('ParticipantGroup', participantGroupSchema);
-
-var ballotSchema = new Schema({
-  _id: { type: Buffer, index: { unique: true } },
-  token: String,
-  poll: String,
-  flags: Array,
-  data: Schema.Types.Mixed
-});
-
-// UUID _id so insertion order isn't assessable.
-// Makes it harder to link order of tokens with Poll.emailsSent
-ballotSchema.pre('save', function(next) {
-  if (this.isNew) {
-    let buffer = new Buffer(16);
-    uuid.v4(null, buffer, 0);
-    this.set('_id', buffer);
-    // BUG: setting the subtype breaks saving in Mongoose.
-    //this._id.subtype(0x04); // BSON subtype UUID
-  }
-  return next();
-});
-
-ballotSchema.methods.getPoll = /* async */ function() {
-  return this.model('Poll').findOne({ slug: this.poll }).exec();
-};
-
-ballotSchema.statics.eachForSlug = function(slug, eachFn) {
-  return new Promise(function(resolve, reject) {
-    let stream = exports.Ballot.find({
-      poll: slug,
-      data: { $exists: true }
-    }).stream();
-
-    stream
-      .on('data', function() {
-        try {
-          eachFn.apply(this, arguments);
-        } catch(err) {
-          return reject(err);
-        }
-      })
-      .on('error', reject)
-      .on('end', resolve);
-  });
-};
-
-exports.Ballot = mongoose.model('Ballot', ballotSchema);
-
-var userSchema = new Schema({
-  username: { type: String, unique: true }, // TODO ENFORCE LOWERCASE
-  displayName: String,
-  iterations: Number,
-  salt: Schema.Types.Buffer,
-  hash: Schema.Types.Buffer,
-  flags: Array
-});
-
-// It sickens me that I had to write this.
-// https://github.com/joyent/node/issues/8560
-function slowEquals(bufferA, bufferB) {
-  let buflenA = bufferA.length,
-      buflenB = bufferB.length,
-      diff = buflenA ^ buflenB;
-
-  for (let i = 0; i < buflenA && i < buflenB; ++i) {
-    diff |= bufferA[i] ^ bufferB[i];
-  }
-
-  return diff === 0;
-}
-
-userSchema.statics.createUser = function(username, password, options) {
-  let self = this;
-  options = options || {};
-
-  return new Promise(function(resolve, reject) {
-    let userModel = self.model('User');
-
-    username = username.trim();
-    if (username === '') {
-      throw new Error('invalid username');
-    }
-
-    if (password == null || password === '') {
-      throw new Error('invalid password');
-    }
-
-    let iterations = options.iterations || 4096;
-    let saltSize = options.saltSize || 128;
-    let keyLength = options.keyLength || 2048;
-    let flags = options.flags || [];
-
-    // Generate salt.
-    crypto.randomBytes(saltSize, function(err, saltBuffer) {
-      if (err) return reject(err);
-
-      // Generate password hash.
-      crypto.pbkdf2(password, saltBuffer, iterations, keyLength, 'sha256', function(err, key) {
-        if (err) return reject(err);
-
-        let user = new userModel({
-          username: username.toLowerCase(),
-          displayName: username,
-          iterations: iterations,
-          salt: saltBuffer,
-          hash: key,
-          flags: flags
-        });
-
-        co(function*() {
-          yield user.save();
-
-          resolve(user);
-        }).catch(reject);
-      });
-    });
-  });
-};
-
-userSchema.statics.authenticate = function(username, password) {
-  return new Promise(function(resolve, reject) {
-    exports.User.findOne({username: username}, function(err, doc) {
-      if (err) { return reject(err); }
-
-      if (doc == null) {
-        return resolve(false);
-      }
-
-      doc.verifyPassword(password).then(function(success) {
-        if (success) {
-          resolve(doc);
-        } else {
-          resolve(false);
-        }
-      }).catch(function(err) {
-        reject(err);
-      });
-    });
-  });
-};
-
-userSchema.methods.verifyPassword = function(password) {
-  let self = this;
-
-  return new Promise(function(resolve, reject) {
-    crypto.pbkdf2(password, self.salt, self.iterations, self.hash.length, 'sha256', function(err, key) {
-      if (err) { return reject(err); }
-
-      return resolve(slowEquals(self.hash, key));
-    });
-  });
-};
-
-userSchema.methods.isAdmin = function() {
-  return this.flags.indexOf('admin') > -1;
-};
-
-exports.User = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Poll', pollSchema);
