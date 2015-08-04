@@ -116,7 +116,6 @@ db.once('open', function() {
   Log.i(TAG, 'db connected.');
   co(function*() {
     Log.i(TAG, 'starting results scheduler.');
-    // TODO sanity check: ensure hasResults matches actual results collection
     yield models.Poll.startScheduler();
   }).then(function() {
     app.listen(config.port);
