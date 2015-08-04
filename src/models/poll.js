@@ -86,6 +86,8 @@ pollSchema.statics.startScheduler = function() {
 };
 
 pollSchema.methods.schedule = function() {
+  let doc = this;
+
   let jobStartName = 'start:' + this.slug,
       jobEndName = 'end:' + this.slug;
 
@@ -102,9 +104,9 @@ pollSchema.methods.schedule = function() {
           Log.i(TAG, 'Starting job: ' + this.name);
           yield this.sendEmails();
           Log.i(TAG, 'Finished job: ' + this.name);
-        }.bind(this)).catch(function(e) {
+        }.bind(doc)).catch(function(e) {
           Log.e(TAG, "Failed to send emails for '" + this.slug + "'.", e);
-        }.bind(this));
+        }.bind(doc));
       });
 
       Log.i(TAG, "Scheduled start of '" + this.slug +  "' for " + this.startTime.toISOString());
@@ -117,9 +119,9 @@ pollSchema.methods.schedule = function() {
         Log.i(TAG, 'Starting job: ' + this.name);
         yield this.saveResults();
         Log.i(TAG, 'Finished job: ' + this.name);
-      }.bind(this)).catch(function(e) {
+      }.bind(doc)).catch(function(e) {
         Log.e(TAG, "Failed to save results for '" + this.slug + "'.", e);
-      }.bind(this));
+      }.bind(doc));
     });
 
     Log.i(TAG, "Scheduled end of '" + this.slug +  "' for " + this.endTime.toISOString());
