@@ -1,5 +1,7 @@
 'use strict';
 
+var TAG = 'oyster';
+
 var process = require('process'),
     path = require('path'),
     app = require('koa')(),
@@ -22,8 +24,7 @@ var models = require('./models'),
     util = require('./util'),
     loggers = require('./loggers'),
     router = Router(),
-    secured = Router(),
-    TAG = 'oyster';
+    secured = Router();
 
 // Pre-routing
 if (config.logPath) {
