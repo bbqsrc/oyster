@@ -25,10 +25,6 @@ ballotSchema.pre('save', function(next) {
   return next();
 });
 
-ballotSchema.methods.getPoll = function() {
-  return this.model('Poll').findOne({ slug: this.poll }).exec();
-};
-
 ballotSchema.statics.eachForSlug = function(slug, eachFn) {
   return new Promise(function(resolve, reject) {
     let stream = this.find({
@@ -47,6 +43,10 @@ ballotSchema.statics.eachForSlug = function(slug, eachFn) {
       .on('error', reject)
       .on('end', resolve);
   }.bind(this));
+};
+
+ballotSchema.methods.getPoll = function() {
+  return this.model('Poll').findOne({ slug: this.poll }).exec();
 };
 
 module.exports = mongoose.model('Ballot', ballotSchema);
