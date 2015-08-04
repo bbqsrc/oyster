@@ -13,7 +13,7 @@
   "dependencies": {
     "co": "^4.6.0",
     "es6-error": "^1.0.0",
-    "huggare": "^0.1.0",
+    "huggare": "^0.2.0",
     "jade": "^1.11.0",
     "koa": "^0.21.0",
     "koa-bodyparser": "^2.0.0",

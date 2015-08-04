@@ -26,7 +26,7 @@ var models = require('./models'),
 
 // Pre-routing
 if (config.logPath) {
-  Log.addFormatter(loggers.FlatFileFormatter({
+  Log.addTransport(loggers.FlatFileFormatter({
     path: config.logPath
   }));
 } else {
