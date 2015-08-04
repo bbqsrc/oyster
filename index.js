@@ -214,16 +214,18 @@ router
 function *pollPrecheck (next) {
   // Check if poll allows router results
   if (!this.poll.isPublic) {
-    return this.status = 403;
+    return this.status = 404; // mask existence
   }
 
   let now = Date.now();
 
   if (+this.poll.startTime > now) {
+    this.status = 403;
     return this.body = 'The poll has not started yet.';
   }
 
   if (+this.poll.endTime > now) {
+    this.status = 403;
     return this.body = 'The poll has not ended yet.';
   }
 
