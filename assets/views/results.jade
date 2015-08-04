@@ -23,19 +23,26 @@ block content
         ul.dropdown-menu(aria-labelledby="advanced-menu")
           li
             a(href='/export/#{poll.slug}/results')
-              | Download results
-              | 
+              | Download results 
+              small (JSON)
+          li
+            a(href='/export/#{poll.slug}/poll')
+              | Download poll 
               small (JSON)
           li 
             a(href='/export/#{poll.slug}/ballots')
-              | Download ballots
-              | 
+              | Download ballots 
               small (JSON)
       | Results of 
       = poll.title
 
   .row
     .col-md-12
+      .alert.alert-info
+        strong= totalCompleteBallots
+        |  ballots received out of a potential total of 
+        strong= poll.emailsSent.length
+        |  (#{(totalCompleteBallots / poll.emailsSent.length * 100).toFixed(2)}%).
       if poll.results.motions
         h2 Motions
         table.table
@@ -86,6 +93,10 @@ block content
                   ol
                     each c in election.order
                       li= c
+                  if election.data.invalids
+                    p
+                      strong Invalid ballots: 
+                      = election.data.invalids
                 .col-md-6.text-right
                   div(style='display: inline-block', data-election=election.id)
                   script.

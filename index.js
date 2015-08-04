@@ -177,35 +177,58 @@ router
       ballot: data
     });
   })
-  .get('/export/:poll/results', function *() {
-    return; // TODO Only if ended, and if public.
+  .get('/export/:poll/results', pollPrecheck, function *() {
+    return this.body = this.poll.results;
   })
-  .get('/results/:poll', function *() {
-    // Check if poll allows router results
-    if (!this.poll.isPublic) {
-      return this.status = 403;
-    }
-
-    let now = +Date.now();
-
-    if (+this.poll.startTime > now) {
-      return this.body = 'The poll has not started yet.';
-    }
-
-    if (+this.poll.endTime > now) {
-      return this.body = 'The poll has not ended yet.';
-    }
+  .get('/export/:poll/poll', pollPrecheck, function *() {
+    let o = this.poll.toObject();
+    delete o.emailsSent; // privacy
+    delete o._id;
+    return this.body = o;
+  })
+  .get('/export/:poll/ballots', pollPrecheck, function *() {
+    return this.body = {
+      poll: this.poll.slug,
+      ballots: yield models.Ballot.find({poll: this.poll.slug}, {
+        _id: 0, __v: 0
+      }).exec()
+    };
+  })
+  .get('/results/:poll', pollPrecheck, function *() {
+    let totalBallots = yield models.Ballot.count({
+      poll: this.poll.slug,
+      data: { $exists: true }
+    }).exec();
 
     if (this.poll.results) {
       return yield this.render('results', {
         title: 'Results - ' + this.poll.title,
-        poll: this.poll
+        poll: this.poll,
+        totalCompleteBallots: totalBallots
       });
     } else {
       return this.body = 'The results have not finished generating yet. Please try again later.';
     }
   });
 
+function *pollPrecheck (next) {
+  // Check if poll allows router results
+  if (!this.poll.isPublic) {
+    return this.status = 403;
+  }
+
+  let now = Date.now();
+
+  if (+this.poll.startTime > now) {
+    return this.body = 'The poll has not started yet.';
+  }
+
+  if (+this.poll.endTime > now) {
+    return this.body = 'The poll has not ended yet.';
+  }
+
+  yield next;
+}
 
 function *isAdmin (next) {
   if (this.req.user) {

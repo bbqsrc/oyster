@@ -152,7 +152,7 @@ class ApprovalElection extends RangeElection {
   }
 
   toObject() {
-    let o = super();
+    let o = super.toObject();
     o.method = 'approval';
     return o;
   }
