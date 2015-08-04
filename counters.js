@@ -366,7 +366,11 @@ function createElectionCounter(id, method, candidates, winners) {
   // TODO bad hardcoding, bad!
 
   if (method === 'schulze') {
-    return new SchulzeElection(id, candidates, winners);
+    return new SchulzeElection(id, candidates, {winners: winners});
+  } else if (method === 'range') {
+    return new RangeElection(id, candidates, {winners: winners});
+  } else if (method === 'approval') {
+    return new ApprovalElection(id, candidates, {winners: winners});
   }
 
   throw new Error('unfinished method, oh yes!');
