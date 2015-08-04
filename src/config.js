@@ -9,10 +9,7 @@ var baseConfig,
     transports = {
       //sendmail: require('nodemailer-sendmail-transport'),
       ses: require('nodemailer-ses-transport')
-    },
-    Log = require('huggare');
-
-var TAG = 'oyster/config';
+    };
 
 try {
   baseConfig = require(process.env.PWD + '/config.json');
