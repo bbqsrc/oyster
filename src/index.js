@@ -40,7 +40,7 @@ app.proxy = config.proxy || true;
 app.use(logger({
   exclude: /^\/static/
 }));
-app.use(views(path.resolve(__dirname, '../assets/views'), {
+app.use(views(path.resolve(__dirname, '../views'), {
   map: { html: 'jade' },
   default: 'jade'
 }));
