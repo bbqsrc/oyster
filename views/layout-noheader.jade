@@ -22,6 +22,9 @@ html(lang="en")
     .container
       block content
     footer.powered-by-oyster
-      | Powered by 
-      a(href='https://bbqsrc.github.io/oyster') Oyster
-      | . Made in Sydney with <span style="color: #d99" class="glyphicon glyphicon-heart"></span>
+      = __("Powered by")
+      a(href='https://bbqsrc.github.io/oyster')  Oyster
+      | . 
+      = __("Made in Sydney with")
+      | 
+      span(style="color: #d99", class="glyphicon glyphicon-heart")

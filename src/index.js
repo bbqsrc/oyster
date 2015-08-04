@@ -12,6 +12,8 @@ var process = require('process'),
     helmet = require('koa-helmet'),
     session = require('koa-session'),
     passport = require('koa-passport'),
+    locale = require('koa-locale'),
+    i18n = require('koa-i18n'),
     moment = require('moment'),
     co = require('co');
 
@@ -37,6 +39,14 @@ app.proxy = config.proxy || true;
 
 app.use(logger({
   exclude: /^\/static/
+}));
+
+locale(app);
+
+app.use(i18n(app, {
+  directory: path.resolve(__dirname, '../locales'),
+  locales: config.locales,
+  modes: ['query', 'cookie', 'header']
 }));
 app.use(views(path.resolve(__dirname, '../views'), {
   map: { html: 'jade' },
@@ -74,7 +84,9 @@ app.use(session({
 
 app.use(function *(next) {
   this.state = {
-    moment: moment
+    moment: moment,
+    __: this.i18n.__.bind(this.i18n),
+    __n: this.i18n.__n.bind(this.i18n)
   };
   yield next;
 });

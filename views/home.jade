@@ -12,12 +12,12 @@ block content
     .col-md-12
       .jumbotron(style='margin-top: 6em')
         .page-header
-          h1 The server is up!
+          h1= __("The server is up!")
         p
-          | This is 
-          strong Oyster
-          | , an open source voting system written by 
-          a(href='https://brendan.so') Brendan Molloy
+          = __("This is")
+          strong  Oyster
+          = __(", an open source voting system written by") 
+          a(href='https://brendan.so')  Brendan Molloy
           | .
         p
-          a(class='btn btn-primary btn-lg', href="https://bbqsrc.github.io/oyster") Read more
+          a(class='btn btn-primary btn-lg', href="https://bbqsrc.github.io/oyster")= __("Read more")

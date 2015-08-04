@@ -1,21 +1,18 @@
 extend layout
 block content
   .page-header
-    h1 All Participant Groups
+    h1= __("All Participant Groups")
 
   .well
-    a.btn.btn-primary(href='/admin/participants/create').
-      Add Participant Group
+    a.btn.btn-primary(href='/admin/participants/create')= __("Add Participant Group")
   table.table.participants
     thead
       tr
-        th Group
-        th Emails
+        th= __("Group")
+        th= __("Emails")
     tbody
       each p in participants
         tr
           td
             a(href='/admin/participant/#{p._id}')= p.name
           td= p.emails.length
-
-
