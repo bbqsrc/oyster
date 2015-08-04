@@ -27,7 +27,7 @@ router
   })
   .get('login', '/login', function* () {
     if (this.req.user) {
-      return this.body = 'Already logged in.';
+      return this.body = this.i18n.__('Already logged in.');
     } else {
       yield this.render('admin-login', {
         title: 'Log in',
@@ -39,7 +39,7 @@ router
     let self = this;
 
     if (this.req.user) {
-      return this.body = 'Already logged in.';
+      return this.body = this.i18n.__('Already logged in.');
     }
 
     yield passport.authenticate('local', function* (err, user) {
@@ -71,7 +71,7 @@ router
     let pgs = yield models.ParticipantGroup.find({}).exec();
 
     yield this.render('admin-participants', {
-      titles: 'All Participants',
+      titles: this.i18n.__('All Participants'),
       participants: pgs
     });
   })
@@ -91,7 +91,7 @@ router
     let polls = yield models.Poll.find({}).exec();
 
     yield this.render('admin-polls', {
-      title: 'All Polls',
+      title: this.i18n.__('All Polls'),
       polls: polls
     });
   })
@@ -99,7 +99,7 @@ router
     let participantGroups = yield models.ParticipantGroup.find({}).exec();
 
     yield this.render('admin-new-poll', {
-      title: 'New Poll',
+      title: this.i18n.__('New Poll'),
       participants: participantGroups
     });
   })
@@ -118,7 +118,7 @@ router
   })
   .get('/poll/:poll', isAdmin, function* () {
     yield this.render('admin-poll', {
-      title: 'Poll - ' + this.poll.slug,
+      title: this.i18n.__('Poll') + ' - ' + this.poll.slug,
       poll: this.poll
     });
   })
@@ -140,7 +140,7 @@ router
     let results = yield this.poll.generateResults();
 
     yield this.render('admin-results', {
-      title: 'Results - ' + this.poll.slug,
+      title: this.i18n.__('Results') + ' - ' + this.poll.slug,
       poll: this.poll,
       results: results
     });

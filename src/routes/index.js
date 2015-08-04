@@ -32,7 +32,7 @@ router
       this.status = 403;
 
       return yield this.render('success', {
-        message: 'You have already responded to this poll.',
+        message: this.i18n.__('You have already responded to this poll.'),
         pageTitle: this.poll.content.pageTitle,
         title: this.poll.content.title,
         ballot: util.reverseObject(this.ballot.data)
@@ -48,7 +48,7 @@ router
       return yield this.render('error', {
         pageTitle: this.poll.content.pageTitle,
         title: this.poll.content.title,
-        message: 'This poll has not yet begun.'
+        message: this.i18n.__('This poll has not yet begun.')
       });
     }
     if (+this.poll.endTime < now) {
@@ -57,7 +57,7 @@ router
       return yield this.render('error', {
         pageTitle: this.poll.content.pageTitle,
         title: this.poll.content.title,
-        message: 'This poll has finished.'
+        message: this.i18n.__('This poll has finished.')
       });
     }
 
@@ -65,7 +65,7 @@ router
   })
   .get('/', function *() {
     yield this.render('home', {
-      title: 'Index'
+      title: this.i18n.__('Index')
     });
   })
   .get('/poll/:poll/:token', function *() {
@@ -88,7 +88,9 @@ router
       return yield this.render('error', {
         pageTitle: this.poll.content.pageTitle,
         title: this.poll.content.title,
-        message: 'For some reason, your ballot could not be saved. An error has been logged. Please try again in a few minutes, or contact the administrator.'
+        message: this.i18n.__('For some reason, your ballot could not be saved. ' +
+                              'An error has been logged. Please try again in a ' +
+                              'few minutes, or contact the administrator.')
       });
     }
 
@@ -123,12 +125,13 @@ router
 
     if (this.poll.results) {
       return yield this.render('results', {
-        title: 'Results - ' + this.poll.title,
+        title: this.i18n.__('Results') + ' - ' + this.poll.title,
         poll: this.poll,
         totalCompleteBallots: totalBallots
       });
     } else {
-      return this.body = 'The results have not finished generating yet. Please try again later.';
+      return this.body = this.i18n.__('The results have not finished ' +
+                                      'generating yet. Please try again later.');
     }
   });
 
@@ -142,12 +145,12 @@ function *pollPrecheck (next) {
 
   if (+this.poll.startTime > now) {
     this.status = 403;
-    return this.body = 'The poll has not started yet.';
+    return this.body = this.i18n.__('The poll has not started yet.');
   }
 
   if (+this.poll.endTime > now) {
     this.status = 403;
-    return this.body = 'The poll has not ended yet.';
+    return this.body = this.i18n.__('The poll has not ended yet.');
   }
 
   yield next;
