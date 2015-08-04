@@ -19,13 +19,13 @@ ballotSchema.pre('save', function(next) {
     let buffer = new Buffer(16);
     uuid.v4(null, buffer, 0);
     this.set('_id', buffer);
-    // BUG: setting the subtype breaks saving in Mongoose.
+    // FIXME: setting the subtype breaks saving in Mongoose.
     //this._id.subtype(0x04); // BSON subtype UUID
   }
   return next();
 });
 
-ballotSchema.methods.getPoll = /* async */ function() {
+ballotSchema.methods.getPoll = function() {
   return this.model('Poll').findOne({ slug: this.poll }).exec();
 };
 

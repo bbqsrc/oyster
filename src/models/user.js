@@ -14,7 +14,7 @@ var userSchema = new Schema({
   flags: Array
 });
 
-// It sickens me that I had to write this.
+// FIXME: It sickens me that I had to write this.
 // https://github.com/joyent/node/issues/8560
 function slowEquals(bufferA, bufferB) {
   let buflenA = bufferA.length,

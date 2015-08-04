@@ -67,62 +67,72 @@ pollSchema.statics.createPoll = function(o) {
   }.bind(this));
 };
 
-pollSchema.statics.findBySlug = /* async */ function(slug) {
+pollSchema.statics.findBySlug = function(slug) {
   return this.findOne({ slug: slug }).exec();
 };
 
-pollSchema.methods.schedule = function() {
-  let doc = this;
+pollSchema.statics.startScheduler = function() {
+  return new Promise(function(resolve, reject) {
+    let stream = this.find({ results: { $exists: false } }).stream();
 
-  let jobStartName = 'start:' + doc.slug,
-      jobEndName = 'end:' + doc.slug;
+    stream.on('data', function(doc) {
+      doc.schedule();
+    })
+    .on('error', reject)
+    .on('close', function() {
+      resolve();
+    });
+  }.bind(this));
+};
+
+pollSchema.methods.schedule = function() {
+  let jobStartName = 'start:' + this.slug,
+      jobEndName = 'end:' + this.slug;
 
   schedule.cancelJob(jobStartName);
   schedule.cancelJob(jobEndName);
 
   let now = Date.now();
 
-  if (doc.startTime) {
+  if (this.startTime) {
     // Don't bother if already ended.
-    if (!(doc.endTime && +doc.endTime < now)) {
-      schedule.scheduleJob(jobStartName, doc.startTime, function() {
+    if (!(this.endTime && +this.endTime < now)) {
+      schedule.scheduleJob(jobStartName, this.startTime, function() {
         co(function* () {
           Log.i(TAG, 'Starting job: ' + this.name);
-          yield doc.sendEmails();
+          yield this.sendEmails();
           Log.i(TAG, 'Finished job: ' + this.name);
         }.bind(this)).catch(function(e) {
-          Log.e(TAG, "Failed to send emails for '" + doc.slug + "'.", e);
-        });
+          Log.e(TAG, "Failed to send emails for '" + this.slug + "'.", e);
+        }.bind(this));
       });
 
-      Log.i(TAG, "Scheduled start of '" + doc.slug +  "' for " + doc.startTime.toISOString());
+      Log.i(TAG, "Scheduled start of '" + this.slug +  "' for " + this.startTime.toISOString());
     }
   }
 
-  if (doc.endTime && !doc.results) {
-    schedule.scheduleJob(jobEndName, doc.endTime, function() {
+  if (this.endTime && !this.results) {
+    schedule.scheduleJob(jobEndName, this.endTime, function() {
       co(function* () {
         Log.i(TAG, 'Starting job: ' + this.name);
-        yield doc.saveResults();
+        yield this.saveResults();
         Log.i(TAG, 'Finished job: ' + this.name);
       }.bind(this)).catch(function(e) {
-        Log.e(TAG, "Failed to save results for '" + doc.slug + "'.", e);
-      });
+        Log.e(TAG, "Failed to save results for '" + this.slug + "'.", e);
+      }.bind(this));
     });
 
-    Log.i(TAG, "Scheduled end of '" + doc.slug +  "' for " + doc.endTime.toISOString());
+    Log.i(TAG, "Scheduled end of '" + this.slug +  "' for " + this.endTime.toISOString());
   }
 };
 
 pollSchema.methods.sendEmails = function() {
-  let self = this;
-
   return co(function*() {
-    let pgs = yield self.model('ParticipantGroup').find({
-      name: { $in : self.participantGroups }
+    let pgs = yield this.model('ParticipantGroup').find({
+      name: { $in : this.participantGroups }
     }).exec();
 
-    if (pgs.length !== self.participantGroups.length) {
+    if (pgs.length !== this.participantGroups.length) {
       throw new Error('Incorrect number of participant groups returned.');
     }
 
@@ -131,46 +141,43 @@ pollSchema.methods.sendEmails = function() {
 
     for (let pg of pgs) {
       for (let email of pg.emails) {
-        if (self.emailsSent.indexOf(email) > -1) {
+        if (this.emailsSent.indexOf(email) > -1) {
           continue;
         }
 
         let token = uuid.v4().replace(/-/g, '');
 
-        let ballot = new (self.model('Ballot'))({
+        let ballot = new (this.model('Ballot'))({
           token: token,
-          poll: self.slug,
+          poll: this.slug,
           flags: pg.flags
         });
 
-        let url = 'https://' + baseUrl + '/poll/' + self.slug + '/' + token;
-        let text = self.email.content.replace('{url}', url);
+        let url = 'https://' + baseUrl + '/poll/' + this.slug + '/' + token;
+        let text = this.email.content.replace('{url}', url);
 
         yield mailer.sendMail({
-          from: self.email.from,
+          from: this.email.from,
           to: email,
-          subject: self.email.subject,
+          subject: this.email.subject,
           text: text
         });
 
-        self.emailsSent.push(email);
-        self.markModified('emailsSent');
-        yield self.save();
+        this.emailsSent.push(email);
+        this.markModified('emailsSent');
+
+        yield this.save();
         yield ballot.save();
       }
     }
-  });
+  }.bind(this));
 };
 
 pollSchema.methods.preparePollData = function() {
-  let doc = this;
-
-  let content = doc.content;
-
   let motions = [];
   let elections = [];
 
-  for (let section of content.sections) {
+  for (let section of this.content.sections) {
     let type = section.type;
 
     if (type === 'motion') {
@@ -278,20 +285,6 @@ pollSchema.methods.saveResults = function() {
 
 pollSchema.methods.isEditable = function() {
   return +this.startTime > Date.now();
-};
-
-pollSchema.statics.startScheduler = function() {
-  return new Promise(function(resolve, reject) {
-    let stream = this.find({ results: { $exists: false } }).stream();
-
-    stream.on('data', function(doc) {
-      doc.schedule();
-    })
-    .on('error', reject)
-    .on('close', function() {
-      resolve();
-    });
-  }.bind(this));
 };
 
 module.exports = mongoose.model('Poll', pollSchema);
