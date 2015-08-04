@@ -102,11 +102,11 @@ pollSchema.methods.schedule = function() {
       schedule.scheduleJob(jobStartName, this.startTime, function() {
         co(function* () {
           Log.i(TAG, 'Starting job: ' + this.name);
-          yield this.sendEmails();
+          yield doc.sendEmails();
           Log.i(TAG, 'Finished job: ' + this.name);
-        }.bind(doc)).catch(function(e) {
-          Log.e(TAG, "Failed to send emails for '" + this.slug + "'.", e);
-        }.bind(doc));
+        }.bind(this)).catch(function(e) {
+          Log.e(TAG, "Failed to send emails for '" + doc.slug + "'.", e);
+        });
       });
 
       Log.i(TAG, "Scheduled start of '" + this.slug +  "' for " + this.startTime.toISOString());
@@ -117,11 +117,11 @@ pollSchema.methods.schedule = function() {
     schedule.scheduleJob(jobEndName, this.endTime, function() {
       co(function* () {
         Log.i(TAG, 'Starting job: ' + this.name);
-        yield this.saveResults();
+        yield doc.saveResults();
         Log.i(TAG, 'Finished job: ' + this.name);
-      }.bind(doc)).catch(function(e) {
-        Log.e(TAG, "Failed to save results for '" + this.slug + "'.", e);
-      }.bind(doc));
+      }.bind(this)).catch(function(e) {
+        Log.e(TAG, "Failed to save results for '" + doc.slug + "'.", e);
+      });
     });
 
     Log.i(TAG, "Scheduled end of '" + this.slug +  "' for " + this.endTime.toISOString());
