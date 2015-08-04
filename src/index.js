@@ -58,7 +58,17 @@ Log.i(TAG, 'Connecting to mongodb...');
 mongoose.connect(config.mongoURL);
 var db = mongoose.connection;
 
-db.on('error', console.error.bind(console, 'connection error:')); // eslint-disable-line
+db.on('error', function(err) {
+  Log.e(TAG, 'mongodb connection error:', err);
+});
+
+db.on('disconnected', function(e) {
+  Log.e(TAG, 'mongodb disconnected.', e);
+});
+
+db.on('reconnected', function() {
+  Log.w(TAG, 'mongodb reconnected.');
+});
 
 // Catch all the errors.
 app.use(function *(next) {
@@ -109,7 +119,7 @@ app.on('error', function(err, ctx) {
 
 // Post-routing
 process.on('unhandledRejection', function(reason, p) {
-  Log.e(TAG, 'Unhandled Rejection at: Promise ' + p + ' reason: ' + reason);
+  Log.e(TAG, 'Unhandled Rejection at: Promise ', p, ' reason: ', reason);
 });
 
 db.once('open', function() {
