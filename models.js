@@ -100,7 +100,7 @@ pollSchema.methods.schedule = function() {
     }
   }
 
-  if (doc.endTime) {
+  if (doc.endTime && !doc.results) {
     schedule.scheduleJob(jobEndName, doc.endTime, function() {
       co(function* () {
         Log.i(TAG, 'Starting job: ' + this.name);
@@ -299,6 +299,8 @@ exports.Poll = mongoose.model('Poll', pollSchema);
 
 var participantGroupSchema = new Schema({
   name: { type: String, unique: true },
+  // TODO: emails should be participants, and contain objects with a required 'email' field.
+  // This allows for traceable ballots eg organisational voting with 'name' field etc.
   emails: { type: Array, default: [] },
   flags: { type: Array, default: [] }
 });
