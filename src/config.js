@@ -31,6 +31,8 @@ var config = _.defaults({}, baseConfig, {
   mongoUsername: null,
   mongoPassword: null,
 
+  locales: ['en'],
+
   mailerTransport: function(x) { //eslint-disable-line
     return {
       send: function(x, cb){ cb() } //eslint-disable-line

@@ -8,28 +8,28 @@ block content
         | (#{poll.slug})
         | 
         if poll.isPublic
-          span.label.label-success Public
+          span.label.label-success= __("Public")
         else
-          span.label.label-warning Private
+          span.label.label-warning= __("Private")
   .well
-    a.btn.btn-primary(href="/results/#{poll.slug}") Public Results
+    a.btn.btn-primary(href="/results/#{poll.slug}")= __("Public Results")
     | 
-    a.btn.btn-primary(href='export/results') Export (JSON)
+    a.btn.btn-primary(href='export/results') #{__("Export")} (JSON)
   .row
     .col-md-12
-      h2 Motions
+      h2= __("Motions")
       
       table.table
         thead
           tr
-            th ID
-            th Threshold
-            th Ayes
-            th Nays
-            th Abstains
-            th Invalids
+            th= __("ID")
+            th= __("Threshold")
+            th= __("Ayes")
+            th= __("Nays")
+            th= __("Abstains")
+            th= __("Invalids")
             th %
-            th Carried?
+            th= __("Carried?")
         tbody
           each m in results.motions
             tr
@@ -42,21 +42,21 @@ block content
               td.text-right= m.counts.invalid
               td.text-right= m.result.percentage
               if m.result.success
-                td.success Carried
+                td.success= __("Carried")
               else
-                td.danger Lapsed
+                td.danger= __("Lapsed")
       
-      h2 Elections
+      h2= __("Elections")
       
       table.table
         thead
           tr
-            th Position
-            th Method
-            th Candidates
-            th Winners
-            th Data
-            th Order
+            th= __("Position")
+            th= __("Method")
+            th= __("Candidates")
+            th= __("Winners")
+            th= __("Data")
+            th= __("Order")
         tbody
           each el in results.elections
             tr

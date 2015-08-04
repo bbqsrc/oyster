@@ -5,48 +5,57 @@ block content
       = poll.title 
       small  (#{poll.slug})
     if poll.isPublic
-      strong Public
+      strong= __("Public")
   .well
-    a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/test').
-      Test Ballot
+    a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/test')
+      = __("Test Ballot")
     | 
-    a.btn.btn-primary(href="/admin/poll/" + poll.slug + '/ballots').
-      Ballots
+    a.btn.btn-primary(href="/admin/poll/" + poll.slug + '/ballots')
+      = __("Ballots")
     | 
-    a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/results').
-      Results
+    a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/results')
+      = __("Results")
   .row
     .col-md-6
       p
-        strong Start: 
+        strong
+          = __("Start")
+          | : 
       p
         time(datetime="#{poll.startTime.toISOString()}")= poll.startTime
       p
-        strong End: 
+        strong
+          = __("End")
+          | : 
       p
         time(datetime="#{poll.endTime.toISOString()}")= poll.endTime
       div
-        strong Content:
+        strong
+          = __("Content")
+          | :
         pre !{JSON.stringify(poll.content, null, 2)}
     .col-md-6
       div
-        strong Participant Groups:
+        strong
+          = __("Participant Groups")
+          | :
         ul
           each participant in poll.participantGroups
             li= participant
       div
         p
-          strong Email
+          strong= __("Email")
         p
-          | From: 
+          = __("From")
+          | : 
           em= poll.email.from
         p
-          | Subject: 
+          = __("Subject")
+          | : 
           em= poll.email.subject
         pre= poll.email.content
         p
-          strong Emails sent: 
+          strong
+            = __("Emails sent")
+            | : 
           | #{poll.emailsSent.length}
-
-
-

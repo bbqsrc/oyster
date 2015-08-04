@@ -14,6 +14,8 @@ var process = require('process'),
     helmet = require('koa-helmet'),
     session = require('koa-session'),
     passport = require('koa-passport'),
+    locale = require('koa-locale'),
+    i18n = require('koa-i18n'),
     moment = require('moment'),
     co = require('co');
 
@@ -41,6 +43,14 @@ app.proxy = config.proxy || true;
 
 app.use(logger({
   exclude: /^\/static/
+}));
+
+locale(app);
+
+app.use(i18n(app, {
+  directory: path.resolve(__dirname, '../locales'),
+  locales: config.locales,
+  modes: ['query', 'cookie', 'header']
 }));
 app.use(views(path.resolve(__dirname, '../views'), {
   map: { html: 'jade' },
@@ -78,7 +88,9 @@ app.use(session({
 
 app.use(function *(next) {
   this.state = {
-    moment: moment
+    moment: moment,
+    __: this.i18n.__.bind(this.i18n),
+    __n: this.i18n.__n.bind(this.i18n)
   };
   yield next;
 });
@@ -254,8 +266,7 @@ secured
       return this.body = 'Already logged in.';
     } else {
       yield this.render('admin-login', {
-        title: 'Log in',
-        submit: 'Log in'
+        title: this.i18n.__('Log in')
       });
     }
   })
@@ -290,7 +301,7 @@ secured
     let pgs = yield models.ParticipantGroup.find({}).exec();
 
     yield this.render('admin-participants', {
-      titles: 'All Participants',
+      titles: this.i18n.__('All Participants'),
       participants: pgs
     });
   })
@@ -310,7 +321,7 @@ secured
     let polls = yield models.Poll.find({}).exec();
 
     yield this.render('admin-polls', {
-      title: 'All Polls',
+      title: this.i18n.__('All Polls'),
       polls: polls
     });
   })
@@ -318,7 +329,7 @@ secured
     let participantGroups = yield models.ParticipantGroup.find({}).exec();
 
     yield this.render('admin-new-poll', {
-      title: 'New Poll',
+      title: this.i18n.__('New Poll'),
       participants: participantGroups
     });
   })
@@ -337,7 +348,7 @@ secured
   })
   .get('/poll/:poll', isAdmin, function* () {
     yield this.render('admin-poll', {
-      title: 'Poll - ' + this.poll.slug,
+      title: this.i18n.__('Poll') + ' - ' + this.poll.slug,
       poll: this.poll
     });
   })
@@ -359,7 +370,7 @@ secured
     let results = yield this.poll.generateResults();
 
     yield this.render('admin-results', {
-      title: 'Results - ' + this.poll.slug,
+      title: this.i18n.__('Results') + ' - ' + this.poll.slug,
       poll: this.poll,
       results: results
     });

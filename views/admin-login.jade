@@ -6,14 +6,14 @@ block content
     .alert.alert-info= flash
   form.form-horizontal(method="post")
     .form-group
-      label.control-label.col-sm-4(for='username') Username
+      label.control-label.col-sm-4(for='username')= __("Username")
       .col-sm-4
         input.form-control(type='text', name='username', id='username')
     .form-group
-      label.control-label.col-sm-4(for='password') Password
+      label.control-label.col-sm-4(for='password')= __("Password")
       .col-sm-4
         input.form-control(type='password', name='password', id='password')
     .form-group
       .col-sm-offset-5.col-sm-1
-        button.btn.btn-primary(type='submit')= submit
+        button.btn.btn-primary(type='submit')= __("Log in")
     

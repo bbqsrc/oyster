@@ -4,56 +4,56 @@ block content
     h1= title
 
   form.col-sm-8.col-sm-offset-2#form(method="POST")
-    h2 Poll Details
+    h2= __("Poll Details")
     .form-group
-      label.control-label(for='fld1') Poll Name
+      label.control-label(for='fld1')= __("Poll Name")
       input.form-control(placeholder='Best Election', type='text', name='title', id='fld1')
     .form-group
-      label.control-label(for='fld2') Slug
+      label.control-label(for='fld2')= __("Slug")
       input.form-control(placeholder='best-election', type='text', name='slug', id='fld2')
     .checkbox
       label
         input(type='checkbox', name='isPublic', checked)
-        | Make public?
+        = __("Make public?")
       .help-block Public means the results will be accessible from the main page.
 
     .row
-      h2 Date and Time
+      h2= __("Date and Time")
     .row
       .form-group.col-sm-6
-        label.control-label(for='startDate') Start Date
+        label.control-label(for='startDate')= __("Start Date")
         .input-group
           input.form-control(placeholder='2014-12-31', type='date', name='startDate', id='startDate')
           span.input-group-btn
-            button.btn.btn-primary.btn-start-date-today(type='button', style='width: 6em') Today
+            button.btn.btn-primary.btn-start-date-today(type='button', style='width: 6em')= __("Today")
       .form-group.col-sm-6
-        label.control-label(for='startTime') Start Time
+        label.control-label(for='startTime')= __("Start Time")
         .input-group
           input.form-control(placeholder='23:59', type='time', name='startTime', id='startTime')
           span.input-group-btn
-            button.btn.btn-primary.btn-start-time-now(type='button', style='width: 6em') Now
+            button.btn.btn-primary.btn-start-time-now(type='button', style='width: 6em')= __("Now")
     .row
       .form-group.col-sm-6
-        label.control-label(for='endDate') End Date
+        label.control-label(for='endDate')= __("End Date")
         .input-group
           input.form-control(placeholder='2015-01-31', type='date', name='endDate', id='endDate')
           span.input-group-btn
-            button.btn.btn-primary.btn-end-date-7days(type='button', style='width: 6em') +7 Days
+            button.btn.btn-primary.btn-end-date-7days(type='button', style='width: 6em')= __("+7 Days")
       .form-group.col-sm-6
-        label.control-label(for='endTime') End Time
+        label.control-label(for='endTime')= __("End Time")
         .input-group
           input.form-control(placeholder='23:59', type='time', name='endTime', id='endTime')
           span.input-group-btn
-            button.btn.btn-primary.btn-end-time-6pm(type='button', style='width: 6em') 6:00 pm
+            button.btn.btn-primary.btn-end-time-6pm(type='button', style='width: 6em')= __("6:00 pm")
      .row
        .form-group.col-sm-6.col-sm-offset-6
-         label.control-label(for='timezone') Timezone
+         label.control-label(for='timezone')= __("Timezone")
          input(type='hidden', name='timezone', id='timezone')
          .timezone-human
-         .help-block Please set your date and time relative to this timezone.
-    h2 Poll Content
+         .help-block= __("Please set your date and time relative to this timezone.")
+    h2= __("Poll Content")
     .form-group
-      label.control-label(for='poll-data') Poll Data
+      label.control-label(for='poll-data')= __("Poll Data")
       textarea.form-control(name='pollData', id='poll-data', rows='8', style='display: none')
       pre#poll-data-editor(style='height: 300px').
         pageTitle = "Page Title (in the &lt;head&gt;)"
@@ -101,21 +101,21 @@ block content
         candidates = ["Candidate A", "Candidate B", "Candidate C"]
         winners = 2 # For multiple winner elections, where supported
 
-      .help-block This is the raw poll data in TOML format.
+      .help-block= __("This is the raw poll data in TOML format.")
     .form-group
-      label.control-label(for='participant-groups') Participant Groups
+      label.control-label(for='participant-groups')= __("Participant Groups")
       select.form-control(multiple, placeholder='foo@bar.lol', name='participants', id='participant-groups', rows='8')
         for p in participants
           option(value=p.name)= p.name
-    h3 Email
+    h3= __("Email")
     .form-group
-      label.control-label(for='fld-email1') From
+      label.control-label(for='fld-email1')= __("From")
       input.form-control(placeholder='Test Person (Organisation) <email@place.lol>', type='text', name='emailFrom', id='fld-email1')
     .form-group
-      label.control-label(for='fld-email2') Subject
+      label.control-label(for='fld-email2')= __("Subject")
       input.form-control(placeholder='Voting Token Inside!', type='text', name='emailSubject', id='fld-email2')
     .form-group
-      label.control-label(for='fld-email3') Body
+      label.control-label(for='fld-email3')= __("Body")
       textarea.form-control(name='emailBody', id='fld-email3', rows='8').
         Dear person,
 
@@ -125,7 +125,7 @@ block content
         Election Team
       .help-block Body must include the {url} token or people won't be able to access the voting page!
 
-    button.btn.btn-success(type='submit') Create Poll
+    button.btn.btn-success(type='submit')= __("Create Poll")
 
     hr
 

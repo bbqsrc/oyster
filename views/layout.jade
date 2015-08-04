@@ -20,20 +20,17 @@ html(lang="en")
       .container-fluid
         .navbar-header
           button.navbar-toggle(data-toggle="collapse", data-target="#navbar-content")
-            span.sr-only Toggle navigation
+            span.sr-only= __("Toggle navigation")
             span.icon-bar
             span.icon-bar
             span.icon-bar
-          a.navbar-brand(href='/admin').
-            Oyster
+          a.navbar-brand(href='/admin') Oyster
         #navbar-content.navbar-collapse.collapse
           ul.nav.navbar-nav
             li
-              a(href='/admin/polls').
-                All Polls
+              a(href='/admin/polls')= __("All Polls")
             li
-              a(href='/admin/participants').
-                Participants
+              a(href='/admin/participants')= __("Participants")
             //li
             //  a(href='/polls/running').
             //    Running Polls
@@ -44,10 +41,12 @@ html(lang="en")
             li
               a(href='/admin/logout')
                 i.glyphicon.glyphicon-log-out
-                |  Logout
+                | 
+                = __("Log out")
           .navbar-form.navbar-right
             a.btn.btn-success(href='/admin/polls/new')
               i.glyphicon.glyphicon-file
-              |  New Poll
+              | 
+              = __("New Poll")
     .container
       block content

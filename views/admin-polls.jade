@@ -5,10 +5,10 @@ block content
   table.table.polls
     thead
       tr
-        th Title
-        th Participants
-        th Start Time
-        th End Time
+        th= __("Title")
+        th= __("Participants")
+        th= __("Start Time")
+        th= __("End Time")
     tbody
       each poll in polls
         tr
@@ -20,5 +20,3 @@ block content
                 li= p
           td= poll.startTime
           td= poll.endTime
-
-
