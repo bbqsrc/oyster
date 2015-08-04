@@ -15,7 +15,6 @@ var baseConfig,
 var TAG = 'oyster/config';
 
 try {
-  Log.i(TAG, 'Loading config: ' + process.env.PWD + '/config.json');
   baseConfig = require(process.env.PWD + '/config.json');
 } catch(e) {
   if (e.code !== 'MODULE_NOT_FOUND') {

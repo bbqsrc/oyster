@@ -15,8 +15,10 @@ var process = require('process'),
     moment = require('moment'),
     co = require('co');
 
-var config = require('./config'),
-    models = require('./models'),
+Log.i(TAG, 'Loading config: ' + process.env.PWD + '/config.json');
+var config = require('./config');
+
+var models = require('./models'),
     util = require('./util'),
     loggers = require('./loggers'),
     router = Router(),
@@ -24,7 +26,6 @@ var config = require('./config'),
     TAG = 'oyster';
 
 // Pre-routing
-
 if (config.logPath) {
   Log.addFormatter(loggers.FlatFileFormatter({
     path: config.logPath
