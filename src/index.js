@@ -112,8 +112,7 @@ app
 app.on('error', function(err, ctx) {
   Log.e(TAG, 'server error', err);
   if (ctx) {
-    Log.e(TAG, 'server ctx:');
-    Log.e(TAG, ctx);
+    Log.e(TAG, 'server ctx:', ctx);
   }
 });
 

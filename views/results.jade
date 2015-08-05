@@ -120,7 +120,7 @@ block content
           | 
           strong 
             time(datetime="#{poll.results.ts.start.toISOString()}")
-              = moment(poll.results.ts.start).format('D MMM YYYY, HH:MM:SSZ')
+              = moment(poll.results.ts.start).format('D MMM YYYY, HH:mm:ssZ')
           | 
           = __("and finished in")
           | 
