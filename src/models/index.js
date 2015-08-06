@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  User: require('./user'),
+  User: require('passport-mongodb').User,
   Ballot: require('./ballot'),
   Poll: require('./poll'),
   ParticipantGroup: require('./participant-group')
