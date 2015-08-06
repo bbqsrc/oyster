@@ -12,6 +12,7 @@ var process = require('process'),
     helmet = require('koa-helmet'),
     session = require('koa-session'),
     passport = require('koa-passport'),
+    passportMongo = require('passport-mongodb'),
     locale = require('koa-locale'),
     i18n = require('koa-i18n'),
     moment = require('moment'),
@@ -83,7 +84,7 @@ app.use(function *(next) {
   }
 });
 
-require('./auth');
+passportMongo.setup(passport);
 
 app.use(session({
     key: config.cookieName,
