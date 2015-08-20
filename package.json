@@ -36,8 +36,14 @@
     "nodemailer-ses-transport": "^1.3.0",
     "passport-mongodb": "^1.0.0"
   },
-  "private": true,
   "devDependencies": {
     "eslint": "^1.0.0"
+  },
+  "publishConfig": {
+    "registry": "http://npm.brendan.so"
+  },
+  "engines": {
+    "iojs": ">= 2.6.0",
+    "node": ">= 0.12.0"
   }
 }
