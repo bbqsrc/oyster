@@ -49,10 +49,12 @@ app.use(i18n(app, {
   locales: config.locales,
   modes: ['query', 'cookie', 'header']
 }));
+
 app.use(views(path.resolve(__dirname, '../views'), {
   map: { html: 'jade' },
   default: 'jade'
 }));
+
 app.use(helmet.defaults());
 
 Log.i(TAG, 'Connecting to mongodb...');
@@ -99,12 +101,19 @@ app.use(function *(next) {
     __: this.i18n.__.bind(this.i18n),
     __n: this.i18n.__n.bind(this.i18n)
   };
+
   yield next;
 });
 
+// Delcious themes.
+app.use(require('./themes')({
+  path: path.join(__dirname, '../content/themes')
+}));
+
 // Routes
 let router = require('./routes/index');
-util.routeStatic(router, '/static', path.resolve(__dirname, '../assets/static'));
+util.routeStatic(router, '/static', path.join(__dirname, '../assets/static'));
+util.routeThemes(router, '/themes', path.join(__dirname, '../content/themes'));
 
 app
   .use(router.routes())

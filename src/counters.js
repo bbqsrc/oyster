@@ -1,5 +1,9 @@
 'use strict';
 
+var TAG = "oyster/counters";
+
+var Log = require('huggare');
+
 class MotionCounter {
   constructor(id, threshold) {
     this.id = id;
@@ -61,9 +65,11 @@ class RangeElection {
     this.maxScore = opts.max || 9;
     this.winners = opts.winners || 1;
     this.invalids = 0;
+    this.total = 0;
+    this.threshold = opts.threshold;
 
     this.scores = {};
-    for (let c in candidates) {
+    for (let c of candidates) {
       this.scores[c] = 0;
     }
   }
@@ -103,6 +109,8 @@ class RangeElection {
       return null;
     }
 
+    this.total++;
+
     for (let c of this.candidates) {
       this.scores[c] += ballot[c];
     }
@@ -112,7 +120,7 @@ class RangeElection {
 
   determineWinners() {
     let rankList = [];
-    for (let cand in this.candidats) {
+    for (let cand of this.candidates) {
       rankList.push([this.scores[cand], cand]);
     }
     rankList.sort();
@@ -130,9 +138,11 @@ class RangeElection {
     return {
       id: this.id,
       method: 'range',
+      threshold: this.threshold,
       candidates: this.candidates,
       winners: this.winners,
       data: {
+        total: this.total,
         invalids: this.invalids,
         minScore: this.minScore,
         maxScore: this.maxScore,
@@ -146,14 +156,41 @@ exports.RangeElection = RangeElection;
 
 class ApprovalElection extends RangeElection {
   constructor(id, candidates, opts) {
-    opts.minScore = 0;
-    opts.maxScore = 1;
+    opts.min = 0;
+    opts.max = 1;
+    opts.threshold = opts.threshold || 'majority';
+
     super(id, candidates, opts);
+
+  }
+
+  calculateThreshold() {
+    let method;
+
+    if (this.threshold === 'majority') {
+      method = function(c) {
+        let p = this.total / 2 | 0 + 1;
+        return this.scores[c] >= p;
+      }.bind(this);
+    }
+
+    let o = {};
+    for (let c of this.candidates) {
+      o[c] = method(c);
+    }
+
+    return o;
   }
 
   toObject() {
     let o = super.toObject();
+
     o.method = 'approval';
+    delete o.data.minScore;
+    delete o.data.maxScore;
+
+    o.data.thresholdMet = this.calculateThreshold();
+
     return o;
   }
 }
@@ -290,13 +327,12 @@ class SchulzeElection {
     for (let cand in ranks) {
       rankList.push([ranks[cand], cand]);
     }
-    rankList.sort();
 
-    let order = [];
-
-    while (rankList.length) {
-      order.push(rankList.pop()[1]);
-    }
+    return rankList.sort(function(a, b) {
+      return b[0] - a[0];
+    }).map(function(x) {
+      return x[1];
+    });
 
     return order;
   }

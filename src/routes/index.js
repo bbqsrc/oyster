@@ -69,10 +69,8 @@ router
     });
   })
   .get('/poll/:poll/:token', function *() {
-    yield this.render('form', {
-      content: this.poll.content,
-      flags: this.ballot.flags
-    });
+    // TODO implement flags
+    yield this.renderTheme(this.poll.theme, this.poll.content);
   })
   .post('/poll/:poll/:token', bodyParser(), function *() {
     let data = util.parseNestedKeys(this.request.body);

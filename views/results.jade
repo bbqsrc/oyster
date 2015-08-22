@@ -44,7 +44,7 @@ block content
         | 
         strong= poll.emailsSent.length
         |  (#{(totalCompleteBallots / poll.emailsSent.length * 100).toFixed(2)}%).
-      if poll.results.motions
+      if poll.results.motions.length
         h2= __("Motions")
         table.table
           thead
@@ -70,7 +70,7 @@ block content
                   td.success= __("Carried")
                 else
                   td.danger= __("Lapsed")
-      if poll.results.elections
+      if poll.results.elections.length
         h2= __("Elections")
         each election in poll.results.elections
           .panel.panel-default
@@ -104,13 +104,38 @@ block content
                         = __("Invalid ballots")
                         | :
                       = election.data.invalids
-                .col-md-6.text-right
-                  div(style='display: inline-block', data-election=election.id)
-                  script.
-                    React.render(React.createElement(SchulzeTable, {data: {
-                      candidates: !{JSON.stringify(election.order)},
-                      values: !{JSON.stringify(election.data.orderedScores)}
-                    }}), $("[data-election='#{election.id}']")[0]);
+                if election.method === "schulze"
+                  .col-md-6.text-right
+                    div(style='display: inline-block', data-election=election.id)
+                    script.
+                      React.render(React.createElement(SchulzeTable, {data: {
+                        candidates: !{JSON.stringify(election.order)},
+                        values: !{JSON.stringify(election.data.orderedScores)}
+                      }}), $("[data-election='#{election.id}']")[0]);
+                if election.method === "approval"
+                  .col-md-6
+                    table.table
+                      thead
+                        tr
+                          th= __("Candidate")
+                          th= __("Votes")
+                          if election.threshold
+                            th= __("Threshold met")
+                          th= __("Result")
+                      tbody
+                        each c in election.order
+                          tr 
+                            td= c
+                            td= election.data.scores[c]
+                            if election.threshold
+                              if election.data.thresholdMet[c]
+                                td.success= __("Yes")
+                                td.success Elected
+                              else
+                                td.danger= __("No")
+                                td.danger Not elected
+                            else
+                              td STUB
       
       .alert.alert-info.text-center
         p

@@ -6,7 +6,10 @@ var Log = require('huggare'),
     router = require('koa-router')(),
     bodyParser = require('koa-bodyparser'),
     passport = require('koa-passport'),
-    models = require('../models');
+    models = require('../models'),
+    util = require('../util'),
+    path = require('path'),
+    fs = require('mz/fs');
 
 function *isAdmin (next) {
   if (this.req.user) {
@@ -42,7 +45,7 @@ router
       return this.body = this.i18n.__('Already logged in.');
     }
 
-    yield passport.authenticate('local', function* (err, user) {
+    yield passport.authenticate('mongodb', function* (err, user) {
       if (err) throw err;
 
       if (user === false) {
@@ -98,9 +101,18 @@ router
   .get('/polls/new', isAdmin, function* () {
     let participantGroups = yield models.ParticipantGroup.find({}).exec();
 
+    // TODO dehardcode
+    let fp = path.join(__dirname, '../../content/themes');
+    let themes = (yield fs.readdir(fp)).filter(function(v) {
+      return fs.statSync(path.join(fp, v)).isDirectory();
+    });
+
+    themes.sort();
+
     yield this.render('admin-new-poll', {
       title: this.i18n.__('New Poll'),
-      participants: participantGroups
+      participants: participantGroups,
+      themes: themes
     });
   })
   .post('/polls/new', isAdmin, bodyParser(), function* () {
@@ -135,6 +147,38 @@ router
   .get('/poll/:poll/ballots', isAdmin, function* () {
     // TODO
     return this.body = 'TODO.';
+  })
+  .get('/poll/:poll/test', isAdmin, function* () {
+    let flags = [];
+
+    if (this.request.query.flags) {
+      flags = this.request.query.flags.split(',');
+    }
+
+    /*
+    yield this.render('form', {
+      content: this.poll.content,
+      flags: flags
+    });
+    */
+    yield this.renderTheme(this.poll.theme, this.poll.content);
+  })
+  .delete('/poll/:poll', isAdmin, function* () {
+    if (this.poll.isEditable()) {
+      this.status = 403;
+      return this.body = "Cannot delete: poll has already been started.";
+    }
+
+    this.poll.cancel();
+    yield this.poll.remove();
+
+    // TODO dehardcode
+    this.redirect('/admin/polls');
+  })
+  .post('/poll/:poll/test', isAdmin, bodyParser(), function* () {
+    let data = util.parseNestedKeys(this.request.body);
+
+    return this.body = JSON.stringify(data, null, 2);
   })
   .get('/poll/:poll/results', isAdmin, function* () {
     let results = yield this.poll.generateResults();

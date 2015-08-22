@@ -1,0 +1,33 @@
+<div class='oyster-motion'>
+  <h3 class='oyster-motion-title'>
+    {{title}}
+  </h3>
+
+  <div class='oyster-motion-body'>
+    {{markdown body}}
+  </div>
+
+  <div class='panel panel-primary'>
+    <div class='panel-heading'>
+      <span class='panel-title'>
+        {{__ "How do you wish to vote on this motion?"}}
+      </span>
+    </div>
+    <div class='panel-body'>
+      <div class='btn-group btn-group-justified' data-toggle="buttons">
+        <label class="btn btn-success">
+          {{__ "Aye"}}
+          <input name="motions.{{id}}" type='radio' value="aye" />
+        </label>
+        <label class="btn btn-warning">
+          {{__ "Abstain"}}
+          <input name="motions.{{id}}" type='radio' value="abstain" checked />
+        </label>
+        <label class="btn btn-danger">
+          {{__ "Nay"}}
+          <input name="motions.{{id}}" type='radio' value="nay" />
+        </label>
+      </div>
+    </div>
+  </div>
+</div>

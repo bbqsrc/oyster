@@ -97,11 +97,16 @@ block content
 
         [[sections.fields]]
 
-        id = "Position up for election"
+        id = "Another position up for election"
         candidates = ["Candidate A", "Candidate B", "Candidate C"]
         winners = 2 # For multiple winner elections, where supported
 
       .help-block= __("This is the raw poll data in TOML format.")
+    .form-group
+      label.control-label(for='theme')= __("Theme")
+      select.form-control(name='theme' id='theme')
+        for t in themes
+          option(value=t)= t
     .form-group
       label.control-label(for='participant-groups')= __("Participant Groups")
       select.form-control(multiple, placeholder='foo@bar.lol', name='participants', id='participant-groups', rows='8')
@@ -142,7 +147,12 @@ block content
       $('.timezone-human').text('UTC' + (dateVal >= 0 ? "+" : "-") + (dateVal / 100));
 
       $(".btn-start-date-today").on('click', function() {
-          var date = new Date().toISOString().split("T")[0];
+          var date = new Date(),
+              d = date.getDate(),
+              m = date.getMonth() + 1,
+              y = date.getFullYear();
+              
+          date = y + '-' + (m < 10 ? "0" : "") + m + "-" + (d < 10 ? "0" : "") + d;
           $("#startDate")[0].value = date;
       });
 
@@ -155,9 +165,16 @@ block content
       });
 
       $(".btn-end-date-7days").on('click', function() {
-          var date = new Date;
+          var date = new Date,
+              d, m, y;
+            
           date.setDate(date.getDate() + 7);
-          date = date.toISOString().split("T")[0];
+          
+          d = date.getDate();
+          m = date.getMonth() + 1;
+          y = date.getFullYear();
+          
+          date = y + '-' + (m < 10 ? "0" : "") + m + "-" + (d < 10 ? "0" : "") + d;
           $("#endDate")[0].value = date;
       });
 

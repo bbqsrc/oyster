@@ -26,7 +26,8 @@ var pollSchema = new Schema({
   startTime: Date,
   endTime: Date,
   content: Schema.Types.Mixed,
-  results: Schema.Types.Mixed
+  results: Schema.Types.Mixed,
+  theme: String
 });
 
 pollSchema.statics.createPoll = function(o) {
@@ -56,7 +57,8 @@ pollSchema.statics.createPoll = function(o) {
       },
       startTime: startTime,
       endTime: endTime,
-      content: pollData
+      content: pollData,
+      theme: o.theme
     });
 
     yield poll.save();
@@ -85,14 +87,21 @@ pollSchema.statics.startScheduler = function() {
   }.bind(this));
 };
 
+pollSchema.methods.cancelSchedule = function() {
+  let jobStartName = 'start:' + this.slug,
+      jobEndName = 'end:' + this.slug;
+
+  schedule.cancelJob(jobStartName);
+  schedule.cancelJob(jobEndName);
+}
+
 pollSchema.methods.schedule = function() {
   let doc = this;
 
   let jobStartName = 'start:' + this.slug,
       jobEndName = 'end:' + this.slug;
 
-  schedule.cancelJob(jobStartName);
-  schedule.cancelJob(jobEndName);
+  this.cancelSchedule();
 
   let now = Date.now();
 

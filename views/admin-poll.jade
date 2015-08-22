@@ -5,7 +5,7 @@ block content
       = poll.title 
       small  (#{poll.slug})
     if poll.isPublic
-      strong= __("Public")
+      .label.label-success= __("Public")
   .well
     a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/test')
       = __("Test Ballot")
@@ -15,6 +15,9 @@ block content
     | 
     a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/results')
       = __("Results")
+    | 
+    form(method='delete' style='display: inline')
+      button.btn.btn-danger Delete poll
   .row
     .col-md-6
       p
@@ -34,6 +37,11 @@ block content
           = __("Content")
           | :
         pre !{JSON.stringify(poll.content, null, 2)}
+      div
+        strong
+          = __("Theme")
+          | :
+        span= poll.theme
     .col-md-6
       div
         strong

@@ -68,13 +68,12 @@ block content
                     li= c
               td.text-right= el.winners
               td
-                if el.method === "schulze"
-                  a.btn.btn-primary(role='button', data-toggle='collapse', 
-                          data-target='#data-#{el.id.replace(/ /g, "_")}', 
-                          href='#data-#{el.id.replace(/ /g, "_")}').
-                    Show
-                  div.collapse(id='data-#{el.id.replace(/ /g, "_")}')
-                    pre !{JSON.stringify(el.data, null, 2)}
+                a.btn.btn-primary(role='button', data-toggle='collapse', 
+                        data-target='#data-#{el.id.replace(/ /g, "_")}', 
+                        href='#data-#{el.id.replace(/ /g, "_")}').
+                  Show
+                div.collapse(id='data-#{el.id.replace(/ /g, "_")}')
+                  pre !{JSON.stringify(el.data, null, 2)}
               td
                 ol
                   each c in el.order

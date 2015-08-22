@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang='{{locale}}'>
+  <head>
+    <base target='_blank'>
+    <meta charset='utf-8'>
+
+    <title>{{pageTitle}}</title>
+
+    <!--[if lt IE 10]>
+    <script src="{{asset 'js/es5-shim.min.js'}}"></script>
+    <script src="{{asset 'js/html5shiv.min.js'}}"></script>
+    <![endif]-->
+
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+
+    <link href="{{asset 'css/bootstrap.min.css'}}" rel='stylesheet'>
+    <link href="{{asset 'css/style.css'}}" rel="stylesheet">
+
+    <script src="{{asset 'js/jquery.min.js'}}"></script>
+    <script src="{{asset 'js/bootstrap.min.js'}}"></script>
+    <script src="{{asset 'js/app.js'}}"></script>
+  </head>
+  <body>
+    <noscript>
+      <div class='alert alert-danger'>
+        This application requires JavaScript to be enabled to function. Please enable JavaScript and reload the page.
+      </div>
+    </noscript>
+
+    <main role='main' class='oyster-main'>
+      <div class='container'>
+        <header>
+          {{> header}}
+
+          <hr>
+
+          {{#if info}}
+            <div class="oyster-section-info alert alert-info">
+              {{markdown info}}
+            </div>
+          {{/if}}
+        </header>
+
+        <form method='post' target='_self'>
+          {{#each sections}}
+            {{> section}}
+          {{/each}}
+
+          <hr>
+
+          <div class="alert alert-warning">
+            {{__ "Please ensure that you have completed your ballot. Once you submit, you cannot go back."}}
+          </div>
+
+          <button type='submit' class='btn btn-success btn-lg btn-block'>{{__ "Submit"}}</button>
+        </form>
+      </div>
+    </main>
+
+    <footer class='powered-by-oyster'>
+      {{{__ "Powered by %s." "<a rel='nofollow' href='https://bbqsrc.github.io/oyster'>Oyster</a>"}}}
+    </footer>
+  </body>
+</html>
