@@ -1,6 +1,6 @@
 'use strict';
 
-var TAG = "oyster/themes";
+const TAG = "oyster/themes";
 
 var handlebars = require('handlebars'),
     extend = require('extend'),
@@ -12,7 +12,7 @@ var handlebars = require('handlebars'),
     config = require('./config'),
     util = require('./util');
 
-function registerPartialDir(hbs, p) {
+function registerPartialDir(hbs, p, prefix) {
   let fns;
 
   try {
@@ -25,16 +25,20 @@ function registerPartialDir(hbs, p) {
   }
 
   for (let fn of fns) {
-    let template = fs.readFileSync(fn, 'utf8');
+    if (!fn.endsWith('.hbs')) {
+      continue;
+    }
+
     let name = path.basename(fn, '.hbs');
-    hbs.registerPartial(name, template);
+    let template = fs.readFileSync(path.resolve(p, fn), 'utf8');
+    hbs.registerPartial(prefix ? prefix + name : name, hbs.compile(template));
   }
 }
 
 function registerPartial(hbs, partialPath) {
   let template = fs.readFileSync(partialPath, 'utf8');
   let name = path.basename(partialPath, '.hbs');
-  return hbs.registerPartial(name, template);
+  return hbs.registerPartial(name, hbs.compile(template));
 }
 
 function compileTemplate(hbs, tmplPath, fallbackPath) {
@@ -64,35 +68,31 @@ var themeHelpers = {
     return i18n.__n.apply(i18n, args);
   },
 
-  candidate: function(method, id, options) {
-    let name = handlebars.Utils.escapeExpression("elections." + id + "." + this);
+  candidate: function(candidateName, id, method, options) {
+    let partials = options.data.theme.hbs.partials;
+    let name = handlebars.Utils.escapeExpression("elections." + id + "." + candidateName);
 
     let classes = 'oyster-candidate-input';
     if (options.hash.class) {
       classes += ' ' + handlebars.Utils.escapeExpression(options.hash.class);
     }
 
-    // TODO implement
-    let minScore = 0; //handlebars.Utils.escapeExpression(this.minScore);
-    let maxScore = 9; //handlebars.Utils.escapeExpression(this.maxScore);
+    let context = {
+      id: name,
+      name: candidateName,
+      classes: classes
+    };
 
-    let inputNode;
+    // TODO implement context options for these properties
+    context.minScore = 0;
+    context.maxScore = 9;
 
-    switch (method) {
-      case "schulze":
-        inputNode = "<input name='" + name + "' class='" + classes + "' type='number' step='1' min='1'>";
-        break;
-      case "score":
-        inputNode = "<input name='" + name + "' class='" + classes + "' type='number' step='1' min='" + minScore + "' max='" + maxScore + "'>";
-        break;
-      case "approval":
-        inputNode = "<input name='" + name + "' class='" + classes + "' type='checkbox' value='1'>";
-        break;
-      default:
-        throw new TypeError('invalid method: ' + method);
+    let partial = partials['method/' + method];
+    if (!partial) {
+      throw new TypeError('Unsupported method by theme: ' + method);
     }
 
-    return new handlebars.SafeString(inputNode);
+    return new handlebars.SafeString(partial(context, options));
   },
 
   shuffle: function(list, options) {
@@ -113,6 +113,7 @@ var themeHelpers = {
     return JSON.stringify(obj, null, indent);
   },
 
+  // TODO: this is a hack for a PPAU theme. We'll remove this one day.
   gvtHack: function(ctx, options) {
     return JSON.stringify(ctx.sections[0].fields[0].candidates, null, 2);
   }
@@ -136,21 +137,27 @@ class Theme {
       this.hbs.registerHelper(name, themeHelpers[name]);
     }
 
+    /*
     for (let tmplName of this.basePartials) {
       registerPartial(this.hbs, path.join(this.path, tmplName + '.hbs'));
     }
+    */
+
+    // The base of the theme.
+    this.index = compileTemplate(this.hbs, path.join(this.path, 'index.hbs'));
 
     // Extra partials might be needed, add them.
     registerPartialDir(this.hbs, path.join(this.path, 'partials'));
 
-    // The base of the theme.
-    this.index = compileTemplate(this.hbs, path.join(this.path, 'index.hbs'));
+    // Method partials
+    registerPartialDir(this.hbs, path.join(this.path, 'partials', 'methods'), 'method/');
   }
 
   get assetPath() {
     return path.join(this.path, 'assets');
   }
 
+  /*
   get basePartials() {
     return [
       'election',
@@ -159,6 +166,7 @@ class Theme {
       'section'
     ];
   }
+  */
 
   render() {
     return this.index.apply(this, arguments);
@@ -199,9 +207,10 @@ module.exports = function(opts) {
 
   let themeMgr = new ThemeManager(opts.path);
 
-  let middleware = function *(next) {
+  return function *(next) {
     this.renderTheme = function *(themeName, locals, options) {
-      Log.d(TAG, themeName);
+      Log.d(TAG, themeName, this);
+
       let l = extend(true, {}, this.state, locals);
       let o = extend(true, { data: {} }, options);
 
@@ -216,6 +225,4 @@ module.exports = function(opts) {
 
     yield next;
   };
-
-  return middleware;
 };

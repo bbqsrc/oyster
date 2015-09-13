@@ -6,12 +6,7 @@
   <ul class='oyster-election-list'>
     {{#shuffle candidates}}
       <li class='oyster-candidate'>
-        <label>
-          {{candidate ../section.method ../id class="form-control"}}
-          <span class='oyster-candidate-name'>
-            {{this}}
-          </span>
-        </label>
+        {{candidate this ../id ../section.method}}
       </li>
     {{/shuffle}}
   </ul>
