@@ -1,5 +1,33 @@
 extend layout
 block content
+  .modal.fade
+    .modal-dialog
+      .modal-content
+        .modal-header
+          button.close(type='button' data-dismiss='modal' aria-label='Close')
+            span(aria-hidden='true') &times;
+          h4= __("Add Participant Group")
+        .modal-body
+          form.form-horizontal
+            .form-group
+              label.control-label(for='pg-name') Group Name
+              .col-sm-10
+                input.form-control#pg-name(name='name' type='text' required)
+            .form-group
+              label.control-label(for='pg-participants') Emails
+                small (newline delimited)
+              .col-sm-10
+                textarea.form-control#pg-participants(name='emails' required)
+            .form-group
+              label.control-label(for='pg-flags') Flags
+                small (space delimited)
+              .col-sm-10
+                input.form-control#pg-flags(name='flags' type='text')
+        .modal-footer
+          button.btn.btn-default(type='button' data-dismiss='modal')= __("Close")
+          | 
+          button.btn.btn-success#pg-insert-btn(type='button') __("Insert")
+    
   .page-header
     h1= __("All Participant Groups")
 
@@ -9,10 +37,17 @@ block content
     thead
       tr
         th= __("Group")
-        th= __("Emails")
+        th= __("Participants")
+        th= __("Actions")
     tbody
       each p in participants
         tr
           td
             a(href='/admin/participant/#{p._id}')= p.name
           td= p.emails.length
+          td
+            btn.btn.btn-danger= __("Remove group")
+  script.
+    $('#pg-insert-btn').on('click', function() {
+      // TODO: make this insert
+    });

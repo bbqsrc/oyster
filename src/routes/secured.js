@@ -88,6 +88,10 @@ router
     // TODO themes.
     return this.body = JSON.stringify(pg.toObject(), null, 2);
   })
+  .delete('/participant/:pgId', isAdmin, function* () {
+
+  })
+  .put()
   .get('/polls', isAdmin, function* () {
     // TODO pagination!!
 
