@@ -1,8 +1,6 @@
 'use strict';
 
-var send = require('koa-send'),
-    path = require('path'),
-    util = require('util'); // nodejs util.
+var util = require('util'); // nodejs util.
 
 /** Splits on '.' into an object. */
 exports.parseNestedKeys = function (obj) {
@@ -24,24 +22,6 @@ exports.parseNestedKeys = function (obj) {
 
   return out;
 };
-
-exports.routeStatic = function (router, prefix, root) {
-  router.get(prefix + '/:staticPath(.+)', function *() {
-    yield send(this, this.params.staticPath, {
-      root: root
-    });
-  });
-};
-
-"content/themes/<theme>/assets/<shit here>"
-
-exports.routeThemes = function (router, prefix, root) {
-  router.get(prefix + '/:theme([-_A-Za-z0-9]+?)/:staticPath([^\\.].+)', function *() {
-    yield send(this, this.params.staticPath, {
-      root: path.join(root, this.params.theme, 'assets')
-    });
-  });
-}
 
 exports.reverseObject = function reverseObject(obj) {
   let o = Object.create(null);
