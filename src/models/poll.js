@@ -8,6 +8,7 @@ var mongoose = require('mongoose'),
     config = require('../config'),
     counters = require('../counters'),
     Schema = mongoose.Schema,
+    tomlify = require('tomlify-j0.4'),
     Log = require('huggare');
 
 var TAG = 'oyster/models/poll';
@@ -296,6 +297,17 @@ pollSchema.methods.saveResults = function() {
 
 pollSchema.methods.isEditable = function() {
   return +this.startTime > Date.now();
+};
+
+var util = require('../util');
+
+pollSchema.methods.contentAsTOML = function() {
+  return tomlify(util.reverseObject(this.content), function(key, value) {
+    if (key === 'info' || key === 'body') {
+      return '"""\n' + value.trim() + '\n"""';
+    }
+    return false;
+  }, 0);
 };
 
 module.exports = mongoose.model('Poll', pollSchema);

@@ -1,69 +1,103 @@
 extend layout
 block content
   .page-header
+    .pull-right
+      .btn-group
+        button.btn.btn-default.dropdown-toggle(type='button' data-toggle='dropdown' )
+          span.caret
+        ul.dropdown-menu
+          li
+            a(href='/admin/poll/' + poll.slug + '/test')
+              = __("Test Ballot")
+          li  
+            a(href="/admin/poll/" + poll.slug + '/ballots')
+              = __("Ballots")
+          li  
+            a(href='/admin/poll/' + poll.slug + '/results')
+              = __("Results")
+          li.divider(role="separator")
+          li
+            a(href='#') Delete poll
     h1
       = poll.title 
       small  (#{poll.slug})
-    if poll.isPublic
-      .label.label-success= __("Public")
-  .well
-    a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/test')
-      = __("Test Ballot")
-    | 
-    a.btn.btn-primary(href="/admin/poll/" + poll.slug + '/ballots')
-      = __("Ballots")
-    | 
-    a.btn.btn-primary(href='/admin/poll/' + poll.slug + '/results')
-      = __("Results")
-    | 
-    form(method='delete' style='display: inline')
-      button.btn.btn-danger Delete poll
+      
   .row
-    .col-md-6
-      p
-        strong
-          = __("Start")
-          | : 
-      p
-        time(datetime="#{poll.startTime.toISOString()}")= poll.startTime
-      p
-        strong
-          = __("End")
-          | : 
-      p
-        time(datetime="#{poll.endTime.toISOString()}")= poll.endTime
+    .col-md-4.col-overview
+      h2 Overview
+      
+      table.table
+        tr
+          th= __("Status")
+          td
+            if poll.results
+              p.label.label-success= __("Finished")
+            else if +poll.startTime < Date.now()
+              p.label.label-warning= __("Running")
+            else
+              p.label.label-info= __("Scheduled")
+        tr 
+          th= __("Visibility")
+          td
+            if poll.isPublic
+              p.label.label-success= __("Public")
+            else
+              p.label.label-warning= __("Private")
+        tr 
+          th= __("Start")
+          td
+            time(title="#{poll.startTime.toISOString()}" datetime="#{poll.startTime.toISOString()}")= moment(poll.startTime).format('llll Z')
+        tr
+          th= __("End")
+          td
+            time(title="#{poll.endTime.toISOString()}" datetime="#{poll.endTime.toISOString()}")= moment(poll.endTime).format('llll Z')
+        tr
+          th= __("Emails sent")
+          td= poll.emailsSent.length
+  
+    .col-md-4.col-controls
+      h2 Settings
+      
+      table.table
+        tr 
+          th= __("Make public?")
+          td
+            input(type='checkbox')
+        tr 
+          th= __("Test ballot requires authentication?")
+          td
+            input(type='checkbox')
+              
+    .col-md-4.col-participants
+      h2 Participants
       div
-        strong
-          = __("Content")
-          | :
-        pre !{JSON.stringify(poll.content, null, 2)}
-      div
-        strong
-          = __("Theme")
-          | :
-        span= poll.theme
-    .col-md-6
-      div
-        strong
-          = __("Participant Groups")
-          | :
-        ul
+        table.table
           each participant in poll.participantGroups
-            li= participant
-      div
-        p
-          strong= __("Email")
-        p
+            tr
+              td= participant
+  .row
+    .col-md-6.col-email
+      h2 Email
+      div.well.well-sm
+        strong
           = __("From")
           | : 
-          em= poll.email.from
-        p
+        = poll.email.from
+        br
+        strong
           = __("Subject")
           | : 
-          em= poll.email.subject
-        pre= poll.email.content
-        p
-          strong
-            = __("Emails sent")
-            | : 
-          | #{poll.emailsSent.length}
+        = poll.email.subject
+      pre= poll.email.content
+          
+    .col-md-6.col-ballot
+      h2 Ballot
+      p
+        strong
+          = __("Theme")
+          | : 
+        span= poll.theme || '[no theme defined!]'
+      div
+        pre(style='max-height: 36em')= poll.contentAsTOML()
+      
+      

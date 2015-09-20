@@ -24,7 +24,7 @@ exports.parseNestedKeys = function (obj) {
 };
 
 exports.reverseObject = function reverseObject(obj) {
-  let o = Object.create(null);
+  let o = Array.isArray(obj) ? [] : Object.create(null);
 
   Object.keys(obj).reverse().forEach(function(key) {
     if (util.isObject(obj[key])) {
