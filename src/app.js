@@ -64,10 +64,16 @@ module.exports = function createApp(root, config) {
       yield next;
     } catch (err) {
       this.status = err.status || 500;
-      //this.body = err.message;
-      this.body = 'Internal server error. Please contact an administrator.';
+      let msg = 'Internal server error. Please contact an administrator.';
+
+      if (process.env.NODE_ENV == null ||
+          process.env.NODE_ENV === 'development') {
+        this.body = '<pre>'+ err.stack + '</pre>';
+      } else {
+        this.body = msg;
+      }
       this.app.emit('error', err, this);
-      Log.e(TAG, this.body, err);
+      Log.e(TAG, err);
     }
   });
 
