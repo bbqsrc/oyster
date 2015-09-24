@@ -1,6 +1,6 @@
 extend layout
 block content
-  .modal.fade
+  .modal.fade#add-participant-group
     .modal-dialog
       .modal-content
         .modal-header
@@ -8,31 +8,28 @@ block content
             span(aria-hidden='true') &times;
           h4= __("Add Participant Group")
         .modal-body
-          form.form-horizontal
+          form
             .form-group
               label.control-label(for='pg-name') Group Name
-              .col-sm-10
-                input.form-control#pg-name(name='name' type='text' required)
+              input.form-control#pg-name(name='name' type='text' required)
             .form-group
-              label.control-label(for='pg-participants') Emails
-                small (newline delimited)
-              .col-sm-10
-                textarea.form-control#pg-participants(name='emails' required)
-            .form-group
-              label.control-label(for='pg-flags') Flags
+              label.control-label(for='pg-flags') Flags 
                 small (space delimited)
-              .col-sm-10
-                input.form-control#pg-flags(name='flags' type='text')
+              input.form-control#pg-flags(name='flags' type='text')
+            .form-group
+              label.control-label(for='pg-participants') Emails 
+                small (newline delimited)
+              input.form-control#pg-participants(name='emails' type='file' required)
         .modal-footer
           button.btn.btn-default(type='button' data-dismiss='modal')= __("Close")
           | 
-          button.btn.btn-success#pg-insert-btn(type='button') __("Insert")
+          button.btn.btn-success#pg-insert-btn(type='button')= __("Insert")
     
   .page-header
     h1= __("All Participant Groups")
 
   .well
-    a.btn.btn-primary(href='/admin/participants/create')= __("Add Participant Group")
+    a.btn.btn-primary(data-toggle="modal" data-target="#add-participant-group")= __("Add Participant Group")
   table.table.participants
     thead
       tr
