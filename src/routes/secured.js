@@ -4,7 +4,7 @@ var TAG = 'oyster/routes/secured';
 
 var Log = require('huggare'),
     router = require('koa-router')(),
-    bodyParser = require('koa-bodyparser'),
+    bodyParser = require('koa-better-body'),
     passport = require('koa-passport'),
     models = require('../models'),
     util = require('../util'),
@@ -39,6 +39,7 @@ router
     }
   })
   .post('/login', bodyParser(), function* (next) {
+    Log.d(TAG, 'request.body.fields', this.request.body.fields);
     let self = this;
 
     if (this.req.user) {
@@ -50,14 +51,14 @@ router
 
       if (user === false) {
         Log.w(TAG, 'failed login attempt for user "' +
-                   self.request.body.username + '".');
+                   self.request.body.fields.username + '".');
         self.status = 401;
         self.redirect('login');
       } else {
         yield self.login(user);
 
         Log.w(TAG, 'successful log in for user "' +
-                   self.request.body.username + '".');
+                   self.request.body.fields.username + '".');
 
         if (self.request.query.r) {
           self.redirect(self.request.query.r);
@@ -77,6 +78,9 @@ router
       titles: this.i18n.__('All Participants'),
       participants: pgs
     });
+  })
+  .post('/participants', isAdmin, bodyParser({ multipart: true }), function*() {
+
   })
   .get('/participant/:pgId', isAdmin, function* () {
     let pg = yield models.ParticipantGroup.findById(this.params.pgId).exec();
@@ -116,7 +120,7 @@ router
     });
   })
   .post('/polls/new', isAdmin, bodyParser(), function* () {
-    let poll = yield models.Poll.createPoll(this.request.body);
+    let poll = yield models.Poll.createPoll(this.request.body.fields);
     this.redirect('/admin/poll/' + poll.slug);
   })
   .param('poll', function *(slug, next) {
@@ -174,7 +178,7 @@ router
     this.redirect('/admin/polls');
   })
   .post('/poll/:poll/test', isAdmin, bodyParser(), function* () {
-    let data = util.parseNestedKeys(this.request.body);
+    let data = util.parseNestedKeys(this.request.body.fields);
 
     return this.body = JSON.stringify(data, null, 2);
   })

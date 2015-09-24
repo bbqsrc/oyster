@@ -4,7 +4,7 @@ var TAG = 'oyster/routes/index';
 
 var Log = require('huggare'),
     router = require('koa-router')(),
-    bodyParser = require('koa-bodyparser'),
+    bodyParser = require('koa-better-body'),
     util = require('../util'),
     models = require('../models');
 
@@ -73,7 +73,7 @@ router
     yield this.renderTheme(this.poll.theme, this.poll.content);
   })
   .post('/poll/:poll/:token', bodyParser(), function *() {
-    let data = util.parseNestedKeys(this.request.body);
+    let data = util.parseNestedKeys(this.request.body.fields);
 
     this.ballot.set('data', data);
     this.ballot.markModified('data');
