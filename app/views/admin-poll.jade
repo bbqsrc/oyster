@@ -77,7 +77,10 @@ block content
               td= participant
   .row
     .col-md-6.col-email
-      h2 Email
+      header
+        .pull-right
+          button.btn.btn-default(type='button') Edit
+        h2 Email
       div.well.well-sm
         strong
           = __("From")
@@ -91,7 +94,10 @@ block content
       pre= poll.email.content
           
     .col-md-6.col-ballot
-      h2 Ballot
+      header
+        .pull-right
+          button.btn.btn-default(type='button') Edit
+        h2 Ballot
       p
         strong
           = __("Theme")
