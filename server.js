@@ -7,6 +7,12 @@ var process = require('process'),
     mongoose = require('mongoose'),
     co = require('co');
 
+if (process.env.NODE_ENV == null ||
+    process.env.NODE_ENV === 'development') {
+  Log.setLevel(0);
+  Log.d(TAG, 'Development mode: setting log level to VERBOSE');
+}
+
 Log.i(TAG, 'Loading config: ' + process.env.PWD + '/config.json');
 
 var config = require('./src/config'),
