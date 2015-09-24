@@ -1,0 +1,20 @@
+<div class='oyster-method-approval'>
+  <div class='oyster-method-approval-state'>
+    <div class='btn-group' data-toggle="buttons">
+      <label class="btn btn-success btn-sm">
+        {{! __ "Approve"}}
+        &#x2713;
+        <input hidden name="{{id}}" type='radio' value="1">
+      </label>
+      <label class="btn btn-danger btn-sm active">
+        {{! __ "Disapprove"}}
+        &#x2717;
+        <input hidden name="{{id}}" type='radio' value="0" checked>
+      </label>
+    </div>
+
+    <span class='oyster-candidate-name'>
+      {{name}}
+    </span>
+  </div>
+</div>

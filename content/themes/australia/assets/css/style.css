@@ -185,9 +185,19 @@ body {
 }
 
 .oyster-election,
-.oyster-motion {
+.oyster-motion,
+.oyster-method-approval-state {
   border: 1px solid #f0f0f0;
   padding: 0em 1.5em;
+}
+
+.oyster-method-approval {
+  display: block;
+  margin: 0 0 2px 0;
+}
+
+.oyster-method-approval-state {
+  padding: 0.5em;
 }
 
 .oyster-election {
@@ -199,7 +209,8 @@ body {
 }
 
 .oyster-motion,
-.oyster-motion .panel {
+.oyster-motion .panel,
+.oyster-method-approval-state {
   -webkit-transition: all .3s;
   -moz-transition: all .3s;
   transition: all .3s;
@@ -245,7 +256,7 @@ body {
 
 .oyster-election ul {
   list-style: none;
-  padding-left: 4em;
+  padding-left: 0;
 }
 
 .oyster-candidate label {
@@ -258,7 +269,7 @@ body {
   font-weight: normal;
 }
 
-.oyster-candidate-input {
+input.oyster-candidate-input {
   width: 3.5em;
   padding: 6px;
   display: inline-block;

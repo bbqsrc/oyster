@@ -32,6 +32,21 @@ $(function() {
     }
   });
 
+  $(".oyster-method-approval .btn").click(function() {
+    var $node = $(this);
+    var body = $node.closest('.oyster-method-approval-state');
+
+    body.removeClass('oyster-motion-success oyster-motion-danger oyster-motion-warning');
+
+    if ($node.hasClass('btn-success')) {
+      body.addClass('oyster-motion-success');
+    } else if ($node.hasClass('btn-danger')) {
+      body.addClass('oyster-motion-danger');
+    } else if ($node.hasClass('btn-warning')) {
+      body.addClass('oyster-motion-warning');
+    }
+  });
+
   // Stop the disappointing enter.
   $(window).keydown(function(e) {
     if (e.keyCode == 13) {

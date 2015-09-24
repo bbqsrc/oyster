@@ -161,6 +161,10 @@ router
       flags: flags
     });
     */
+    if (!this.poll.theme) {
+      Log.e(TAG, 'Poll', this.poll.slug, 'is missing a theme; defaulting to australia.');
+      this.poll.theme = 'australia';
+    }
     yield this.renderTheme(this.poll.theme, this.poll.content);
   })
   .delete('/poll/:poll', isAdmin, function* () {
