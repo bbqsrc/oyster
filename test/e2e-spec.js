@@ -1,8 +1,16 @@
 'use strict';
 
 var createApp = require('../src/app'),
-    path = require('path'),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    path = require('path');
+
+var expect = require('chai').expect;
+
+var webdriverio = require('webdriverio');
+var client = webdriverio.remote({
+  user: process.env.SAUCE_USERNAME,
+  key: process.env.SAUCE_ACCESS_KEY
+});
 
 var testConfig = {
   production: false,
@@ -39,10 +47,14 @@ var testConfig = {
   }
 };
 
-describe('Environment configuration', function() {
-  let app, db;
+describe('Oyster', function() {
+  this.timeout(10000);
 
-  beforeAll(function(done) {
+  let app, db, agent;
+
+  before(function(done) {
+    this.timeout(30000);
+
     app = createApp(path.resolve(__dirname, '..'), testConfig);
 
     mongoose.connect(testConfig.mongoURL);
@@ -54,11 +66,24 @@ describe('Environment configuration', function() {
     });
 
     db.once('open', function() {
-      done();
+      agent = app.listen(testConfig.port);
+
+      client
+        .init()
+        .then(function() {
+          done();
+        });
     });
   });
 
-  afterAll(function() {
-    mongoose.disconnect();
+  describe('Admin page', function() {
+    it('should require logging in', function(done) {
+      client
+        .url('http://this.local:30000/admin')
+        .getTitle().then(function(title) {
+          expect(title).to.equal('Log in| Oyster');
+        })
+        .end(done);
+    });
   });
 });
