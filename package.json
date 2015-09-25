@@ -4,7 +4,8 @@
   "description": "An online voting system.",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha",
+    "test-e2e": "wdio test/wdio.conf.js"
   },
   "author": "Brendan Molloy <brendan@bbqsrc.net>",
   "repository": "bbqsrc/oyster",
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "chai": "^3.3.0",
+    "chai-as-promised": "^5.1.0",
     "eslint": "^1.0.0",
     "mocha": "^2.3.3",
     "supertest": "^1.1.0",
