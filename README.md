@@ -1,6 +1,6 @@
 # Oyster
 
-[![Travis](https://img.shields.io/travis/rust-lang/rust.svg?style=flat-square)](https://travis-ci.org/bbqsrc/oyster) [![Codecov](https://img.shields.io/codecov/c/github/codecov/example-python.svg?style=flat-square)](https://codecov.io/github/bbqsrc/oyster) [![Gitter](https://img.shields.io/badge/Gitter-Join_chat_%E2%86%92-1dce73.svg)](https://gitter.im/bbqsrc/oyster)
+[![Travis](https://img.shields.io/travis/bbqsrc/oyster.svg?style=flat)](https://travis-ci.org/bbqsrc/oyster) [![Codecov](https://img.shields.io/codecov/c/github/bbqsrc/oyster.svg?style=flat)](https://codecov.io/github/bbqsrc/oyster) [![Gitter](https://img.shields.io/badge/gitter-Join_chat_%E2%86%92-1dce73.svg?style=flat)](https://gitter.im/bbqsrc/oyster)
 
 A free voting system.
 
