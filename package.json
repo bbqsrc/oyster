@@ -45,7 +45,6 @@
   "devDependencies": {
     "chai": "^3.3.0",
     "eslint": "^1.0.0",
-    "jasmine-spec-reporter": "^2.4.0",
     "mocha": "^2.3.3",
     "supertest": "^1.1.0",
     "webdriverio": "^3.2.4"
