@@ -2,10 +2,16 @@
   "name": "oyster",
   "version": "0.1.0",
   "description": "An online voting system.",
-  "main": "src/index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "mocha",
-    "test-e2e": "wdio test/wdio.conf.js"
+    "test": "wdio test/wdio.conf.js",
+    "test:coverage": "istanbul cover wdio -- test/wdio.conf.js",
+    "test:coverage:upload": "cat ./coverage/coverage.json | codecov",
+    "prepublish": "npm run build-assets",
+    "build-assets": "npm run bower && npm run webpack",
+    "bower": "bower install bootstrap ajaxorg/ace-builds && sh scripts/post-bower.sh",
+    "webpack": "[ -f assets/static/js/toml.js ] || npm run webpack:toml",
+    "webpack:toml": "webpack -p --output-library toml --output-library-target var node_modules/toml/index.js assets/static/js/toml.js"
   },
   "author": "Brendan Molloy <brendan@bbqsrc.net>",
   "repository": "bbqsrc/oyster",
@@ -13,7 +19,6 @@
   "license": "GPL-3.0",
   "dependencies": {
     "co": "^4.6.0",
-    "es6-error": "^1.0.0",
     "extend": "^3.0.0",
     "handlebars": "^3.0.3",
     "huggare": "^0.3.0",
@@ -44,12 +49,17 @@
     "tomlify-j0.4": "^1.0.1"
   },
   "devDependencies": {
+    "bower": "^1.5.3",
     "chai": "^3.3.0",
     "chai-as-promised": "^5.1.0",
+    "codecov.io": "^0.1.6",
     "eslint": "^1.0.0",
+    "istanbul": "^0.3.21",
     "mocha": "^2.3.3",
     "supertest": "^1.1.0",
-    "webdriverio": "^3.2.4"
+    "toml": "^2.3.0",
+    "webdriverio": "^3.2.4",
+    "webpack": "^1.12.2"
   },
   "publishConfig": {
     "registry": "http://npm.brendan.so"

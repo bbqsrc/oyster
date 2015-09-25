@@ -1,6 +1,6 @@
 'use strict';
 
-var TAG = 'oyster';
+const TAG = 'oyster';
 
 var process = require('process'),
     Log = require('huggare').defaults(),
@@ -9,11 +9,11 @@ var process = require('process'),
     co = require('co');
 
 Log.i(TAG, 'Loading config: ' + process.env.PWD + '/config.json');
-var config = require('./config');
 
-var models = require('./models'),
-    loggers = require('./loggers'),
-    createApp = require('./app');
+var config = require('./src/config'),
+    models = require('./src/models'),
+    loggers = require('./src/loggers'),
+    createApp = require('./src/app');
 
 // Pre-routing
 if (config.logPath) {
@@ -42,7 +42,7 @@ db.on('reconnected', function() {
   Log.w(TAG, 'mongodb reconnected.');
 });
 
-let app = createApp(path.resolve(__dirname, '..'), config);
+let app = createApp(__dirname, config);
 
 // Post-routing
 process.on('unhandledRejection', function(reason, p) {
