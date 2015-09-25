@@ -22,7 +22,7 @@ function routeStatic(router, prefix, root) {
       root: root
     });
   });
-};
+}
 
 function routeThemes(router, prefix, root) {
   router.get(prefix + '/:theme([-_A-Za-z0-9]+?)/:staticPath([^\\.].+)', function *() {

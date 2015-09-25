@@ -1,6 +1,6 @@
 'use strict';
 
-const TAG = "oyster/themes";
+const TAG = 'oyster/themes';
 
 var handlebars = require('handlebars'),
     extend = require('extend'),
@@ -9,8 +9,7 @@ var handlebars = require('handlebars'),
     Log = require('huggare'),
     path = require('path'),
     fs = require('fs'),
-    config = require('./config'),
-    util = require('./util');
+    config = require('./config');
 
 function registerPartialDir(hbs, p, prefix) {
   let fns;
@@ -18,7 +17,7 @@ function registerPartialDir(hbs, p, prefix) {
   try {
     fns = fs.readdirSync(p);
   } catch(err) {
-    if (err.code !== "ENOENT") {
+    if (err.code !== 'ENOENT') {
       throw err;
     }
     return;
@@ -35,13 +34,7 @@ function registerPartialDir(hbs, p, prefix) {
   }
 }
 
-function registerPartial(hbs, partialPath) {
-  let template = fs.readFileSync(partialPath, 'utf8');
-  let name = path.basename(partialPath, '.hbs');
-  return hbs.registerPartial(name, hbs.compile(template));
-}
-
-function compileTemplate(hbs, tmplPath, fallbackPath) {
+function compileTemplate(hbs, tmplPath) {
   let template = fs.readFileSync(tmplPath, 'utf8');
   return hbs.compile(template);
 }
@@ -70,7 +63,7 @@ var themeHelpers = {
 
   candidate: function(candidateName, id, method, options) {
     let partials = options.data.theme.hbs.partials;
-    let name = handlebars.Utils.escapeExpression("elections." + id + "." + candidateName);
+    let name = handlebars.Utils.escapeExpression('elections.' + id + '.' + candidateName);
 
     let classes = 'oyster-candidate-input';
     if (options.hash.class) {
@@ -114,7 +107,7 @@ var themeHelpers = {
   },
 
   // TODO: this is a hack for a PPAU theme. We'll remove this one day.
-  gvtHack: function(ctx, options) {
+  gvtHack: function(ctx, options) { // eslint-disable-line
     return JSON.stringify(ctx.sections[0].fields[0].candidates, null, 2);
   }
 };
@@ -202,7 +195,7 @@ module.exports = function(opts) {
   opts = opts || {};
 
   if (!opts.path) {
-    throw new TypeError("Missing opts.path.");
+    throw new TypeError('Missing opts.path.');
   }
 
   let themeMgr = new ThemeManager(opts.path);
@@ -219,7 +212,7 @@ module.exports = function(opts) {
       let theme = themeMgr.get(themeName);
       o.data.theme = theme;
 
-      this.type = "html";
+      this.type = 'html';
       return this.body = theme.render(l, o);
     };
 

@@ -5,7 +5,6 @@ const TAG = 'oyster';
 var process = require('process'),
     Log = require('huggare').defaults(),
     mongoose = require('mongoose'),
-    path = require('path'),
     co = require('co');
 
 Log.i(TAG, 'Loading config: ' + process.env.PWD + '/config.json');
@@ -17,11 +16,9 @@ var config = require('./src/config'),
 
 // Pre-routing
 if (config.logPath) {
-  /*
   Log.addTransport(loggers.FlatFileFormatter({
     path: config.logPath
   }));
-  */
 } else {
   Log.w(TAG, 'no logPath specified; logging only to console.');
 }

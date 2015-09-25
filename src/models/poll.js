@@ -94,7 +94,7 @@ pollSchema.methods.cancelSchedule = function() {
 
   schedule.cancelJob(jobStartName);
   schedule.cancelJob(jobEndName);
-}
+};
 
 pollSchema.methods.schedule = function() {
   let doc = this;

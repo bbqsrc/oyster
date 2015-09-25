@@ -149,18 +149,12 @@ router
     return this.body = 'TODO.';
   })
   .get('/poll/:poll/test', isAdmin, function* () {
-    let flags = [];
-
+    let flags = []; // eslint-disable-line
     if (this.request.query.flags) {
       flags = this.request.query.flags.split(',');
     }
 
-    /*
-    yield this.render('form', {
-      content: this.poll.content,
-      flags: flags
-    });
-    */
+    // TODO: implement flag support for themes again
     if (!this.poll.theme) {
       Log.e(TAG, 'Poll', this.poll.slug, 'is missing a theme; defaulting to australia.');
       this.poll.theme = 'australia';
@@ -170,7 +164,7 @@ router
   .delete('/poll/:poll', isAdmin, function* () {
     if (this.poll.isEditable()) {
       this.status = 403;
-      return this.body = "Cannot delete: poll has already been started.";
+      return this.body = 'Cannot delete: poll has already been started.';
     }
 
     this.poll.cancel();

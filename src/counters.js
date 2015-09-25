@@ -1,9 +1,5 @@
 'use strict';
 
-var TAG = "oyster/counters";
-
-var Log = require('huggare');
-
 class MotionCounter {
   constructor(id, threshold) {
     this.id = id;
@@ -333,8 +329,6 @@ class SchulzeElection {
     }).map(function(x) {
       return x[1];
     });
-
-    return order;
   }
 
   toObject() {
