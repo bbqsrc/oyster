@@ -42,7 +42,7 @@ block content
         tr(data-id="#{p._id}")
           td
             a(href='/admin/participant/#{p._id}')= p.name
-          td= p.emails.length
+          td= p.participants.length
           td
             each flag in p.flags
               span.label.label-info.label-sm= flag
@@ -51,6 +51,8 @@ block content
             btn.btn.btn-xs.btn-danger.delete-group-btn= __("Remove group")
   script.
     $('#pg-insert-btn').on('click', function() {
+      var self = this;
+      
       $(this).attr('disabled', true);
     
       var data = new FormData();
@@ -67,11 +69,15 @@ block content
         contentType: false
       }).success(function() {
         location.reload();
-      }).error(function(err, msg) {
-        alert(msg);
-      }).complete(function() {
-        $(this).removeAttr('disabled');
-      })
+      }).error(function(res, _, msg) {
+        if (res.status === 409) {
+          alert(res.responseJSON.length + " duplicate emails detected.\n\n" 
+              + JSON.stringify(res.responseJSON.emails, null, 2))
+        } else {
+          alert(res.response);
+        }
+        $(self).removeAttr('disabled');
+      });
     });
     
     $('.delete-group-btn').on('click', function() {

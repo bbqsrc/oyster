@@ -89,11 +89,9 @@ router
       return this.status = 500;
     }
 
-    let emails = data.split('\n').map(function(email) {
-      return email.trim();
-    }).filter(function(v) { return v != null && v.length > 0; });
-
-    // TODO validate emails are valid
+    let participants = data.split('\n').map(function(email) {
+      return { email: email.trim() };
+    }).filter(function(v) { return v != null && v.email.length > 0; });
 
     let flags = body.fields.flags.trim();
     if (flags === '') {
@@ -104,11 +102,21 @@ router
 
     let pg = new models.ParticipantGroup({
       name: body.fields.name.trim(),
-      emails: emails,
+      participants: participants,
       flags: flags
     });
 
-    yield pg.save();
+    try {
+      yield pg.save();
+    } catch(err) {
+      // Duplicate emails
+      if (err.data) {
+        this.status = 409;
+        return this.body = err.data;
+      } else {
+        throw err;
+      }
+    }
 
     return this.status = 200;
   })
