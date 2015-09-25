@@ -39,7 +39,6 @@ router
     }
   })
   .post('/login', bodyParser(), function* (next) {
-    Log.d(TAG, 'request.body.fields', this.request.body.fields);
     let self = this;
 
     if (this.req.user) {
@@ -80,7 +79,38 @@ router
     });
   })
   .post('/participants', isAdmin, bodyParser({ multipart: true }), function*() {
+    let body = this.request.body;
 
+    let data;
+    try {
+      data = yield fs.readFile(body.files.participants.path, {encoding: 'utf-8'});
+    } catch (e) {
+      Log.wtf(TAG, 'An uploaded file could not be read!', e);
+      return this.status = 500;
+    }
+
+    let emails = data.split('\n').map(function(email) {
+      return email.trim();
+    }).filter(function(v) { return v != null && v.length > 0; });
+
+    // TODO validate emails are valid
+
+    let flags = body.fields.flags.trim();
+    if (flags === '') {
+      flags = [];
+    } else {
+      flags = flags.split(/\s+/);
+    }
+
+    let pg = new models.ParticipantGroup({
+      name: body.fields.name.trim(),
+      emails: emails,
+      flags: flags
+    });
+
+    yield pg.save();
+
+    return this.status = 200;
   })
   .get('/participant/:pgId', isAdmin, function* () {
     let pg = yield models.ParticipantGroup.findById(this.params.pgId).exec();
@@ -91,6 +121,21 @@ router
 
     // TODO themes.
     return this.body = JSON.stringify(pg.toObject(), null, 2);
+  })
+  .delete('/participant/:pgId', isAdmin, function*() {
+    let pg = yield models.ParticipantGroup.findById(this.params.pgId).exec();
+
+    if (!pg) {
+      return this.status = 404;
+    }
+
+    if (yield pg.isDeletable()) {
+      yield pg.remove();
+      return this.status = 200;
+    }
+
+    this.status = 403;
+    return this.body = 'This participant group is currently in use.';
   })
   .get('/polls', isAdmin, function* () {
     // TODO pagination!!

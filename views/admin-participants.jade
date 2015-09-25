@@ -35,16 +35,60 @@ block content
       tr
         th= __("Group")
         th= __("Participants")
+        th= __("Flags")
         th= __("Actions")
     tbody
       each p in participants
-        tr
+        tr(data-id="#{p._id}")
           td
             a(href='/admin/participant/#{p._id}')= p.name
           td= p.emails.length
           td
-            btn.btn.btn-danger= __("Remove group")
+            each flag in p.flags
+              span.label.label-info.label-sm= flag
+              | 
+          td
+            btn.btn.btn-xs.btn-danger.delete-group-btn= __("Remove group")
   script.
     $('#pg-insert-btn').on('click', function() {
-      // TODO: make this insert
+      $(this).attr('disabled', true);
+    
+      var data = new FormData();
+      
+      data.append('name', $('#pg-name').val());
+      data.append('flags', $('#pg-flags').val());
+      data.append('participants', $("#pg-participants")[0].files[0]);
+      
+      $.ajax({
+        type: 'post',
+        url: location.href,
+        data: data,
+        processData: false,
+        contentType: false
+      }).success(function() {
+        location.reload();
+      }).error(function(err, msg) {
+        alert(msg);
+      }).complete(function() {
+        $(this).removeAttr('disabled');
+      })
+    });
+    
+    $('.delete-group-btn').on('click', function() {
+      var id = $(this).closest('[data-id]').attr('data-id');
+      
+      var choice = window.confirm('Are you sure you want to remove this row?');
+      
+      if (!choice) {
+        return;
+      }
+      
+      $.ajax({
+        type: 'delete',
+        url: '/admin/participant/' + id
+      }).success(function() {
+        location.reload();
+      }).error(function(err, msg) {
+        alert(msg);
+      })
     });

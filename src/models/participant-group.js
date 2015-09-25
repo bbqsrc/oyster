@@ -11,4 +11,15 @@ var participantGroupSchema = new Schema({
   flags: { type: Array, default: [] }
 });
 
+participantGroupSchema.methods.isDeletable = function() {
+  return co(function*() {
+    let polls = yield mongoose.model('Poll').count({
+      participantGroups: this.name,
+      results: { $exists: false }
+    }).exec();
+
+    return polls === 0;
+  }.bind(this));
+};
+
 module.exports = mongoose.model('ParticipantGroup', participantGroupSchema);
