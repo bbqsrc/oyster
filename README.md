@@ -1,5 +1,7 @@
 # Oyster
 
+[![Travis](https://img.shields.io/travis/rust-lang/rust.svg?style=flat-square)](https://travis-ci.org/bbqsrc/oyster) [![Codecov](https://img.shields.io/codecov/c/github/codecov/example-python.svg?style=flat-square)](https://codecov.io/github/bbqsrc/oyster) [![Gitter](https://img.shields.io/badge/Gitter-Join_chat_%E2%86%92-1dce73.svg)](https://gitter.im/bbqsrc/oyster)
+
 A free voting system.
 
 **This is not production ready. Do not use it without knowing exactly how insane you're being.**

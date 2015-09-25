@@ -12,3 +12,10 @@ env:
     - secure: XOQtCVQAAMjXGhN5Wk8OFDSSRBCwJ2EbJdUO/Wdbgjsa6aUN+zSdkXOl9ak2jX0YKrJECQz23uIx2GdhJotC0Yf3xgP7OFkWaGWFTcJfs2WZMS2xUIgA2clx1iJfFZ8ZmGxqfeGp92ctQVLwx3lbZ9Na5B1jC7CaECh8iI9aNet2TG6bTlzNFv6zwzWKVLC1DO2ZJhkkPsN4EgEcFXKi9hNvwfkRk7kUiwm/R5D/SIxS/Nt98hLm2IPuoiAFFwF4TRA/QrkyZbUNorxiUM8Fp2YLL8IQSRpbjn7PKO93KSpryMNAgrsN39S63LfjkJhStBe1WRxy2Fni0JOMe4MRlkIMwVC7aJSanDYVsemkBxbovABIEQxqnC+22j9tQfV4itk/fB1X9cmTv5H6xICPoJkpZoF8hQwKPJs65TO3M9QzcSuKXmYqOczBOgnh8YyhUCiKcjlYkF13+/ruT0aDMiqPMGjHhrsvriGLGPVJ2tzBaymdNzlqqashA5svjmTLkusxj7vUY7iKu8B6QRMpR7M1KElekEcNhNNI7tgPXRLPjvgDgCkY03DJGJ+xyCjkUVoQ+8QSs1wi2Sy1gkrPDhQ8H6vM8CDQjoPt0jzsClcoII3geD5m5RBemZ4OqOd6xH/tsXF6ILU9kee3RtjwH858MHHe+XqCHRLBZgk/zMI=
 addons:
   sauce_connect: true
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/d7389dc3d4a07e283046
+    on_success: change
+    on_failure: always
+    on_start: never
