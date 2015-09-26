@@ -1,4 +1,7 @@
-assets/
+assets/static/js/*.min.js
+assets/static/css/*.min.css
+assets/static/fonts/
 bower_components/
 node_modules/
+coverage/
 config.json
