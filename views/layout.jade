@@ -4,7 +4,7 @@ html(lang="en")
     meta(charset='utf-8')
     title
       = title
-      | | Oyster
+      |  | Oyster
     <!--[if lt IE 10]>
     <script src="/static/js/es5-shim.min.js"></script>
     <script src="/static/js/html5shiv.min.js"></script>
@@ -26,27 +26,32 @@ html(lang="en")
             span.icon-bar
           a.navbar-brand(href='/admin') Oyster
         #navbar-content.navbar-collapse.collapse
+          
+          .navbar-form.navbar-left
+            a.btn.btn-success(href='/admin/polls/new')
+              span.glyphicon.glyphicon-file
+              | 
+              = __("New Poll")
           ul.nav.navbar-nav
             li
               a(href='/admin/polls')= __("All Polls")
             li
               a(href='/admin/participants')= __("Participants")
-            //li
-            //  a(href='/polls/running').
-            //    Running Polls
-            //li
-            //  a(href='/polls/closed').
-            //    Closed Polls
           ul.nav.navbar-nav.navbar-right
             li
-              a(href='/admin/logout')
-                i.glyphicon.glyphicon-log-out
+              a(href='/admin/users')= __("Users")
+            li.dropdown
+              a.toggle-dropdown(href='#' data-toggle='dropdown')= __("Signed in as %s", user.username)
                 | 
-                = __("Log out")
-          .navbar-form.navbar-right
-            a.btn.btn-success(href='/admin/polls/new')
-              i.glyphicon.glyphicon-file
-              | 
-              = __("New Poll")
+                span.caret
+              ul.dropdown-menu
+                li
+                  a(href='/admin/change-password') Change password
+                li.divider(role='separator')
+                li
+                  a(href='/admin/logout') 
+                    span.glyphicon.glyphicon-log-out
+                    | 
+                    = __("Log out")
     .container
       block content

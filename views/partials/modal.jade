@@ -1,0 +1,27 @@
+mixin modal(title, button)
+  .modal.fade(id!=attributes.id class!=attributes.class)
+    .modal-dialog
+      .modal-content
+        .modal-header
+          button.close(type='button' data-dismiss='modal')
+            span &times;
+          h4= title
+        .modal-body
+          block
+        .modal-footer
+          button.btn.btn-default(type='button' data-dismiss='modal') Close
+          button.btn.btn-success(type='button')= button
+
+mixin dangerModal(title, button)
+  .modal.fade(id!=attributes.id class!=attributes.class)
+    .modal-dialog
+      .modal-content
+        .modal-header
+          button.close(type='button' data-dismiss='modal')
+            span &times;
+          h4= title
+        .modal-body
+          block
+        .modal-footer
+          button.btn.btn-default(type='button' data-dismiss='modal') Close
+          button.btn.btn-danger(type='button')= button

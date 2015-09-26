@@ -8,7 +8,7 @@ describe('Oyster', function() {
       let title = yield browser
         .url('http://localhost:3000/admin')
         .getTitle();
-      expect(title).to.equal('Log in| Oyster');
+      expect(title).to.equal('Log in | Oyster');
     });
   });
 });

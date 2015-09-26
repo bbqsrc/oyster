@@ -190,6 +190,51 @@ router
   .get('/poll/:poll/export/results', isAdmin, function* () {
     return this.body = JSON.stringify(yield this.poll.generateResults(), null, 2);
   })
+  .get('/users', isAdmin, function* () {
+    yield this.render('admin-users', {
+      title: this.i18n.__('Users')
+    });
+  })
+  .get('/change-password', isAdmin, function* () {
+    yield this.render('admin-change-password', {
+      title: this.i18n.__('Change Password')
+    });
+  })
+  .post('/change-password', isAdmin, bodyParser(), function* () {
+    let body = this.request.body;
+
+    if (!body.currPassword || !body.password || !body.password2) {
+      this.status = 400;
+      return yield this.render('admin-change-password', {
+        title: this.i18n.__('Change Password'),
+        error: 'Some fields were missing data.'
+      });
+    }
+
+    if (body.password !== body.password2) {
+      return yield this.render('admin-change-password', {
+        title: this.i18n.__('Change Password'),
+        error: 'New password does not match in both fields.'
+      });
+    }
+
+    let success = yield this.req.user.verifyPassword(body.currPassword);
+    if (!success) {
+      return yield this.render('admin-change-password', {
+        title: this.i18n.__('Change Password'),
+        error: 'Incorrect password.'
+      });
+    }
+
+    let user = yield this.req.user.updatePassword(body.password);
+    yield user.save();
+    this.req.user = user;
+
+    return yield this.render('admin-change-password', {
+      title: this.i18n.__('Change Password'),
+      success: 'Password successfully updated.'
+    });
+  })
   .get('/*', isAdmin);
 
 router.prefix('/admin');

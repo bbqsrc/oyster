@@ -1,0 +1,169 @@
+extend layout
+include partials/modal
+
+block content
+  +modal('Update role', 'Update')(id='update-role')
+    form.form-horizontal
+      .form-group
+        label.control-label.col-sm-2(for='c-role')= __("Role")
+        .col-sm-10
+          select.form-control#c-role
+            option(value='admin') Admin
+            option(value='superadmin') Superadmin
+            
+  +dangerModal('Remove user', 'Delete')(id='remove-user')
+    p
+      | Are you sure you want to remove the user '
+      span#c-username
+      | '?
+  
+  +modal('New user', 'Create')(id='create-user')
+    form.form-horizontal
+      .form-group
+        label.control-label.col-sm-2(for='cu-username')= __("Username")
+        .col-sm-10
+          input.form-control#cu-username
+      .form-group
+        label.control-label.col-sm-2(for='cu-password')= __("Password")
+        .col-sm-10
+          input.form-control#cu-password(type='password')
+      .form-group
+        label.control-label.col-sm-2(for='cu-role')= __("Role")
+        .col-sm-10
+          select.form-control#cu-role
+            option(value='admin') Admin
+            option(value='superadmin') Superadmin
+    
+  .page-header
+    .pull-right
+      button.btn.btn-primary#btn-new-user(data-toggle='modal' data-target='#create-user')= __("New user")
+    h1= title
+
+  table.table#users
+    thead
+      tr 
+        th= __("Username")
+        th= __("Role")
+        th= __("Actions")
+    tbody
+  
+  script.
+    var tbody = $('#users tbody');
+    var users = [];
+    
+    var selectedUser = null;
+    
+    function updateView() {
+      tbody.empty();
+      users.sort();
+      
+      users.forEach(function(user, i) {
+        var row = $(document.createElement('tr'));
+        row.attr('data-id', user._id);
+        row.attr('data-index', i);
+        
+        var role = user.flags.indexOf('superadmin') > -1 
+                   ? 'superadmin' 
+                   : user.flags.indexOf('admin') > -1
+                      ? 'admin'
+                      : 'UNKNOWN!';
+        
+        var td = $(document.createElement('td'));
+        td.text(user.username)
+        row.append(td);
+        
+        td = $(document.createElement('td'));
+        td.text(role);
+        row.append(td);
+        
+        td = $(document.createElement('td'));
+        
+        var btn1 = $(document.createElement('button'));
+        btn1.addClass('btn btn-danger btn-xs');
+        btn1.text('Remove');
+        btn1.on('click', function() {
+          var modal = $("#remove-user");
+          var row = $(this).closest('tr');
+          selectedUser = row.attr('data-id');
+          $("#c-username").text(users[row.attr('data-index')].username);
+          modal.modal('show');
+        });
+        
+        var btn2 = $(document.createElement('button'));
+        btn2.addClass('btn btn-default btn-xs');
+        btn2.text('Update role');
+        btn2.on('click', function() {
+          var modal = $("#update-role");
+          selectedUser = $(this).closest('tr').attr('data-id');
+          $("#c-role").val(role);
+          modal.modal('show');
+        });
+        td.append(btn2);
+        td.append(' ');
+        td.append(btn1);
+        
+        row.append(td);
+        
+        tbody.append(row);
+      });
+    }
+    
+    $.get('/api/users', function(data, status, xhr) {
+      users = data.users;
+      updateView();
+    });
+    
+    $("#update-role .btn-success").on('click', function() {
+      $.ajax('/api/user/' + selectedUser, {
+        method: 'PUT',
+        data: {
+          role: $("#c-role").val()
+        }
+      })
+      .done(function(res, status, xhr) {
+        $("#update-role").modal('hide');
+        var row = $("[data-id='" + selectedUser + "']")
+        var i = row.attr('data-index');
+        users[i] = res;
+        updateView();
+        selectedUser = null;
+      }).fail(function(xhr, err, msg) {
+        alert(msg);
+      });
+    });
+    
+    $("#remove-user .btn-danger").on('click', function() {
+      $.ajax('/api/user/' + selectedUser, {
+        method: 'DELETE'
+      })
+      .done(function(res, status, xhr) {
+        $("#remove-user").modal('hide');
+        var row = $("[data-id='" + selectedUser + "']")
+        var i = row.attr('data-index');
+        users.splice(parseInt(i, 10), 1);
+        updateView();
+        selectedUser = null;
+      }).fail(function(xhr, err, msg) {
+        alert(msg);
+      });
+    });
+    
+    $("#create-user .btn-success").on('click', function() {
+      $.ajax('/api/users', {
+        method: 'POST',
+        data: {
+          username: $("#cu-username").val(),
+          password: $("#cu-password").val(),
+          role: $("#cu-role").val()
+        }
+      })
+      .done(function(res, status, xhr) {
+        $("#create-user").modal('hide');
+        console.log(res);
+        users.push(res);
+        updateView();
+        selectedUser = null;
+      }).fail(function(xhr, err, msg) {
+        alert(msg);
+      });
+    });

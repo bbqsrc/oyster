@@ -84,7 +84,8 @@ module.exports = function createApp(root, config) {
     this.state = {
       moment: moment,
       __: this.i18n.__.bind(this.i18n),
-      __n: this.i18n.__n.bind(this.i18n)
+      __n: this.i18n.__n.bind(this.i18n),
+      user: this.req.user
     };
 
     yield next;
@@ -102,7 +103,8 @@ module.exports = function createApp(root, config) {
 
   app
     .use(router.routes())
-    .use(require('./routes/secured').routes());
+    .use(require('./routes/secured').routes())
+    .use(require('./routes/api').routes());
 
   app.on('error', function(err, ctx) {
     Log.e(TAG, 'server error', err);

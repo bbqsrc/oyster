@@ -16,9 +16,9 @@ var config = require('./src/config'),
 
 // Pre-routing
 if (config.logPath) {
-  Log.addTransport(loggers.FlatFileFormatter({
-    path: config.logPath
-  }));
+  //Log.addTransport(loggers.FlatFileFormatter({
+  //  path: config.logPath
+  //}));
 } else {
   Log.w(TAG, 'no logPath specified; logging only to console.');
 }
