@@ -1,0 +1,12 @@
+{
+    "plugins": [
+      "react"
+    ],
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "env": {
+      "browser": true
+    },
+    "extends": "../.eslintrc"
+}

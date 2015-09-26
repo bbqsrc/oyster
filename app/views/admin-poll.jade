@@ -1,4 +1,8 @@
 extend layout
+block head
+  script(src='/static/js/ace/ace.js')
+  script(src='/static/js/react.min.js')
+  script(src='/static/js/components.min.js')
 block content
   .page-header
     .pull-right
@@ -92,18 +96,9 @@ block content
           | : 
         = poll.email.subject
       pre= poll.email.content
-          
     .col-md-6.col-ballot
-      header
-        .pull-right
-          button.btn.btn-default(type='button') Edit
-        h2 Ballot
-      p
-        strong
-          = __("Theme")
-          | : 
-        span= poll.theme || '[no theme defined!]'
-      div
-        pre(style='max-height: 36em')= poll.contentAsTOML()
-      
-      
+    script.
+      Oyster.insertComponent(Oyster.EditBallot, {
+        content: !{JSON.stringify(poll.contentAsTOML())},
+        theme: "#{poll.theme}" || '[no theme!]'
+      }, '.col-ballot');
