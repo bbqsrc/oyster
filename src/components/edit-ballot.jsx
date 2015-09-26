@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Modal from './modal';
+import TomlValidator from './toml-validator';
 
 import ace from 'ace';
 import $ from 'jquery';
@@ -32,6 +33,12 @@ const EditPoll = React.createClass({
     editor.getSession().setMode('ace/mode/toml');
 
     editor.setValue(this.state.content);
+    editor.on('input', function() {
+      // TODO: move into AceEditor obj.
+      this.setState({
+        content: editor.getValue()
+      });
+    }.bind(this));
 
     this.editor = editor;
   },
@@ -73,7 +80,8 @@ const EditPoll = React.createClass({
           options={{show: false, backdrop: 'static'}}
           btnClass='success' btnText='Save'
       >
-        <pre ref='editor' style={{minHeight: this.state.windowHeight - 230 }}></pre>
+        <pre ref='editor' style={{minHeight: this.state.windowHeight - 250 }}></pre>
+        <TomlValidator source={this.state.content} />
       </Modal>
     );
 
