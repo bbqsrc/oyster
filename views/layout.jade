@@ -38,15 +38,25 @@ html(lang="en")
             li
               a(href='/admin/participants')= __("Participants")
           ul.nav.navbar-nav.navbar-right
-            li
-              a(href='/admin/users')= __("Users")
             li.dropdown
-              a.toggle-dropdown(href='#' data-toggle='dropdown')= __("Signed in as %s", user.username)
+              a.toggle-dropdown(href='#' data-toggle='dropdown')
+                span.glyphicon.glyphicon-wrench
                 | 
                 span.caret
               ul.dropdown-menu
+                li.dropdown-header!= __("System Management")
                 li
-                  a(href='/admin/change-password') Change password
+                  a(href='/admin/users')= __("Users")
+            li.dropdown
+              a.toggle-dropdown(href='#' data-toggle='dropdown')
+                span.glyphicon.glyphicon-user
+                | 
+                span.caret
+              ul.dropdown-menu
+                li.dropdown-header!= __("Signed in as %s", "<strong>" + user.username + "</strong>")
+                li.divider(role='separator')
+                li
+                  a(href='/admin/change-password')= __("Change password")
                 li.divider(role='separator')
                 li
                   a(href='/admin/logout') 
