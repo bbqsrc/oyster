@@ -80,7 +80,7 @@ const EditPoll = React.createClass({
           options={{show: false, backdrop: 'static'}}
           btnClass='success' btnText='Save'
       >
-        <pre ref='editor' style={{minHeight: this.state.windowHeight - 250 }}></pre>
+        <pre ref='editor' style={{minHeight: this.state.windowHeight - 300}}></pre>
         <TomlValidator source={this.state.content} />
       </Modal>
     );
@@ -91,13 +91,13 @@ const EditPoll = React.createClass({
           <div className='pull-right'>
             <button ref='editBtn' className='btn btn-default btn-sm' onClick={this.onClickEdit}>Edit</button>
           </div>
-          <h2>Ballot</h2>
-        </header>
+          <h2>Ballot
+            <small style={{marginLeft: '1em'}}>
+              <strong>Theme:</strong> {this.props.theme}
+            </small>
+          </h2>
 
-        <p>
-          <strong>Theme:</strong>
-          <span>{this.props.theme}</span>
-        </p>
+        </header>
 
         <pre style={{height: '36em'}}>
           {this.state.content}

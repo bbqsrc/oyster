@@ -82,21 +82,9 @@ block content
               td= participant
   .row
     .col-md-6.col-email
-      header
-        .pull-right
-          button.btn.btn-default(type='button') Edit
-        h2 Email
-      div.well.well-sm
-        strong
-          = __("From")
-          | : 
-        = poll.email.from
-        br
-        strong
-          = __("Subject")
-          | : 
-        = poll.email.subject
-      pre= poll.email.content
+    script.
+      Oyster.insertComponent(Oyster.EditEmail, 
+        !{JSON.stringify(poll.email)}, '.col-email');
     .col-md-6.col-ballot
     script.
       Oyster.insertComponent(Oyster.EditBallot, {
