@@ -15,10 +15,10 @@ if (process.env.NODE_ENV == null ||
 
 Log.i(TAG, 'Loading config: ' + process.env.PWD + '/config.json');
 
-var config = require('./src/config'),
-    models = require('./src/models'),
-    loggers = require('./src/loggers'),
-    createApp = require('./src/app');
+var config = require('./app/config'),
+    models = require('./app/models'),
+    loggers = require('./app/loggers'),
+    createApp = require('./app');
 
 // Pre-routing
 if (config.logPath) {
