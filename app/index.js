@@ -46,12 +46,12 @@ module.exports = function createApp(root, config) {
   locale(app);
 
   app.use(i18n(app, {
-    directory: resolvePath(root, 'locales'),
+    directory: resolvePath(root, 'content/locales'),
     locales: config.locales,
     modes: ['query', 'cookie', 'header']
   }));
 
-  app.use(views(resolvePath(root, 'views'), {
+  app.use(views('./views', {
     map: { html: 'jade' },
     default: 'jade'
   }));
