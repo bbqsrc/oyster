@@ -48,9 +48,9 @@ var config = {
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
     // https://docs.saucelabs.com/reference/platforms-configurator
     //
-    capabilities: [{
-        browserName: 'firefox'
-    }],
+    //capabilities: [{
+    //    browserName: 'firefox'
+    //}],
     //
     // ===================
     // Test Configurations
@@ -105,7 +105,7 @@ var config = {
     // Test reporter for stdout.
     // The following are supported: dot (default), spec and xunit
     // see also: http://webdriver.io/guide/testrunner/reporters.html
-    reporter: 'spec',
+    //reporter: 'spec',
 
     //
     // Options to be passed to Mocha.
@@ -183,12 +183,14 @@ function travisJob(browser) {
 }
 
 if (process.env.CI) {
+  config.reporter = 'dot';
   config.capabilities = [
     travisJob('firefox'),
     travisJob('chrome'),
     travisJob('internet explorer')
   ];
 } else {
+  config.reporter = 'spec';
   config.capabilities = [
     { browserName: 'firefox' }
   ];
