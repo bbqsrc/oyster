@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 var testConfig = require('./config.js');
 
 var config = {
@@ -123,6 +124,8 @@ var config = {
     //
     // Gets executed before all workers get launched.
     onPrepare: function() {
+      console.log('[-] Preparing environment for testing…');
+
       return new Promise(function(resolve) {
         var path = require('path');
 
@@ -133,11 +136,14 @@ var config = {
 
         var app = createApp(basePath, testConfig);
 
+        console.log('[-] Connecting to database…');
         mongoose.connect(testConfig.mongoURL);
         var db = mongoose.connection;
 
         db.once('open', function() {
+          console.log('[-] Database connected!');
           app.listen(testConfig.port);
+          console.log('[-] Oyster listening on port ' + testConfig.port + '\n');
           resolve();
         });
       });
