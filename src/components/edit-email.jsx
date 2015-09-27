@@ -1,19 +1,19 @@
 import { Component } from 'react';
 
+/*
 import Modal from './modal';
 
 import ace from 'ace';
 import $ from 'jquery';
+*/
 
 export default
 class EditEmail extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
+    const email = this.props.poll.email;
+
     return (
-      <div>
+      <div className='col-md-6 col-email'>
         <header>
           <div className='pull-right'>
             <button ref='editBtn' className='btn btn-default btn-sm' onClick={this.onClickEdit}>Edit</button>
@@ -24,15 +24,15 @@ class EditEmail extends Component {
         <div className="panel panel-default">
           <header className="panel-heading">
             <div>
-              <strong>From: </strong> {this.props.from}
+              <strong>From: </strong> {email.from}
             </div>
             <div>
-              <strong>Subject: </strong> {this.props.subject}
+              <strong>Subject: </strong> {email.subject}
             </div>
           </header>
           <div className="panel-body">
             <div style={{'whiteSpace': 'pre-wrap'}}>
-              {this.props.content}
+              {email.content}
             </div>
           </div>
         </div>

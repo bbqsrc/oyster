@@ -9,7 +9,7 @@ const handlebars = require('handlebars'),
       Log = require('huggare'),
       path = require('path'),
       fs = require('fs'),
-      I18n = require('i18n-2'),
+      //I18n = require('i18n-2'),
       config = require('./config');
 
 function registerPartialDir(hbs, p, prefix) {
@@ -42,10 +42,6 @@ function compileTemplate(hbs, tmplPath) {
   return hbs.compile(template);
 }
 
-<<<<<<< HEAD
-const themeHelpers = {
-  asset(assetPath, options) {
-=======
 function registerTranslations(ctx, fpath) {
   ctx.locales = {};
 
@@ -67,9 +63,8 @@ function registerTranslations(ctx, fpath) {
   }
 }
 
-var themeHelpers = {
-  asset: function(assetPath, options) {
->>>>>>> themes locales WIP
+const themeHelpers = {
+  asset(assetPath, options) {
     return handlebars.Utils.escapeExpression(path.join(
         config.themeAssetsURL, options.data.theme.name, assetPath));
   },
@@ -150,9 +145,9 @@ class Theme {
     this.path = path.join(themePath, name);
 
     this.hbs = handlebars.create();
-    this.i18n = new I18n({
-        // TODO get all the locales from the locales directory.
-    });
+    //this.i18n = new I18n({
+    //    // TODO get all the locales from the locales directory.
+    //});
 
     try {
       fs.stat(this.path);

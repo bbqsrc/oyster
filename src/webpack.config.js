@@ -17,7 +17,8 @@ module.exports = {
     'react': 'React',
     'jquery': '$',
     'ace': 'ace',
-    'toml': 'toml'
+    'toml': 'toml',
+    'moment': 'moment'
   },
   output: {
     library: 'Oyster',

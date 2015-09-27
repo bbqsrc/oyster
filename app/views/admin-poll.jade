@@ -1,6 +1,7 @@
 extend layout
 block head
   script(src='/static/js/toml.min.js')
+  script(src='/static/js/moment.min.js')
   script(src='/static/js/ace/ace.js')
   script(src='/static/js/react.min.js')
   script(src='/static/js/components.min.js')
@@ -8,7 +9,7 @@ block content
   .page-header
     .pull-right
       .btn-group
-        button.btn.btn-default.dropdown-toggle(type='button' data-toggle='dropdown' )
+        button.btn.btn-default.dropdown-toggle(type='button' data-toggle='dropdown')
           span.caret
         ul.dropdown-menu
           li
@@ -22,11 +23,18 @@ block content
               = __("Results")
           li.divider(role="separator")
           li
-            a(href='#') Delete poll
+            a(href='#')= __("Delete poll")
     h1
       = poll.title 
       small  (#{poll.slug})
+
+    div.app-content
+    script.
+      Oyster.insertComponent(Oyster.AdminPollPage, { 
+        poll: !{JSON.stringify(poll, null, 2)} 
+      }, '.app-content');
       
+//-
   .row
     .col-md-4.col-overview
       h2 Overview
