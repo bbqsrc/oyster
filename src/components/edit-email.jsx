@@ -1,12 +1,5 @@
 import { Component } from 'react';
 
-/*
-import Modal from './modal';
-
-import ace from 'ace';
-import $ from 'jquery';
-*/
-
 export default
 class EditEmail extends Component {
   render() {

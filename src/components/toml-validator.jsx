@@ -1,10 +1,10 @@
 import { Component } from 'react';
-import toml from 'toml';
+import TOML from 'toml';
 
 export default class TomlValidator extends Component {
   render() {
     try {
-      toml.parse(this.props.source);
+      TOML.parse(this.props.source);
       return <div className='alert alert-success toml-valid'>{this.props.validMessage || 'OK'}</div>;
     } catch(err) {
       let msg = 'Parsing error on line ' + err.line +

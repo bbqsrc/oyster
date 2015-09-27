@@ -12,7 +12,7 @@ export default class EditPoll extends Component {
 
     this.state = {
       editMode: false,
-      content: props.poll.content,
+      content: props.poll.contentAsTOML(),
       windowHeight: window.innerHeight
     };
   }
