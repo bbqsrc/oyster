@@ -17,9 +17,14 @@ const koa = require('koa'),
       compress = require('koa-compress'),
       moment = require('moment');
 
+const MONTH = 2629740;
+
 function routeStatic(router, prefix, root) {
   router.get(`${prefix}/:staticPath(.+)`, function* sendStatic() {
-    yield send(this, this.params.staticPath, { root });
+    yield send(this, this.params.staticPath, {
+      root,
+      maxage: MONTH
+    });
   });
 }
 

@@ -238,7 +238,8 @@ if (process.env.CI) {
 } else {
   config.reporter = 'spec';
   config.capabilities = [
-    { browserName: 'firefox' }
+    { browserName: 'internet explorer' },
+    { browserName: 'chrome' }
   ];
 }
 
