@@ -100,7 +100,7 @@ describe('Oyster', function() {
                           '/admin/login\\?r=%2Fadmin$',
                           'Log in | Oyster');
 
-        yield login(browser);
+        expect((yield login(browser).url()).value).to.match(/\/admin$/);
       });
     });
   });
@@ -169,7 +169,7 @@ describe('Oyster', function() {
 
         yield browser.keys('abcdef');
 
-        expect(yield browser.execute('editor.getValue()').value).to.equal('abcdef');
+        expect((yield browser.execute('editor.getValue()')).value).to.equal('abcdef');
       });
 
       xit('should validate the input for correctness', function*() {
@@ -202,7 +202,8 @@ describe('Oyster', function() {
 
     describe('Email body field', function() {
       it('should be a field and be editable', function*() {
-        yield* existsSet('#fld-email3', 'This is my email.\n\nIt might be common but it is mine. Click your URL.\n\n{url}\n');
+        // Firefox: clears new lines at the end.
+        yield* existsSet('#fld-email3', 'This is my email.\n\nIt might be common but it is mine. Click your URL.\n\n{url}');
       });
 
       xit('should validate input for a {url} string', function*() {
