@@ -4,7 +4,7 @@
   "description": "An online voting system.",
   "main": "server.js",
   "scripts": {
-    "test": "wdio test/wdio.conf.js",
+    "test": "wdio -r spec test/wdio.conf.js",
     "test:coverage": "istanbul cover wdio -- test/wdio.conf.js",
     "test:coverage:upload": "cat ./coverage/coverage.json | codecov",
     "prepublish": "npm run build-assets",

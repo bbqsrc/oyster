@@ -27,7 +27,7 @@ html(lang="#{locale}")
           a.navbar-brand(href='/admin') Oyster
         #navbar-content.navbar-collapse.collapse
           .navbar-form.navbar-left
-            a.btn.btn-primary(href='/admin/polls/new')
+            a.btn.btn-primary#btn-new-poll(href='/admin/polls/new')
               span.glyphicon.glyphicon-file
               | 
               = __("New Poll")
@@ -38,7 +38,7 @@ html(lang="#{locale}")
               a(href='/admin/participants')= __("Participants")
           ul.nav.navbar-nav.navbar-right
             li.dropdown
-              a.toggle-dropdown(href='#' data-toggle='dropdown')
+              a.toggle-dropdown#btn-dropdown-settings(href='#' data-toggle='dropdown')
                 span.glyphicon.glyphicon-wrench
                 | 
                 span.caret
@@ -47,20 +47,20 @@ html(lang="#{locale}")
                 li
                   a(href='/admin/users')= __("Users")
             li.dropdown
-              a.toggle-dropdown(href='#' data-toggle='dropdown')
+              a.toggle-dropdown#btn-dropdown-user(href='#' data-toggle='dropdown')
                 span.glyphicon.glyphicon-user
                 | 
                 span.caret
-              ul.dropdown-menu
-                li.dropdown-header!= __("Signed in as %s", "<strong>" + user.username + "</strong>")
+              ul.dropdown-menu#dropdown-user
+                li.dropdown-header!= __("Logged in as %s", "<strong>" + user.username + "</strong>")
                 li.divider(role='separator')
                 li
-                  a(href='/admin/change-password')= __("Change password")
+                  a#btn-change-password(href='/admin/change-password')= __("Change password")
                 li
-                  a(href='/admin/change-language')= __("Change language")
+                  a#btn-change-language(href='/admin/change-language')= __("Change language")
                 li.divider(role='separator')
                 li
-                  a(href='/admin/logout') 
+                  a#btn-logout(href='/admin/logout') 
                     span.glyphicon.glyphicon-log-out
                     | 
                     = __("Log out")

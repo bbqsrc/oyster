@@ -8,11 +8,11 @@ block content
     .form-group
       label.control-label.col-sm-4(for='username')= __("Username")
       .col-sm-4
-        input.form-control(type='text', name='username', id='username')
+        input.form-control#username(type='text' name='username')
     .form-group
       label.control-label.col-sm-4(for='password')= __("Password")
       .col-sm-4
-        input.form-control(type='password', name='password', id='password')
+        input.form-control#password(type='password' name='password')
     .form-group
       .col-sm-offset-5.col-sm-1
         button.btn.btn-primary(type='submit')= __("Log in")

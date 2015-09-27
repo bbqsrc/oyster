@@ -1,4 +1,5 @@
 /* eslint-disable no-console,no-unused-vars */
+/* global mongoose,expect */
 var testConfig = require('./config.js');
 
 var config = {
@@ -140,8 +141,8 @@ var config = {
         var basePath = path.resolve(__dirname, '..');
 
         console.log('[-] Requiring dependencies…');
-        var createApp = require(path.resolve(basePath, 'app')),
-            mongoose = require('mongoose');
+        var mongoose = require('mongoose');
+        var createApp = require(path.resolve(basePath, 'app'));
 
         console.log('[-] Creating app…');
         var app = createApp(basePath, testConfig);
@@ -170,9 +171,19 @@ var config = {
     var chai = require('chai');
     var chaiAsPromised = require('chai-as-promised');
 
+    mongoose = require('mongoose'); // eslint-disable-line no-undef
+    var path = require('path');
+    require(path.resolve(__dirname, '../app/models'));
     chai.use(chaiAsPromised);
-    expect = chai.expect; // eslint-disable-line
+    expect = chai.expect; // eslint-disable-line no-undef
     chai.Should();
+
+    return new Promise(function(resolve) {
+      mongoose.connect(testConfig.mongoURL);
+      mongoose.connection.once('open', function() {
+        resolve();
+      });
+    });
   },
   //
   // Gets executed after all tests are done. You still have access to all global variables from
