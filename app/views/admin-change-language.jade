@@ -1,0 +1,20 @@
+extend layout
+block content
+  .page-header
+    h1= __("Change Language")
+  
+  if success
+    .alert.alert-success= success
+  
+  form.form-horizontal(method='post')
+    .form-group
+      label.control-label.col-sm-2(for='locale')= __("Language")
+      .col-sm-10
+        select.form-control#locale(name='locale')
+          each l in locales
+            //- Compare to global locale
+            if l == locale
+              option(value="#{l}" selected)= l
+            else
+              option(value="#{l}")= l
+    button.col-sm-offset-2.btn.btn-primary(type='submit')= __("Update")
