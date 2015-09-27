@@ -8,6 +8,7 @@ const Log = require('huggare'),
       passport = require('koa-passport'),
       models = require('../models'),
       util = require('../util'),
+      config = require('../config'),
       path = require('path'),
       fs = require('mz/fs');
 
@@ -292,6 +293,24 @@ router
     return yield this.render('admin-change-password', {
       title: this.i18n.__('Change Password'),
       success: 'Password successfully updated.'
+    });
+  })
+  .get('/change-language', isAdmin, function*() {
+    return yield this.render('admin-change-language', {
+      title: this.i18n.__('Change Language'),
+      locales: config.locales
+    });
+  })
+  .post('/change-language', isAdmin, bodyParser(), function*() {
+    const locale = this.request.body.fields.locale;
+
+    yield models.User.update(this.req.user, {
+      $set: { 'data.locale': locale }
+    }).exec();
+
+    return yield this.render('admin-change-language', {
+      title: this.i18n.__('Change Language'),
+      locales: config.locales
     });
   })
   .get('/*', isAdmin);

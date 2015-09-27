@@ -1,5 +1,5 @@
 doctype html
-html(lang="en")
+html(lang="#{locale}")
   head
     meta(charset='utf-8')
     title
@@ -26,7 +26,6 @@ html(lang="en")
             span.icon-bar
           a.navbar-brand(href='/admin') Oyster
         #navbar-content.navbar-collapse.collapse
-          
           .navbar-form.navbar-left
             a.btn.btn-success(href='/admin/polls/new')
               span.glyphicon.glyphicon-file
@@ -57,6 +56,8 @@ html(lang="en")
                 li.divider(role='separator')
                 li
                   a(href='/admin/change-password')= __("Change password")
+                li
+                  a(href='/admin/change-language')= __("Change language")
                 li.divider(role='separator')
                 li
                   a(href='/admin/logout') 

@@ -86,11 +86,24 @@ module.exports = function createApp(root, config) {
   .use(passport.session());
 
   app.use(function* setAppState(next) {
+    let locale = config.locales[0];
+
+    let user;
+    if (this.req.user) {
+      user = this.req.user;
+    }
+
+    if (user && user.data.locale) {
+      locale = user.data.locale;
+      this.i18n.setLocale(locale);
+    }
+
     this.state = {
       moment,
       __: this.i18n.__.bind(this.i18n),
       __n: this.i18n.__n.bind(this.i18n),
-      user: this.req.user
+      user: user,
+      locale: locale
     };
 
     yield next;
