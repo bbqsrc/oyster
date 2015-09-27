@@ -1,6 +1,7 @@
 extend layout
 block head
   script(src='/static/js/toml.min.js')
+  script(src='/static/js/mongoose.min.js')
   script(src='/static/js/moment.min.js')
   script(src='/static/js/ace/ace.js')
   script(src='/static/js/react.min.js')
@@ -31,71 +32,6 @@ block content
     div.app-content
     script.
       Oyster.insertComponent(Oyster.AdminPollPage, { 
-        poll: !{JSON.stringify(poll, null, 2)} 
+        poll: !{JSON.stringify(poll)}
       }, '.app-content');
       
-//-
-  .row
-    .col-md-4.col-overview
-      h2 Overview
-      
-      table.table
-        tr
-          th= __("Status")
-          td
-            if poll.results
-              p.label.label-success= __("Finished")
-            else if +poll.startTime < Date.now()
-              p.label.label-warning= __("Running")
-            else
-              p.label.label-info= __("Scheduled")
-        tr 
-          th= __("Visibility")
-          td
-            if poll.isPublic
-              p.label.label-success= __("Public")
-            else
-              p.label.label-warning= __("Private")
-        tr 
-          th= __("Start")
-          td
-            time(title="#{poll.startTime.toISOString()}" datetime="#{poll.startTime.toISOString()}")= moment(poll.startTime).format('llll Z')
-        tr
-          th= __("End")
-          td
-            time(title="#{poll.endTime.toISOString()}" datetime="#{poll.endTime.toISOString()}")= moment(poll.endTime).format('llll Z')
-        tr
-          th= __("Emails sent")
-          td= poll.emailsSent.length
-  
-    .col-md-4.col-controls
-      h2 Settings
-      
-      table.table
-        tr 
-          th= __("Make public?")
-          td
-            input(type='checkbox')
-        tr 
-          th= __("Test ballot requires authentication?")
-          td
-            input(type='checkbox')
-              
-    .col-md-4.col-participants
-      h2 Participants
-      div
-        table.table
-          each participant in poll.participantGroups
-            tr
-              td= participant
-  .row
-    .col-md-6.col-email
-    script.
-      Oyster.insertComponent(Oyster.EditEmail, 
-        !{JSON.stringify(poll.email)}, '.col-email');
-    .col-md-6.col-ballot
-    script.
-      Oyster.insertComponent(Oyster.EditBallot, {
-        content: !{JSON.stringify(poll.contentAsTOML())},
-        theme: "#{poll.theme}" || '[no theme!]'
-      }, '.col-ballot');

@@ -1,7 +1,9 @@
 var path = require('path');
 
 module.exports = {
-  entry: path.resolve(__dirname, 'components/index'),
+  entry: {
+    components: path.resolve(__dirname, 'index')
+  },
   resolve: {
     extensions: ['', '.js', '.jsx']
   },
@@ -18,11 +20,12 @@ module.exports = {
     'jquery': '$',
     'ace': 'ace',
     'toml': 'toml',
-    'moment': 'moment'
+    'moment': 'moment',
+    'mongoose': 'mongoose'
   },
   output: {
     library: 'Oyster',
     path: path.resolve(__dirname, '../assets/static/js'),
-    filename: 'components.min.js'
+    filename: '[name].min.js'
   }
 };
