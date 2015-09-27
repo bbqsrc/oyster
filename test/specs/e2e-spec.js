@@ -107,13 +107,20 @@ describe('Oyster', function() {
 
   describe('New poll page', function() {
     before(function*() {
-      yield browser.url('/admin/polls/new');
+      yield browser.url('/admin/polls/new').waitForExists('.btn-success');
     });
 
     function* existsSet(selector, value) {
       expect(yield browser.isExisting(selector)).to.be.true;
       yield browser.setValue(selector, value);
       expect(yield browser.getValue(selector)).to.equal(value);
+    }
+
+    function* existsDateTimeSet(selector, value) {
+      // Chrome throws a fit on date fields for some reason.
+      expect(yield browser.isExisting(selector)).to.be.true;
+      yield browser.execute('document.querySelector("' + selector + '").value = "' + value + '";');
+      expect((yield browser.execute(selector))).to.equal(value);
     }
 
     it('should have a poll name field and be editable', function*() {
@@ -132,20 +139,20 @@ describe('Oyster', function() {
       expect(yield browser.isExisting('[name="isPublic"]')).to.be.true;
     });
 
-    it('should have a state date field and be editable', function*() {
-      yield* existsSet('#startDate', '2015-01-01');
+    it('should have a start date field and be editable', function*() {
+      yield* existsDateTimeSet('#startDate', '2015-01-01');
     });
 
-    it('should have a state time field and be editable', function*() {
-      yield* existsSet('#startTime', '00:00');
+    it('should have a start time field and be editable', function*() {
+      yield* existsDateTimeSet('#startTime', '00:00');
     });
 
     it('should have an end date field and be editable', function*() {
-      yield* existsSet('#endDate', '2015-12-31');
+      yield* existsDateTimeSet('#endDate', '2015-12-31');
     });
 
     it('should have an end time field and be editable', function*() {
-      yield* existsSet('#endTime', '23:59');
+      yield* existsDateTimeSet('#endTime', '23:59');
     });
 
     xit('should set the start date to today if you press the "Today" button', function*() {
@@ -163,13 +170,13 @@ describe('Oyster', function() {
         yield browser.isExisting('#poll-data-editor .ace_content');
 
         // :(
-        yield browser.execute("editor.setValue('');");
+        yield browser.execute("window.editor.setValue('');");
 
         yield browser.moveToObject('.ace_content').leftClick();
 
         yield browser.keys('abcdef');
 
-        expect((yield browser.execute('editor.getValue()')).value).to.equal('abcdef');
+        expect((yield browser.execute('window.editor.getValue()')).value).to.equal('abcdef');
       });
 
       xit('should validate the input for correctness', function*() {
