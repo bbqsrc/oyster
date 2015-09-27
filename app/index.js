@@ -56,7 +56,7 @@ module.exports = function createApp(root, config) {
     default: 'jade'
   }));
 
-  app.use(helmet.defaults());
+  app.use(helmet());
 
   // Catch all the errors.
   app.use(function *(next) {
