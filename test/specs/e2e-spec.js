@@ -107,7 +107,7 @@ describe('Oyster', function() {
 
   describe('New poll page', function() {
     before(function*() {
-      yield browser.url('/admin/polls/new').waitForExists('.btn-success');
+      yield browser.url('/admin/polls/new').waitForExist('.btn-success');
     });
 
     function* existsSet(selector, value) {

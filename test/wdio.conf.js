@@ -229,6 +229,7 @@ function travisJob(browser) {
 
 if (process.env.CI) {
   config.reporter = 'dot';
+  config.coloredLogs = false;
   config.capabilities = [
     travisJob('firefox'),
     travisJob('chrome'),
