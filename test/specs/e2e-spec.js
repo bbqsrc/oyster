@@ -19,6 +19,7 @@ function* checkRoute(b, u, t) {
 describe('Oyster', function() {
   this.timeout(30000);
 
+  /*
   describe('Home page', function() {
     it('should load', function*() {
       yield browser.url('/');
@@ -33,13 +34,14 @@ describe('Oyster', function() {
     });
   });
 
+  */
   describe('Log in page', function() {
     it('should let us log in', function*() {
       yield login(browser.url('/admin/login'));
       yield* checkRoute(browser, '/admin$', 'Index | Oyster');
     });
   });
-
+  /*
   describe('Admin dashboard', function() {
     describe('Navbar links', function() {
       afterEach(function*() {
@@ -104,7 +106,7 @@ describe('Oyster', function() {
       });
     });
   });
-
+  */
   describe('New poll page', function() {
     before(function*() {
       yield browser.url('/admin/polls/new').waitForExist('.btn-success');
@@ -119,10 +121,14 @@ describe('Oyster', function() {
     function* existsDateTimeSet(selector, value) {
       // Chrome throws a fit on date fields for some reason.
       expect(yield browser.isExisting(selector)).to.be.true;
-      yield browser.execute('document.querySelector("' + selector + '").value = "' + value + '";');
-      expect((yield browser.execute(selector))).to.equal(value);
+
+      yield browser.selectorExecute(selector, function(nodes, value) {
+        return nodes[0].value = value;
+      }, value);
+      expect((yield browser.getValue(selector))).to.equal(value);
     }
 
+    /*
     it('should have a poll name field and be editable', function*() {
       yield* existsSet('#fld1', 'Test Poll');
     });
@@ -138,6 +144,7 @@ describe('Oyster', function() {
     it('should have a checkbox for making the poll public', function*() {
       expect(yield browser.isExisting('[name="isPublic"]')).to.be.true;
     });
+    */
 
     it('should have a start date field and be editable', function*() {
       yield* existsDateTimeSet('#startDate', '2015-01-01');
@@ -176,7 +183,7 @@ describe('Oyster', function() {
 
         yield browser.keys('abcdef');
 
-        expect((yield browser.execute('window.editor.getValue()')).value).to.equal('abcdef');
+        expect((yield browser.execute('return window.editor.getValue()')).value).to.equal('abcdef');
       });
 
       xit('should validate the input for correctness', function*() {

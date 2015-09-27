@@ -78,7 +78,7 @@ router
     const pgs = yield models.ParticipantGroup.find({}).exec();
 
     yield this.render('admin-participants', {
-      titles: this.i18n.__('All Participants'),
+      title: this.i18n.__('Participants'),
       participants: pgs
     });
   })
