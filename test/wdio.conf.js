@@ -1,6 +1,7 @@
 /* eslint-disable no-console,no-unused-vars */
 /* global mongoose,expect */
-var testConfig = require('./config.js');
+var makeConfig = require('./config.js');
+var testConfig = makeConfig();
 
 var config = {
   //
@@ -141,8 +142,15 @@ var config = {
         var basePath = path.resolve(__dirname, '..');
 
         console.log('[-] Requiring dependencies…');
+        var Log = require('huggare');
         var mongoose = require('mongoose');
         var createApp = require(path.resolve(basePath, 'app'));
+
+        console.log('[-] Setting up logging…');
+
+        Log.addTransport(require(path.resolve(basePath, 'app/loggers')).FlatFileFormatter({
+          path: testConfig.logPath
+        }));
 
         console.log('[-] Creating app…');
         var app = createApp(basePath, testConfig);
@@ -155,9 +163,18 @@ var config = {
 
         db.once('open', function() {
           console.log('[-] Database connected!');
+
           app.listen(testConfig.port);
-          console.log('[-] Oyster listening on port ' + testConfig.port + '\n');
-          resolve();
+          console.log('[-] Oyster listening on port ' + testConfig.port);
+
+          mongoose.model('User').remove({username: 'test'}).exec().then(function() {
+            mongoose.model('User').createUser('test', 'test', {
+              flags: ['admin', 'superadmin']
+            }).then(function() {
+              console.log('[-] Test admin user created.\n');
+              resolve();
+            });
+          });
         });
       } catch (err) {
         return onError(err);
@@ -174,12 +191,14 @@ var config = {
     mongoose = require('mongoose'); // eslint-disable-line no-undef
     var path = require('path');
     require(path.resolve(__dirname, '../app/models'));
+
     chai.use(chaiAsPromised);
     expect = chai.expect; // eslint-disable-line no-undef
     chai.Should();
 
     return new Promise(function(resolve) {
       mongoose.connect(testConfig.mongoURL);
+
       mongoose.connection.once('open', function() {
         resolve();
       });

@@ -19,13 +19,6 @@ function* checkRoute(b, u, t) {
 describe('Oyster', function() {
   this.timeout(30000);
 
-  before(function*() {
-    yield mongoose.model('User').remove({username: 'test'}).exec();
-    yield mongoose.model('User').createUser('test', 'test', {
-      flags: ['admin', 'superadmin']
-    });
-  });
-
   describe('Home page', function() {
     it('should load', function*() {
       yield browser.url('/');

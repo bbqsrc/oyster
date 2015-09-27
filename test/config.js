@@ -1,34 +1,37 @@
-module.exports = Object.freeze({
-  production: false,
-  host: 'localhost',
-  port: 3000,
+const _ = require('lodash');
 
-  mongoHost: 'localhost',
-  mongoPort: 27017,
-  mongoDB: 'oysterTest',
-  mongoUsername: null,
-  mongoPassword: null,
+module.exports = function makeConfig(o) {
+  return Object.freeze(_.defaults({}, o, {
+    host: 'localhost',
+    port: 3000,
 
-  locales: ['en'],
+    mongoHost: 'localhost',
+    mongoPort: 27017,
+    mongoDB: 'oysterTest',
+    mongoUsername: null,
+    mongoPassword: null,
 
-  mailerTransport: function(x) { //eslint-disable-line
-    return {
-      send: function(x, cb){ cb() } //eslint-disable-line
-    };
-  },
-  mailerConfig: {},
+    locales: ['en'],
 
-  logPath: './test-server.log',
+    mailerTransport: function(x) { //eslint-disable-line
+      return {
+        send: function(x, cb){ cb() } //eslint-disable-line
+      };
+    },
+    mailerConfig: {},
 
-  cookieSecret: 'test secret',
-  cookieName: 'oyster.id',
-  cookieMaxAge: 900000,
+    logPath: './test-server.log',
 
-  get mongoURL() {
-    return 'mongodb://' + this.mongoHost + ':' + this.mongoPort + '/' + this.mongoDB;
-  },
+    cookieSecret: 'test secret',
+    cookieName: 'oyster.id',
+    cookieMaxAge: 900000,
 
-  createMailer: function() {
-    return; // Stubbed
-  }
-});
+    get mongoURL() {
+      return 'mongodb://' + this.mongoHost + ':' + this.mongoPort + '/' + this.mongoDB;
+    },
+
+    createMailer: function() {
+      return; // Stubbed
+    }
+  }));
+};
