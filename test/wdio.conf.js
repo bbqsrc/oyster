@@ -126,26 +126,41 @@ var config = {
   onPrepare: function() {
     console.log('[-] Preparing environment for testing…');
 
-    return new Promise(function(resolve) {
-      var path = require('path');
+    return new Promise(function(resolve, reject) {
+      function onError(err) {
+        console.log('[!] There was an error!');
+        console.log(err);
+        return reject(err);
+      }
 
-      var basePath = path.resolve(__dirname, '..');
+      try {
+        console.log('[-] Preparation promise started.');
+        var path = require('path');
 
-      var createApp = require(path.resolve(basePath, 'src/app')),
-          mongoose = require('mongoose');
+        var basePath = path.resolve(__dirname, '..');
 
-      var app = createApp(basePath, testConfig);
+        console.log('[-] Requiring dependencies…');
+        var createApp = require(path.resolve(basePath, 'app')),
+            mongoose = require('mongoose');
 
-      console.log('[-] Connecting to database…');
-      mongoose.connect(testConfig.mongoURL);
-      var db = mongoose.connection;
+        console.log('[-] Creating app…');
+        var app = createApp(basePath, testConfig);
 
-      db.once('open', function() {
-        console.log('[-] Database connected!');
-        app.listen(testConfig.port);
-        console.log('[-] Oyster listening on port ' + testConfig.port + '\n');
-        resolve();
-      });
+        console.log('[-] Connecting to database…');
+        mongoose.connect(testConfig.mongoURL);
+        var db = mongoose.connection;
+
+        db.on('error', onError);
+
+        db.once('open', function() {
+          console.log('[-] Database connected!');
+          app.listen(testConfig.port);
+          console.log('[-] Oyster listening on port ' + testConfig.port + '\n');
+          resolve();
+        });
+      } catch (err) {
+        return onError(err);
+      }
     });
   },
   //
