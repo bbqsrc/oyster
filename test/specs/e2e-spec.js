@@ -41,20 +41,22 @@ describe('Oyster', function() {
   });
 
   describe('Admin dashboard', function() {
-    it('should let us navigate to New Poll page', function*() {
-      yield browser
-        .url('/admin')
-        .click('#btn-new-poll');
+    describe('Navbar links', function() {
+      afterEach(function*() {
+        yield browser.url('/admin');
+      });
 
-      yield* checkRoute(browser, '/admin/polls/new$', 'New Poll | Oyster');
-    });
+      it('should let us navigate to New Poll page', function*() {
+        yield* checkRoute(browser.click('#btn-new-poll'), '/admin/polls/new$', 'New Poll | Oyster');
+      });
 
-    xit('should let us navigate to All Polls', function() {
+      it('should let us navigate to All Polls', function*() {
+        yield* checkRoute(browser.click('#btn-all-polls'), '/admin/polls$', 'All Polls | Oyster');
+      });
 
-    });
-
-    xit('should let us navigate to Participants', function() {
-
+      it('should let us navigate to Participants', function*() {
+        yield* checkRoute(browser.click('#btn-participants'), '/admin/participants$', 'Participants | Oyster');
+      });
     });
 
     it('should let us open the user dropdown', function*() {
@@ -100,6 +102,134 @@ describe('Oyster', function() {
 
         yield login(browser);
       });
+    });
+  });
+
+  describe('New poll page', function() {
+    before(function*() {
+      yield browser.url('/admin/polls/new');
+    });
+
+    function* existsSet(selector, value) {
+      expect(yield browser.isExisting(selector)).to.be.true;
+      yield browser.setValue(selector, value);
+      expect(yield browser.getValue(selector)).to.equal(value);
+    }
+
+    it('should have a poll name field and be editable', function*() {
+      yield* existsSet('#fld1', 'Test Poll');
+    });
+
+    it('should have a slug field and be editable', function*() {
+      yield* existsSet('#fld2', 'test-poll');
+    });
+
+    xit('should auto-populate the slug field', function*() {
+
+    });
+
+    it('should have a checkbox for making the poll public', function*() {
+      expect(yield browser.isExisting('[name="isPublic"]')).to.be.true;
+    });
+
+    it('should have a state date field and be editable', function*() {
+      yield* existsSet('#startDate', '2015-01-01');
+    });
+
+    it('should have a state time field and be editable', function*() {
+      yield* existsSet('#startTime', '00:00');
+    });
+
+    it('should have an end date field and be editable', function*() {
+      yield* existsSet('#endDate', '2015-12-31');
+    });
+
+    it('should have an end time field and be editable', function*() {
+      yield* existsSet('#endTime', '23:59');
+    });
+
+    xit('should set the start date to today if you press the "Today" button', function*() {
+
+    });
+
+    it('should have a timezone field', function*() {
+      yield browser.isExisting('#timezone');
+      yield browser.isExisting('.timezone-human');
+      expect(yield browser.getText('.timezone-human')).to.match(/^UTC/);
+    });
+
+    describe('Poll data field', function() {
+      it('it should be editable with a syntax highlighting editor', function*() {
+        yield browser.isExisting('#poll-data-editor .ace_content');
+
+        // :(
+        yield browser.execute("editor.setValue('');");
+
+        yield browser.moveToObject('.ace_content').leftClick();
+
+        yield browser.keys('abcdef');
+
+        expect(yield browser.execute('editor.getValue()').value).to.equal('abcdef');
+      });
+
+      xit('should validate the input for correctness', function*() {
+
+      });
+    });
+
+
+    it('should have a theme dropdown', function*() {
+      yield browser.isExisting('#theme');
+    });
+
+    xit('should have a participant groups multi-selection field', function*() {
+
+    });
+
+    describe('Email from field', function() {
+      it('shoud be a field and be editable', function*() {
+        yield* existsSet('#fld-email1', 'Test (Place) <email@thing.lol>');
+      });
+
+      xit('should validate input for correctness', function*() {
+
+      });
+    });
+
+    it('should have an email subject field', function*() {
+      yield* existsSet('#fld-email2', 'Subject goes here');
+    });
+
+    describe('Email body field', function() {
+      it('should be a field and be editable', function*() {
+        yield* existsSet('#fld-email3', 'This is my email.\n\nIt might be common but it is mine. Click your URL.\n\n{url}\n');
+      });
+
+      xit('should validate input for a {url} string', function*() {
+
+      });
+    });
+
+    describe('Create poll button', function() {
+      xit('should be a button', function*() {
+
+      });
+
+      xit('should not allow submission if poll content is invalid', function*() {
+
+      });
+
+      xit('should not allow submission if email from field is invalid', function*() {
+
+      });
+
+      xit('should create a poll when clicked', function*() {
+
+      });
+    });
+
+    xit('should have redirected us to the poll page', function*() {
+
     });
   });
 });

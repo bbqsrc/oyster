@@ -33,9 +33,9 @@ html(lang="#{locale}")
               = __("New Poll")
           ul.nav.navbar-nav
             li
-              a(href='/admin/polls')= __("All Polls")
+              a#btn-all-polls(href='/admin/polls')= __("All Polls")
             li
-              a(href='/admin/participants')= __("Participants")
+              a#btn-participants(href='/admin/participants')= __("Participants")
           ul.nav.navbar-nav.navbar-right
             li.dropdown
               a.toggle-dropdown#btn-dropdown-settings(href='#' data-toggle='dropdown')
