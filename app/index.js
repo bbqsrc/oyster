@@ -14,6 +14,7 @@ const koa = require('koa'),
       locale = require('koa-locale'),
       i18n = require('koa-i18n'),
       send = require('koa-send'),
+      compress = require('koa-compress'),
       moment = require('moment');
 
 function routeStatic(router, prefix, root) {
@@ -41,6 +42,8 @@ module.exports = function createApp(root, config) {
   app.use(logger({
     exclude: /^\/static/
   }));
+
+  app.use(compress());
 
   locale(app);
 
