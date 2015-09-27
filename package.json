@@ -10,8 +10,8 @@
     "prepublish": "npm run build-assets",
     "build-assets": "npm run bower && npm run webpack",
     "bower": "sh scripts/post-bower.sh",
-    "webpack": "npm run webpack:components && [ -f assets/static/js/toml.min.js ] || npm run webpack:toml",
-    "webpack:toml": "webpack -p --output-library toml node_modules/toml/index.js assets/static/js/toml.min.js",
+    "webpack": "npm run webpack:components && npm run webpack:toml",
+    "webpack:toml": "webpack -p --output-library toml src/toml.js assets/static/js/toml.min.js",
     "webpack:components": "webpack -p --config src/webpack.config.js"
   },
   "author": "Brendan Molloy <brendan@bbqsrc.net>",
@@ -64,6 +64,7 @@
     "react": "^0.13.3",
     "supertest": "^1.1.0",
     "toml": "^2.3.0",
+    "uglify-js": "^2.4.24",
     "webdriverio": "^3.2.4",
     "webpack": "^1.12.2"
   },
