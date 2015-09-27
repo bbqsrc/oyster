@@ -9,6 +9,7 @@ const handlebars = require('handlebars'),
       Log = require('huggare'),
       path = require('path'),
       fs = require('fs'),
+      I18n = require('i18n-2'),
       config = require('./config');
 
 function registerPartialDir(hbs, p, prefix) {
@@ -41,8 +42,34 @@ function compileTemplate(hbs, tmplPath) {
   return hbs.compile(template);
 }
 
+<<<<<<< HEAD
 const themeHelpers = {
   asset(assetPath, options) {
+=======
+function registerTranslations(ctx, fpath) {
+  ctx.locales = {};
+
+  let fns;
+  try {
+    fns = fs.readdirSync(fpath);
+  } catch(err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+    return;
+  }
+
+  for (let fn of fns) {
+    const data = fs.readFileSync(path.join(fpath, fn));
+    const basename = path.basename(fn, '.js');
+    const json = JSON.parse(data);
+    ctx.locales[basename] = json;
+  }
+}
+
+var themeHelpers = {
+  asset: function(assetPath, options) {
+>>>>>>> themes locales WIP
     return handlebars.Utils.escapeExpression(path.join(
         config.themeAssetsURL, options.data.theme.name, assetPath));
   },
@@ -123,6 +150,9 @@ class Theme {
     this.path = path.join(themePath, name);
 
     this.hbs = handlebars.create();
+    this.i18n = new I18n({
+        // TODO get all the locales from the locales directory.
+    });
 
     try {
       fs.stat(this.path);
@@ -149,22 +179,14 @@ class Theme {
 
     // Method partials
     registerPartialDir(this.hbs, path.join(this.path, 'partials', 'methods'), 'method/');
+
+    // Register localisations
+    registerTranslations(this, path.join(this.path, 'locales'));
   }
 
   get assetPath() {
     return path.join(this.path, 'assets');
   }
-
-  /*
-  get basePartials() {
-    return [
-      'election',
-      'header',
-      'motion',
-      'section'
-    ];
-  }
-  */
 
   render() {
     return this.index.apply(this, arguments);
