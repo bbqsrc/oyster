@@ -18,7 +18,7 @@ module.exports = Object.freeze({
   },
   mailerConfig: {},
 
-  logPath: null,
+  logPath: './test-server.log',
 
   cookieSecret: 'test secret',
   cookieName: 'oyster.id',

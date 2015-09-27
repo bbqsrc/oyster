@@ -20,7 +20,7 @@ describe('Oyster', function() {
   this.timeout(30000);
 
   before(function*() {
-    yield mongoose.model('User').remove({username: 'test'});
+    yield mongoose.model('User').remove({username: 'test'}).exec();
     yield mongoose.model('User').createUser('test', 'test', {
       flags: ['admin', 'superadmin']
     });
@@ -102,7 +102,7 @@ describe('Oyster', function() {
           .url('/admin');
 
         yield* checkRoute(browser,
-                          '/admin/login\?r=%2Fadmin$',
+                          '/admin/login\\?r=%2Fadmin$',
                           'Log in | Oyster');
 
         yield login(browser);

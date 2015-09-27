@@ -5,6 +5,9 @@ services:
   - mongodb
 script:
   - npm run test:coverage
+after_failure:
+  - cat ./test-server.log
+after_script:
   - npm run test:coverage:upload
 env:
   global:
