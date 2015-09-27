@@ -126,14 +126,6 @@ describe('Oyster', function() {
       expect((yield browser.getValue(selector))).to.equal(value);
     }
 
-    function* existsTextareaSet(selector, value) {
-      expect(yield browser.isExisting(selector)).to.be.true;
-      yield browser.clearElement(selector)
-          .scroll(selector).moveToObject(selector)
-          .leftClick().keys(value);
-      expect((yield browser.getValue(selector))).to.equal(value);
-    }
-
     describe('Basic fields', function() {
       it('should have a poll name field and be editable', function*() {
         yield* existsSet('#fld1', 'Test Poll');
@@ -213,7 +205,7 @@ describe('Oyster', function() {
 
       it('email body field should be a field and be editable', function*() {
         // Firefox: clears new lines at the end.
-        yield* existsTextareaSet('#fld-email3', 'This is my email.\n\nIt might be common but it is mine. Click your URL.\n\n{url}');
+        yield* existsSet('#fld-email3', 'This is my email.\n\nIt might be common but it is mine. Click your URL.\n\n{url}');
       });
 
       xit('body field should validate input for a {url} string', function*() {
