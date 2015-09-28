@@ -126,27 +126,30 @@ function* putUsers() {
 
   return (this.status = 200);
 })
-.get('/themes', isAdmin, function*() {
-  return this.body = { themes: this.themeManager.themes };
+.get('/themes', isAdmin, function* getThemes() {
+  return (this.body = { themes: this.themeManager.themes });
 })
-.put('/poll/:pollSlug', isAdmin, bodyParser(), function*() {
-  let poll = yield models.Poll.findOne({slug: this.params.pollSlug}).exec();
+.put('/poll/:pollSlug', isAdmin, bodyParser(),
+function* putPoll() {
+  const poll = yield models.Poll.findOne({
+    slug: this.params.pollSlug
+  }).exec();
 
   if (!poll) {
-    return this.status = 404;
+    return (this.status = 404);
   }
 
   if (!poll.isEditable()) {
-    return this.status = 403;
+    return (this.status = 403);
   }
 
   // TODO validate conditional editable fields
-  let fields = this.request.body.fields;
+  const fields = this.request.body.fields;
 
   poll.set(fields);
   yield poll.save();
 
-  return this.body = { poll: poll };
+  return (this.body = { poll });
 });
 
 module.exports = router;

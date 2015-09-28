@@ -35,7 +35,7 @@ ballotSchema.statics.eachForSlug = function eachForSlug(slug, eachFn) {
     }).stream();
 
     stream
-      .on('data', function() {
+      .on('data', () => {
         try {
           eachFn.apply(this, arguments);
         } catch (err) {

@@ -9,7 +9,6 @@ const Log = require('huggare'),
       models = require('../models'),
       util = require('../util'),
       config = require('../config'),
-      path = require('path'),
       fs = require('mz/fs');
 
 // TODO don't repeat yourself
@@ -127,7 +126,7 @@ router
         return (this.body = err.data);
       } else if (/ValidationError/.test(err.name)) {
         this.status = 400;
-        return this.body = 'Invalid data';
+        return (this.body = 'Invalid data');
       } else {
         throw err;
       }
@@ -300,13 +299,14 @@ router
       success: 'Password successfully updated.'
     });
   })
-  .get('/change-language', isAdmin, function*() {
+  .get('/change-language', isAdmin, function* getChangeLanguage() {
     return yield this.render('admin-change-language', {
       title: this.i18n.__('Change Language'),
       locales: config.locales
     });
   })
-  .post('/change-language', isAdmin, bodyParser(), function*() {
+  .post('/change-language', isAdmin, bodyParser(),
+  function* postChangeLanguage() {
     const locale = this.request.body.fields.locale;
 
     yield models.User.update(this.req.user, {

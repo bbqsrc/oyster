@@ -9,7 +9,7 @@ const handlebars = require('handlebars'),
       Log = require('huggare'),
       path = require('path'),
       fs = require('fs'),
-      //I18n = require('i18n-2'),
+      // I18n = require('i18n-2'),
       config = require('./config');
 
 function registerPartialDir(hbs, p, prefix) {
@@ -44,21 +44,22 @@ function compileTemplate(hbs, tmplPath) {
 
 function registerTranslations(ctx, fpath) {
   ctx.locales = {};
-
   let fns;
+
   try {
     fns = fs.readdirSync(fpath);
-  } catch(err) {
+  } catch (err) {
     if (err.code !== 'ENOENT') {
       throw err;
     }
     return;
   }
 
-  for (let fn of fns) {
+  for (const fn of fns) {
     const data = fs.readFileSync(path.join(fpath, fn));
     const basename = path.basename(fn, '.js');
     const json = JSON.parse(data);
+
     ctx.locales[basename] = json;
   }
 }
@@ -145,9 +146,9 @@ class Theme {
     this.path = path.join(themePath, name);
 
     this.hbs = handlebars.create();
-    //this.i18n = new I18n({
+    // this.i18n = new I18n({
     //    // TODO get all the locales from the locales directory.
-    //});
+    // });
 
     try {
       fs.stat(this.path);
@@ -193,9 +194,10 @@ class ThemeManager {
     this.cache = {};
     this.path = themePath;
 
-    let themes = fs.readdirSync(themePath).filter(function(v) {
+    const themes = fs.readdirSync(themePath).filter(v => {
       return fs.statSync(path.join(themePath, v)).isDirectory();
     });
+
     themes.sort();
 
     Object.defineProperty(this, 'themes', {

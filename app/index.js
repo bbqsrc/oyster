@@ -11,7 +11,7 @@ const koa = require('koa'),
       session = require('koa-session'),
       passport = require('koa-passport'),
       passportMongo = require('passport-mongodb'),
-      locale = require('koa-locale'),
+      koaLocale = require('koa-locale'),
       i18n = require('koa-i18n'),
       send = require('koa-send'),
       compress = require('koa-compress'),
@@ -50,7 +50,7 @@ module.exports = function createApp(root, config) {
 
   app.use(compress());
 
-  locale(app);
+  koaLocale(app);
 
   app.use(i18n(app, {
     directory: resolvePath(root, 'content/locales'),
@@ -95,8 +95,8 @@ module.exports = function createApp(root, config) {
 
   app.use(function* setAppState(next) {
     let locale = config.locales[0];
-
     let user;
+
     if (this.req.user) {
       user = this.req.user;
     }
@@ -110,8 +110,8 @@ module.exports = function createApp(root, config) {
       moment,
       __: this.i18n.__.bind(this.i18n),
       __n: this.i18n.__n.bind(this.i18n),
-      user: user,
-      locale: locale
+      user,
+      locale
     };
 
     yield next;
