@@ -70,11 +70,11 @@ block content
       }).success(function() {
         location.reload();
       }).error(function(res, _, msg) {
-        if (res.status === 409) {
+        if (res.status === 409 && res.responseJSON) {
           alert(res.responseJSON.length + " duplicate emails detected.\n\n" 
               + JSON.stringify(res.responseJSON.emails, null, 2))
         } else {
-          alert(res.response);
+          alert(res.responseText);
         }
         $(self).removeAttr('disabled');
       });

@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 
 import Modal from './modal';
 import TomlValidator from './toml-validator';
+import ThemeSelector from './theme-selector';
 
 import ace from 'ace';
 import $ from 'jquery';
+import TOML from 'toml';
 
 export default class EditPoll extends Component {
   constructor(props) {
@@ -13,6 +15,7 @@ export default class EditPoll extends Component {
     this.state = {
       editMode: false,
       content: props.poll.contentAsTOML(),
+      theme: props.poll.theme,
       windowHeight: window.innerHeight
     };
   }
@@ -52,14 +55,30 @@ export default class EditPoll extends Component {
   }
 
   onModalSubmit() {
+    const content = this.editor.getValue();
     this.setState({
-      content: this.editor.getValue()
+      content: content
+    });
+
+    $.ajax('/api/poll/' + this.props.poll.slug, {
+      method: 'put',
+      data: {
+        content: TOML.parse(content)
+      }
+    }, function(res) {
+      $(window).trigger('poll:updated', res.poll);
     });
   }
 
   onWindowResize() {
     this.setState({
       windowHeight: window.innerHeight
+    });
+  }
+
+  onChangeTheme(e) {
+    this.setState({
+      theme: e.target.value
     });
   }
 
@@ -74,15 +93,19 @@ export default class EditPoll extends Component {
   render() {
     this.modal = (
       <Modal
-          size='lg'
-          title='Edit ballot template'
-          visible={this.state.editMode}
-          onHide={this.onModalHide.bind(this)}
-          onClick={this.onModalSubmit.bind(this)}
-          options={{show: false, backdrop: 'static'}}
-          btnClass='success' btnText='Save'
+        size='lg'
+        title='Edit ballot template'
+        visible={this.state.editMode}
+        onHide={this.onModalHide.bind(this)}
+        onClick={this.onModalSubmit.bind(this)}
+        options={{show: false, backdrop: 'static'}}
+        btnClass='success' btnText='Save'
       >
-        <pre ref='editor' style={{minHeight: this.state.windowHeight - 300}}></pre>
+        <div className='form-group'>
+          <label htmlFor='theme' className='control-label'>Theme</label>
+          <ThemeSelector id='theme' className='form-control' value={this.state.theme} onChange={this.onChangeTheme.bind(this)}/>
+        </div>
+        <pre ref='editor' style={{minHeight: this.state.windowHeight - 370}}></pre>
         <TomlValidator source={this.state.content} />
       </Modal>
     );
@@ -95,7 +118,7 @@ export default class EditPoll extends Component {
           </div>
           <h2>Ballot
             <small style={{marginLeft: '1em'}}>
-              <strong>Theme:</strong> {this.props.poll.theme || 'no theme!'}
+              <strong>Theme:</strong> {this.state.theme || 'no theme!'}
             </small>
           </h2>
 

@@ -125,6 +125,28 @@ function* putUsers() {
   yield user.remove();
 
   return (this.status = 200);
+})
+.get('/themes', isAdmin, function*() {
+  return this.body = { themes: this.themeManager.themes };
+})
+.put('/poll/:pollSlug', isAdmin, bodyParser(), function*() {
+  let poll = yield models.Poll.findOne({slug: this.params.pollSlug}).exec();
+
+  if (!poll) {
+    return this.status = 404;
+  }
+
+  if (!poll.isEditable()) {
+    return this.status = 403;
+  }
+
+  // TODO validate conditional editable fields
+  let fields = this.request.body.fields;
+
+  poll.set(fields);
+  yield poll.save();
+
+  return this.body = { poll: poll };
 });
 
 module.exports = router;

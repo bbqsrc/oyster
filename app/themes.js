@@ -192,6 +192,16 @@ class ThemeManager {
   constructor(themePath) {
     this.cache = {};
     this.path = themePath;
+
+    let themes = fs.readdirSync(themePath).filter(function(v) {
+      return fs.statSync(path.join(themePath, v)).isDirectory();
+    });
+    themes.sort();
+
+    Object.defineProperty(this, 'themes', {
+      value: themes,
+      enumerable: true
+    });
   }
 
   load(themeName) {
@@ -222,6 +232,8 @@ module.exports = function themes(modOpts) {
   const themeMgr = new ThemeManager(opts.path);
 
   return function* appThemes(next) {
+    this.themeManager = themeMgr;
+
     this.renderTheme = function* renderTheme(themeName, locals, options) {
       Log.d(TAG, themeName, this);
 

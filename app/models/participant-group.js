@@ -77,4 +77,4 @@ participantGroupSchema.pre('save', function preSave(next) {
   }
 });
 
-module.exports = mongoose.model('participantSchemaGroup', participantGroupSchema);
+module.exports = mongoose.model('ParticipantGroup', participantGroupSchema);

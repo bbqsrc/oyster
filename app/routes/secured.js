@@ -125,6 +125,9 @@ router
       if (err.data) {
         this.status = 409;
         return (this.body = err.data);
+      } else if (/ValidationError/.test(err.name)) {
+        this.status = 400;
+        return this.body = 'Invalid data';
       } else {
         throw err;
       }
@@ -171,12 +174,14 @@ router
     const participantGroups = yield models.ParticipantGroup.find({}).exec();
 
     // TODO dehardcode
-    const fp = path.join(__dirname, '../../content/themes');
-    const themes = (yield fs.readdir(fp)).filter(v => {
+    /*
+    let fp = path.join(__dirname, '../../content/themes');
+    let themes = (yield fs.readdir(fp)).filter(function(v) {
       return fs.statSync(path.join(fp, v)).isDirectory();
     });
-
     themes.sort();
+    */
+    const themes = this.themeManager.themes;
 
     yield this.render('admin-new-poll', {
       title: this.i18n.__('New Poll'),

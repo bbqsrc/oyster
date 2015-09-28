@@ -8,6 +8,9 @@ import EditBallot from './edit-ballot';
 
 import { Poll } from '../models';
 
+import $ from 'jquery';
+import mongoose from 'mongoose';
+
 export default class AdminPollPage extends Component {
   constructor(props) {
     super(props);
@@ -17,6 +20,23 @@ export default class AdminPollPage extends Component {
     this.state = {
       poll: doc
     };
+  }
+
+  onPollUpdated(e, data) {
+    const doc = new mongoose.Document(data, Poll);
+
+    this.setState({
+      poll: doc
+    });
+  }
+
+  componentDidMount() {
+    this._onPollUpdated = this.onPollUpdated.bind(this);
+    $(window).on('poll:updated', this._onPollUpdated);
+  }
+
+  componentDidUnmount() {
+    $(window).off('poll:updated', this._onPollUpdated);
   }
 
   render() {
