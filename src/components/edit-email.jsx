@@ -46,11 +46,26 @@ class EditEmail extends Component {
   }
 
   onModalHide() {
-
+    this.setState({
+      email: this.props.poll.email,
+      editMode: false
+    });
   }
 
   onModalSubmit() {
+    const self = this;
 
+    // Get ahead of primary source of truth update
+    this.props.poll.email = this.state.email;
+
+    $.ajax('/api/poll/' + this.props.poll.slug, {
+      method: 'put',
+      data: {
+        email: self.state.email.toObject()
+      }
+    }).success(function(res) {
+      $(window).trigger('poll:updated', res.poll);
+    });
   }
 
   render() {

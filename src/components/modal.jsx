@@ -1,13 +1,16 @@
-import React from 'react';
+import { Component } from 'react';
 
 import $ from 'jquery';
 
-const Modal = React.createClass({
-  getInitialState() {
-    return {
+export default
+class Modal extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
       visible: false
     };
-  },
+  }
 
   componentDidMount() {
     let m = $(React.findDOMNode(this));
@@ -23,7 +26,7 @@ const Modal = React.createClass({
     }
 
     this.$ = m;
-  },
+  }
 
   onClick() {
     let shouldHide = true;
@@ -40,13 +43,12 @@ const Modal = React.createClass({
         visible: false
       });
     }
-  },
+  }
 
   componentDidUnmount() {
     this.$.modal('hide').data('bs.modal', null);
     this.$.remove();
-    console.log('lol');
-  },
+  }
 
   componentWillUpdate(nextProps) {
     // Check for change to visible prop
@@ -55,13 +57,17 @@ const Modal = React.createClass({
         visible: nextProps.visible
       });
     }
-  },
+  }
 
   componentDidUpdate(_, prevState) {
     if (prevState.visible !== this.state.visible) {
       this.$.modal(this.state.visible ? 'show' : 'hide');
     }
-  },
+  }
+
+  isButtonEnabled() {
+    return this.props.btnEnabled === undefined || this.props.btnEnabled;
+  }
 
   render() {
     return (
@@ -79,7 +85,7 @@ const Modal = React.createClass({
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-              <button type="button" className={'btn btn-' + (this.props.btnClass || 'primary')} onClick={this.onClick} >
+              <button type="button" disabled={!this.isButtonEnabled.bind(this)} className={'btn btn-' + (this.props.btnClass || 'primary')} onClick={this.onClick.bind(this)} >
                 {this.props.btnText}
               </button>
             </div>
@@ -88,6 +94,4 @@ const Modal = React.createClass({
       </div>
     );
   }
-});
-
-export { Modal as default };
+}

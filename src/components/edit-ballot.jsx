@@ -14,8 +14,9 @@ export default class EditPoll extends Component {
 
     this.state = {
       editMode: false,
-      content: props.poll.contentAsTOML(),
-      theme: props.poll.theme,
+      canSubmit: true,
+      content: this.props.poll.contentAsTOML(),
+      theme: this.props.poll.theme,
       windowHeight: window.innerHeight
     };
   }
@@ -24,6 +25,8 @@ export default class EditPoll extends Component {
     if (!this.editor) {
       this.applyAceEditor();
     }
+
+    this.editor.setValue(this.state.content);
 
     this.setState({
       editMode: true
@@ -37,9 +40,7 @@ export default class EditPoll extends Component {
     editor.setTheme('ace/theme/monokai');
     editor.getSession().setMode('ace/mode/toml');
 
-    editor.setValue(this.state.content);
     editor.on('input', function() {
-      // TODO: move into AceEditor obj.
       this.setState({
         content: editor.getValue()
       });
@@ -50,22 +51,30 @@ export default class EditPoll extends Component {
 
   onModalHide() {
     this.setState({
+      content: this.props.poll.contentAsTOML(),
+      theme: this.props.poll.theme,
       editMode: false
+    }, function() {
+      // Ensure it gets the correct content
+      this.editor.setValue(this.state.content);
     });
   }
 
   onModalSubmit() {
-    const content = this.editor.getValue();
-    this.setState({
-      content: content
-    });
+
+    const content = TOML.parse(this.state.content);
+
+    // Get ahead of the 'primary source of truth' updates
+    this.props.poll.content = content;
+    this.props.poll.theme = this.state.theme;
 
     $.ajax('/api/poll/' + this.props.poll.slug, {
       method: 'put',
       data: {
-        content: TOML.parse(content)
+        content: content,
+        theme: this.state.theme
       }
-    }, function(res) {
+    }).success(function(res) {
       $(window).trigger('poll:updated', res.poll);
     });
   }
@@ -100,13 +109,14 @@ export default class EditPoll extends Component {
         onClick={this.onModalSubmit.bind(this)}
         options={{show: false, backdrop: 'static'}}
         btnClass='success' btnText='Save'
+        btnEnabled={this.state.canSubmit}
       >
         <div className='form-group'>
           <label htmlFor='theme' className='control-label'>Theme</label>
           <ThemeSelector id='theme' className='form-control' value={this.state.theme} onChange={this.onChangeTheme.bind(this)}/>
         </div>
         <pre ref='editor' style={{minHeight: this.state.windowHeight - 370}}></pre>
-        <TomlValidator source={this.state.content} />
+        <TomlValidator onChange={v => this.setState({ canSubmit: v })} source={this.state.content} />
       </Modal>
     );
 
