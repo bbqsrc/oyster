@@ -1,36 +1,37 @@
 'use strict';
 
-var TAG = 'oyster/routes/secured';
+const TAG = 'oyster/routes/secured';
 
-var Log = require('huggare'),
-    router = require('koa-router')(),
-    bodyParser = require('koa-better-body'),
-    passport = require('koa-passport'),
-    models = require('../models'),
-    util = require('../util'),
-    path = require('path'),
-    fs = require('mz/fs');
+const Log = require('huggare'),
+      router = require('koa-router')(),
+      bodyParser = require('koa-better-body'),
+      passport = require('koa-passport'),
+      models = require('../models'),
+      util = require('../util'),
+      path = require('path'),
+      fs = require('mz/fs');
 
-function *isAdmin (next) {
+// TODO don't repeat yourself
+function* isAdmin(next) {
   if (this.req.user) {
     if (this.req.user.isAdmin()) {
       yield next;
     } else {
-      return this.status = 403;
+      return (this.status = 403);
     }
   } else {
-    this.redirect('/admin/login?r=' + encodeURIComponent(this.request.originalUrl)); // TODO dehardcode
+    this.redirect(`/admin/login?r=${encodeURIComponent(this.request.originalUrl)}`);
   }
 }
 
 router
-  .get('logout', '/logout', function* () {
+  .get('logout', '/logout', function* getLogout() {
     this.logout();
     this.redirect('/admin/login');
   })
-  .get('login', '/login', function* () {
+  .get('login', '/login', function* getLogin() {
     if (this.req.user) {
-      return this.body = this.i18n.__('Already logged in.');
+      return (this.body = this.i18n.__('Already logged in.'));
     } else {
       yield this.render('admin-login', {
         title: 'Log in',
@@ -38,26 +39,28 @@ router
       });
     }
   })
-  .post('/login', bodyParser(), function* (next) {
-    let self = this;
+  .post('/login', bodyParser(), function* postLogin(next) {
+    const self = this;
 
     if (this.req.user) {
-      return this.body = this.i18n.__('Already logged in.');
+      return (this.body = this.i18n.__('Already logged in.'));
     }
 
-    yield passport.authenticate('mongodb', function* (err, user) {
-      if (err) throw err;
+    yield passport.authenticate('mongodb', function* callback(err, user) {
+      if (err) {
+        throw err;
+      }
+
+      const username = self.request.body.fields.username;
 
       if (user === false) {
-        Log.w(TAG, 'failed login attempt for user "' +
-                   self.request.body.fields.username + '".');
+        Log.w(TAG, `failed login attempt for user "${username}".`);
         self.status = 401;
         self.redirect('login');
       } else {
         yield self.login(user);
 
-        Log.w(TAG, 'successful log in for user "' +
-                   self.request.body.fields.username + '".');
+        Log.w(TAG, `successful log in for user "${username}".`);
 
         if (self.request.query.r) {
           self.redirect(self.request.query.r);
@@ -67,100 +70,108 @@ router
       }
     }).call(this, next);
   })
-  .get('/', isAdmin, function* () {
+  .get('/', isAdmin, function* getRoot() {
     yield this.render('admin-index', { title: 'Index' });
   })
-  .get('/participants', isAdmin, function* () {
-    let pgs = yield models.ParticipantGroup.find({}).exec();
+  .get('/participants', isAdmin, function* getParticipants() {
+    const pgs = yield models.ParticipantGroup.find({}).exec();
 
     yield this.render('admin-participants', {
       titles: this.i18n.__('All Participants'),
       participants: pgs
     });
   })
-  .post('/participants', isAdmin, bodyParser({ multipart: true }), function*() {
-    let body = this.request.body;
+  .post('/participants', isAdmin, bodyParser({ multipart: true }),
+  function* postParticipants() {
+    const fields = this.request.body.fields;
+    const files = this.request.body.files;
 
     let data;
+
     try {
-      data = yield fs.readFile(body.files.participants.path, {encoding: 'utf-8'});
+      data = yield fs.readFile(files.participants.path, { encoding: 'utf-8' });
     } catch (e) {
       Log.wtf(TAG, 'An uploaded file could not be read!', e);
-      return this.status = 500;
+      return (this.status = 500);
     }
 
-    let participants = data.split('\n').map(function(email) {
+    const participants = data.split('\n').map(email => {
       return { email: email.trim() };
-    }).filter(function(v) { return v != null && v.email.length > 0; });
+    }).filter(v => {
+      return v != null && v.email.length > 0;
+    });
 
-    let flags = body.fields.flags.trim();
+    let flags = fields.flags.trim();
+
     if (flags === '') {
       flags = [];
     } else {
       flags = flags.split(/\s+/);
     }
 
-    let pg = new models.ParticipantGroup({
-      name: body.fields.name.trim(),
-      participants: participants,
-      flags: flags
+    const name = fields.name.trim();
+
+    const pg = new models.ParticipantGroup({
+      name,
+      participants,
+      flags
     });
 
     try {
       yield pg.save();
-    } catch(err) {
+    } catch (err) {
       // Duplicate emails
       if (err.data) {
         this.status = 409;
-        return this.body = err.data;
+        return (this.body = err.data);
       } else {
         throw err;
       }
     }
 
-    return this.status = 200;
+    return (this.status = 200);
   })
-  .get('/participant/:pgId', isAdmin, function* () {
-    let pg = yield models.ParticipantGroup.findById(this.params.pgId).exec();
+  .get('/participant/:pgId', isAdmin, function* getParticipantGroup() {
+    const pg = yield models.ParticipantGroup.findById(this.params.pgId).exec();
 
     if (!pg) {
-      return this.status = 404;
+      return (this.status = 404);
     }
 
     // TODO themes.
-    return this.body = JSON.stringify(pg.toObject(), null, 2);
+    return (this.body = JSON.stringify(pg.toObject(), null, 2));
   })
-  .delete('/participant/:pgId', isAdmin, function*() {
-    let pg = yield models.ParticipantGroup.findById(this.params.pgId).exec();
+  .delete('/participant/:pgId', isAdmin, function* deleteParticipantGroup() {
+    const pg = yield models.ParticipantGroup.findById(this.params.pgId).exec();
 
     if (!pg) {
-      return this.status = 404;
+      return (this.status = 404);
     }
 
     if (yield pg.isDeletable()) {
       yield pg.remove();
-      return this.status = 200;
+      return (this.status = 200);
     }
 
     this.status = 403;
-    return this.body = 'This participant group is currently in use.';
+    return (this.body = this.i18n.__('This participant group is currently in use.'));
   })
-  .get('/polls', isAdmin, function* () {
+  .get('/polls', isAdmin, function* getPolls() {
     // TODO pagination!!
 
-    let polls = yield models.Poll.find({}).exec();
+    const polls = yield models.Poll.find({}).exec();
 
     yield this.render('admin-polls', {
       title: this.i18n.__('All Polls'),
-      polls: polls
+      polls
     });
   })
-  .get('/polls/new', isAdmin, function* () {
-    let participantGroups = yield models.ParticipantGroup.find({}).exec();
+  .get('/polls/new', isAdmin, function* getNewPoll() {
+    const participantGroups = yield models.ParticipantGroup.find({}).exec();
 
     // TODO dehardcode
-    let fp = path.join(__dirname, '../../content/themes');
-    let themes = (yield fs.readdir(fp)).filter(function(v) {
+    const fp = path.join(__dirname, '../../content/themes');
+    const themes = (yield fs.readdir(fp)).filter(v => {
       return fs.statSync(path.join(fp, v)).isDirectory();
     });
 
@@ -169,44 +180,32 @@ router
     yield this.render('admin-new-poll', {
       title: this.i18n.__('New Poll'),
       participants: participantGroups,
-      themes: themes
+      themes
     });
   })
-  .post('/polls/new', isAdmin, bodyParser(), function* () {
-    let poll = yield models.Poll.createPoll(this.request.body.fields);
-    this.redirect('/admin/poll/' + poll.slug);
+  .post('/polls/new', isAdmin, bodyParser(), function* postNewPoll() {
+    const poll = yield models.Poll.createPoll(this.request.body.fields);
+
+    this.redirect(`/admin/poll/${poll.slug}`);
   })
-  .param('poll', function *(slug, next) {
+  .param('poll', function* paramPoll(slug, next) {
     this.poll = yield models.Poll.findBySlug(slug);
 
     if (!this.poll) {
-      return this.status = 404;
+      return (this.status = 404);
     }
 
     yield next;
   })
-  .get('/poll/:poll', isAdmin, function* () {
+  .get('/poll/:poll', isAdmin, function* getPoll() {
     yield this.render('admin-poll', {
-      title: this.i18n.__('Poll') + ' - ' + this.poll.slug,
+      title: `${this.i18n.__('Poll')} - ${this.poll.slug}`,
       poll: this.poll
     });
   })
-  .get('/poll/:poll/edit', isAdmin, function* () {
-    // this.poll.isEditable()
+  .get('/poll/:poll/test', isAdmin, function* getTestPoll() {
+    let flags = []; // eslint-disable-line no-unused-vars
 
-    return this.body = 'TODO.';
-  })
-  .post('/poll/:poll/edit', isAdmin, function* () {
-    // this.poll.isEditable()
-
-    return this.body = 'TODO.';
-  })
-  .get('/poll/:poll/ballots', isAdmin, function* () {
-    // TODO
-    return this.body = 'TODO.';
-  })
-  .get('/poll/:poll/test', isAdmin, function* () {
-    let flags = []; // eslint-disable-line
     if (this.request.query.flags) {
       flags = this.request.query.flags.split(',');
     }
@@ -216,12 +215,13 @@ router
       Log.e(TAG, 'Poll', this.poll.slug, 'is missing a theme; defaulting to australia.');
       this.poll.theme = 'australia';
     }
+
     yield this.renderTheme(this.poll.theme, this.poll.content);
   })
-  .delete('/poll/:poll', isAdmin, function* () {
+  .delete('/poll/:poll', isAdmin, function* deletePoll() {
     if (this.poll.isEditable()) {
       this.status = 403;
-      return this.body = 'Cannot delete: poll has already been started.';
+      return (this.body = 'Cannot delete: poll has already been started.');
     }
 
     this.poll.cancel();
@@ -230,35 +230,35 @@ router
     // TODO dehardcode
     this.redirect('/admin/polls');
   })
-  .post('/poll/:poll/test', isAdmin, bodyParser(), function* () {
-    let data = util.parseNestedKeys(this.request.body.fields);
+  .post('/poll/:poll/test', isAdmin, bodyParser(), function* postTestPoll() {
+    const data = util.parseNestedKeys(this.request.body.fields);
 
-    return this.body = JSON.stringify(data, null, 2);
+    return (this.body = JSON.stringify(data, null, 2));
   })
-  .get('/poll/:poll/results', isAdmin, function* () {
-    let results = yield this.poll.generateResults();
+  .get('/poll/:poll/results', isAdmin, function* getPollResults() {
+    const results = yield this.poll.generateResults();
 
     yield this.render('admin-results', {
-      title: this.i18n.__('Results') + ' - ' + this.poll.slug,
+      title: `${this.i18n.__('Results')} - ${this.poll.slug}`,
       poll: this.poll,
-      results: results
+      results
     });
   })
-  .get('/poll/:poll/export/results', isAdmin, function* () {
-    return this.body = JSON.stringify(yield this.poll.generateResults(), null, 2);
+  .get('/poll/:poll/export/results', isAdmin, function* getExportedResults() {
+    return (this.body = JSON.stringify(yield this.poll.generateResults(), null, 2));
   })
-  .get('/users', isAdmin, function* () {
+  .get('/users', isAdmin, function* getUsers() {
     yield this.render('admin-users', {
       title: this.i18n.__('Users')
     });
   })
-  .get('/change-password', isAdmin, function* () {
+  .get('/change-password', isAdmin, function* getChangePassword() {
     yield this.render('admin-change-password', {
       title: this.i18n.__('Change Password')
     });
   })
-  .post('/change-password', isAdmin, bodyParser(), function* () {
-    let body = this.request.body;
+  .post('/change-password', isAdmin, bodyParser(), function* postChangePassword() {
+    const body = this.request.body;
 
     if (!body.currPassword || !body.password || !body.password2) {
       this.status = 400;
@@ -275,7 +275,8 @@ router
       });
     }
 
-    let success = yield this.req.user.verifyPassword(body.currPassword);
+    const success = yield this.req.user.verifyPassword(body.currPassword);
+
     if (!success) {
       return yield this.render('admin-change-password', {
         title: this.i18n.__('Change Password'),
@@ -283,7 +284,8 @@ router
       });
     }
 
-    let user = yield this.req.user.updatePassword(body.password);
+    const user = yield this.req.user.updatePassword(body.password);
+
     yield user.save();
     this.req.user = user;
 

@@ -1,15 +1,15 @@
 'use strict'; /* eslint-disable no-unused-vars */
 
-var nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 
-module.exports.createTransport = function(transporter) {
-  let transport = nodemailer.createTransport.apply(nodemailer, arguments);
+module.exports.createTransport = function createTransport(transporter) {
+  const transport = nodemailer.createTransport.apply(...arguments);
 
-  let _sendMail = transport.sendMail.bind(transport);
+  const _sendMail = transport.sendMail.bind(transport);
 
   transport.sendMail = function sendMail(data) {
-    return new Promise(function(resolve, reject) {
-      _sendMail(data, function(err, info) {
+    return new Promise((resolve, reject) => {
+      _sendMail(data, (err, info) => {
         if (err) {
           return reject(err);
         }

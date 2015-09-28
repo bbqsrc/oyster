@@ -1,10 +1,10 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    uuid = require('node-uuid'),
-    Schema = mongoose.Schema;
+const mongoose = require('mongoose'),
+      uuid = require('node-uuid'),
+      Schema = mongoose.Schema;
 
-var ballotSchema = new Schema({
+const ballotSchema = new Schema({
   _id: { type: Buffer, index: { unique: true } },
   token: String,
   poll: String,
@@ -14,20 +14,22 @@ var ballotSchema = new Schema({
 
 // UUID _id so insertion order isn't assessable.
 // Makes it harder to link order of tokens with Poll.emailsSent
-ballotSchema.pre('save', function(next) {
+ballotSchema.pre('save', function preSave(next) {
   if (this.isNew) {
-    let buffer = new Buffer(16);
+    const buffer = new Buffer(16);
+
     uuid.v4(null, buffer, 0);
     this.set('_id', buffer);
     // FIXME: setting the subtype breaks saving in Mongoose.
-    //this._id.subtype(0x04); // BSON subtype UUID
+    // this._id.subtype(0x04); // BSON subtype UUID
   }
+
   return next();
 });
 
-ballotSchema.statics.eachForSlug = function(slug, eachFn) {
-  return new Promise(function(resolve, reject) {
-    let stream = this.find({
+ballotSchema.statics.eachForSlug = function eachForSlug(slug, eachFn) {
+  return new Promise((resolve, reject) => {
+    const stream = this.find({
       poll: slug,
       data: { $exists: true }
     }).stream();
@@ -36,16 +38,16 @@ ballotSchema.statics.eachForSlug = function(slug, eachFn) {
       .on('data', function() {
         try {
           eachFn.apply(this, arguments);
-        } catch(err) {
+        } catch (err) {
           return reject(err);
         }
       })
       .on('error', reject)
       .on('end', resolve);
-  }.bind(this));
+  });
 };
 
-ballotSchema.methods.getPoll = function() {
+ballotSchema.methods.getPoll = function getPoll() {
   return this.model('Poll').findOne({ slug: this.poll }).exec();
 };
 

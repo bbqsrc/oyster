@@ -1,27 +1,27 @@
 'use strict';
 
-var Log = require('huggare'),
-    fs = require('fs');
+const Log = require('huggare'),
+      fs = require('fs');
 
-var FlatFileFormatter = function(opts) {
-  var TAG = 'FlatFileFormatter';
+function FlatFileFormatter(options) {
+  const TAG = 'FlatFileFormatter';
 
-  opts = opts || {};
+  const opts = options || {};
 
   if (!opts.path) {
     throw new Error('opts.path required');
   }
 
-  var stream = fs.createWriteStream(opts.path, {
+  const stream = fs.createWriteStream(opts.path, {
     flags: 'a',
     encoding: 'utf8'
   });
 
-  stream.on('error', function(err) {
+  stream.on('error', err => {
     Log.wtf(TAG, 'stream has had a write error', err);
   });
 
-  return function(ts, prio, tag, args) {
+  return function flatFileFormatter(ts, prio, tag, args) {
     if (opts.level && prio < opts.level) {
       return;
     }
@@ -33,15 +33,15 @@ var FlatFileFormatter = function(opts) {
     }
 
     if (args.message) {
-      stream.write(ts.toISOString() + ' [' + this.SHORT_NAMES[prio] + '] ' +
-                   tag + ': ' + args.message + '\n');
+      const shortName = this.SHORT_NAMES[prio];
+
+      stream.write(`${ts.toISOString()} [${shortName}] ${tag}: ${args.message}\n`);
     }
 
     if (args.err) {
-      stream.write(args.err.stack || args.err);
-      stream.write('\n');
+      stream.write(`${args.err.stack || args.err}\n`);
     }
   };
-};
+}
 
 module.exports.FlatFileFormatter = FlatFileFormatter;

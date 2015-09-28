@@ -1,29 +1,30 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    co = require('co');
+const mongoose = require('mongoose'),
+      Schema = mongoose.Schema,
+      co = require('co');
 
-var participantSchema = new Schema({
+const participantSchema = new Schema({
   email: { type: String },
   profile: {}
 });
 
-participantSchema.path('email').validate(function(email) {
+participantSchema.path('email').validate(email => {
   // Check for extra spaces
-  let em = email.trim();
+  const em = email.trim();
+
   return em === email && /^.+@.+\..+$/.test(em);
 }, 'invalid email');
 
-var participantGroupSchema = new Schema({
+const participantGroupSchema = new Schema({
   name: { type: String, unique: true },
   participants: { type: [participantSchema], default: [] },
   flags: { type: [String], default: [] }
 });
 
-participantGroupSchema.methods.isDeletable = function() {
-  return co(function*() {
-    let polls = yield mongoose.model('Poll').count({
+participantGroupSchema.methods.isDeletable = function isDeletable() {
+  return co(function* co$isDeletable() {
+    const polls = yield mongoose.model('Poll').count({
       participantGroups: this.name,
       results: { $exists: false }
     }).exec();
@@ -32,11 +33,11 @@ participantGroupSchema.methods.isDeletable = function() {
   }.bind(this));
 };
 
-participantGroupSchema.methods.duplicateEmails = function() {
-  let emails = new Map();
+participantGroupSchema.methods.duplicateEmails = function duplicateEmails() {
+  const emails = new Map();
 
-  for (let p of this.participants) {
-    let email = p.email;
+  for (const p of this.participants) {
+    const email = p.email;
 
     if (emails.has(email)) {
       emails.set(email, emails.get(email) + 1);
@@ -45,14 +46,14 @@ participantGroupSchema.methods.duplicateEmails = function() {
     }
   }
 
-  let dupes = {
+  const dupes = {
     length: 0,
     emails: {}
   };
 
-  for (let o of emails.entries()) {
-    let k = o[0];
-    let v = o[1];
+  for (const o of emails.entries()) {
+    const k = o[0];
+    const v = o[1];
 
     if (v > 1) {
       dupes.length++;
@@ -63,13 +64,13 @@ participantGroupSchema.methods.duplicateEmails = function() {
   return dupes;
 };
 
-participantGroupSchema.pre('save', function(next) {
-  let dupes = this.duplicateEmails();
+participantGroupSchema.pre('save', function preSave(next) {
+  const dupes = this.duplicateEmails();
 
   if (dupes.length) {
-    let err = new Error('Duplicate emails found.');
-    err.data = dupes;
+    const err = new Error('Duplicate emails found.');
 
+    err.data = dupes;
     next(err);
   } else {
     next();

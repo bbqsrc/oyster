@@ -1,31 +1,31 @@
 'use strict';
 
-var TAG = 'oyster/routes/index';
+const TAG = 'oyster/routes/index';
 
-var Log = require('huggare'),
-    router = require('koa-router')(),
-    bodyParser = require('koa-better-body'),
-    util = require('../util'),
-    models = require('../models');
+const Log = require('huggare'),
+      router = require('koa-router')(),
+      bodyParser = require('koa-better-body'),
+      util = require('../util'),
+      models = require('../models');
 
 router
-  .param('poll', function *(slug, next) {
+  .param('poll', function* paramPoll(slug, next) {
     this.poll = yield models.Poll.findBySlug(slug);
 
     if (!this.poll) {
-      return this.status = 404;
+      return (this.status = 404);
     }
 
     yield next;
   })
-  .param('token', function *(token, next) {
+  .param('token', function* paramToken(token, next) {
     this.ballot = yield models.Ballot.findOne({
       poll: this.poll.slug,
-      token: token
+      token
     }).exec();
 
     if (!this.ballot) {
-      return this.status = 404;
+      return (this.status = 404);
     }
 
     if (this.ballot.data != null) {
@@ -39,7 +39,7 @@ router
       });
     }
 
-    let now = +Date.now();
+    const now = +Date.now();
 
     // Let us be only serving if within the good period of time oh yes.
     if (+this.poll.startTime > now) {
@@ -63,24 +63,24 @@ router
 
     yield next;
   })
-  .get('/', function *() {
+  .get('/', function* getRoot() {
     yield this.render('home', {
       title: this.i18n.__('Index')
     });
   })
-  .get('/poll/:poll/:token', function *() {
+  .get('/poll/:poll/:token', function* getPollForToken() {
     // TODO implement flags
     yield this.renderTheme(this.poll.theme, this.poll.content);
   })
-  .post('/poll/:poll/:token', bodyParser(), function *() {
-    let data = util.parseNestedKeys(this.request.body.fields);
+  .post('/poll/:poll/:token', bodyParser(), function* postPollForToken() {
+    const data = util.parseNestedKeys(this.request.body.fields);
 
     this.ballot.set('data', data);
     this.ballot.markModified('data');
 
     try {
       yield this.ballot.save();
-    } catch(e) {
+    } catch (e) {
       Log.e(TAG, 'failure to save ballot', e);
       this.status = 500;
       return yield this.render('error', {
@@ -98,57 +98,66 @@ router
       ballot: data
     });
   })
-  .get('/export/:poll/results', pollPrecheck, function *() {
-    return this.body = this.poll.results;
+  .get('/export/:poll/results', pollPrecheck,
+  function* getExportedPollResults() {
+    return (this.body = this.poll.results);
   })
-  .get('/export/:poll/poll', pollPrecheck, function *() {
-    let o = this.poll.toObject();
-    delete o.emailsSent; // privacy
+  .get('/export/:poll/poll', pollPrecheck,
+  function* getExportedPollData() {
+    const o = this.poll.toObject();
+
+    // privacy
+    delete o.emailsSent;
     delete o._id;
-    return this.body = o;
+
+    return (this.body = o);
   })
-  .get('/export/:poll/ballots', pollPrecheck, function *() {
-    return this.body = {
+  .get('/export/:poll/ballots', pollPrecheck,
+  function* getExportedPollBallots() {
+    this.body = {
       poll: this.poll.slug,
-      ballots: yield models.Ballot.find({poll: this.poll.slug}, {
+      ballots: yield models.Ballot.find({ poll: this.poll.slug }, {
         _id: 0, __v: 0
       }).exec()
     };
+    return;
   })
-  .get('/results/:poll', pollPrecheck, function *() {
-    let totalBallots = yield models.Ballot.count({
+  .get('/results/:poll', pollPrecheck, function* getPollResults() {
+    const totalBallots = yield models.Ballot.count({
       poll: this.poll.slug,
       data: { $exists: true }
     }).exec();
 
     if (this.poll.results) {
       return yield this.render('results', {
-        title: this.i18n.__('Results') + ' - ' + this.poll.title,
+        title: `${this.i18n.__('Results')} - ${this.poll.title}`,
         poll: this.poll,
-        totalCompleteBallots: totalBallots
+        totalDeletedBallots: totalBallots
       });
     } else {
-      return this.body = this.i18n.__('The results have not finished ' +
-                                      'generating yet. Please try again later.');
+      this.body = this.i18n.__('The results have not finished ' +
+                                'generating yet. Please try again later.');
+      return;
     }
   });
 
-function *pollPrecheck (next) {
+function* pollPrecheck(next) {
   // Check if poll allows router results
   if (!this.poll.isPublic) {
-    return this.status = 404; // mask existence
+    // mask existence
+    return (this.status = 404);
   }
 
-  let now = Date.now();
+  const now = Date.now();
 
   if (+this.poll.startTime > now) {
     this.status = 403;
-    return this.body = this.i18n.__('The poll has not started yet.');
+    return (this.body = this.i18n.__('The poll has not started yet.'));
   }
 
   if (+this.poll.endTime > now) {
     this.status = 403;
-    return this.body = this.i18n.__('The poll has not ended yet.');
+    return (this.body = this.i18n.__('The poll has not ended yet.'));
   }
 
   yield next;

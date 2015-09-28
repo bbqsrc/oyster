@@ -1,32 +1,33 @@
 'use strict';
 
-var util = require('util'); // nodejs util.
+// nodejs util.
+const util = require('util');
 
 /** Splits on '.' into an object. */
-exports.parseNestedKeys = function (obj) {
-  let out = {};
+exports.parseNestedKeys = function parseNestedKeys(obj) {
+  const out = {};
 
-  for (let key in obj) {
-    let chunks = key.split('.');
+  for (const key in obj) {
+    const chunks = key.split('.');
     let tmp = out;
 
-    for (let i = 0, ii = chunks.length-1; i < ii; ++i) {
+    for (let i = 0, ii = chunks.length - 1; i < ii; ++i) {
       if (tmp[chunks[i]] == null) {
         tmp[chunks[i]] = {};
       }
       tmp = tmp[chunks[i]];
     }
 
-    tmp[chunks[chunks.length-1]] = obj[key];
+    tmp[chunks[chunks.length - 1]] = obj[key];
   }
 
   return out;
 };
 
 exports.reverseObject = function reverseObject(obj) {
-  let o = Array.isArray(obj) ? [] : Object.create(null);
+  const o = Array.isArray(obj) ? [] : Object.create(null);
 
-  Object.keys(obj).reverse().forEach(function(key) {
+  Object.keys(obj).reverse().forEach(key => {
     if (util.isObject(obj[key])) {
       o[key] = reverseObject(obj[key]);
     } else {

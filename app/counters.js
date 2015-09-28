@@ -26,17 +26,18 @@ class MotionCounter {
 
   toObject() {
     // TODO dehardcode
-    let total = this.c.aye + this.c.nay;
+    const total = this.c.aye + this.c.nay;
     let p, s, pc;
 
     if (this.threshold === 'two-thirds') {
       p = total / 3 * 2 | 0 + 1;
       s = this.c.aye >= p;
-      pc = (this.c.aye / total * 100).toFixed(2) + '%';
-    } else { // simple majority
+      pc = `${(this.c.aye / total * 100).toFixed(2)}%`;
+    } else {
+      // simple majority
       p = total / 2 | 0 + 1;
       s = this.c.aye >= p;
-      pc = (this.c.aye / total * 100).toFixed(2) + '%';
+      pc = `${(this.c.aye / total * 100).toFixed(2)}%`;
     }
 
     return {
@@ -65,15 +66,16 @@ class RangeElection {
     this.threshold = opts.threshold;
 
     this.scores = {};
-    for (let c of candidates) {
+    for (const c of candidates) {
       this.scores[c] = 0;
     }
   }
 
+  /* eslint-disable complexity */
   parse(ballot) {
-    let clean = {};
+    const clean = {};
 
-    for (let c of this.candidates) {
+    for (const c of this.candidates) {
       let v = ballot[c];
 
       if (!/^\s*[0-9]+\s*$/.test(v)) {
@@ -87,7 +89,7 @@ class RangeElection {
         v = parseInt(v, 10);
       }
 
-      if (v < this.minScore || v > this.maxScore || v !== v) {
+      if (Number.isNaN(v) || v < this.minScore || v > this.maxScore) {
         return null;
       }
 
@@ -96,9 +98,10 @@ class RangeElection {
 
     return clean;
   }
+  /* eslint-enable complexity */
 
-  insert(ballot) {
-    ballot = this.parse(ballot);
+  insert(unparsedBallot) {
+    const ballot = this.parse(unparsedBallot);
 
     if (ballot == null) {
       this.invalids++;
@@ -107,7 +110,7 @@ class RangeElection {
 
     this.total++;
 
-    for (let c of this.candidates) {
+    for (const c of this.candidates) {
       this.scores[c] += ballot[c];
     }
 
@@ -115,13 +118,14 @@ class RangeElection {
   }
 
   determineWinners() {
-    let rankList = [];
-    for (let cand of this.candidates) {
+    const rankList = [];
+
+    for (const cand of this.candidates) {
       rankList.push([this.scores[cand], cand]);
     }
     rankList.sort();
 
-    let order = [];
+    const order = [];
 
     while (rankList.length) {
       order.push(rankList.pop()[1]);
@@ -157,21 +161,22 @@ class ApprovalElection extends RangeElection {
     opts.threshold = opts.threshold || 'majority';
 
     super(id, candidates, opts);
-
   }
 
   calculateThreshold() {
     let method;
 
     if (this.threshold === 'majority') {
-      method = function(c) {
-        let p = this.total / 2 | 0 + 1;
+      method = c => {
+        const p = this.total / 2 | 0 + 1;
+
         return this.scores[c] >= p;
-      }.bind(this);
+      };
     }
 
-    let o = {};
-    for (let c of this.candidates) {
+    const o = {};
+
+    for (const c of this.candidates) {
       o[c] = method(c);
     }
 
@@ -179,7 +184,7 @@ class ApprovalElection extends RangeElection {
   }
 
   toObject() {
-    let o = super.toObject();
+    const o = super.toObject();
 
     o.method = 'approval';
     delete o.data.minScore;
@@ -192,6 +197,22 @@ class ApprovalElection extends RangeElection {
 }
 exports.ApprovalElection = ApprovalElection;
 
+function createScoreMatrix(size) {
+  const x = [];
+
+  for (let i = 0; i < size; ++i) {
+    const y = [];
+
+    for (let j = 0; j < size; ++j) {
+      y.push(0);
+    }
+
+    x.push(y);
+  }
+
+  return x;
+}
+
 class SchulzeElection {
   constructor(id, candidates, opts) {
     this.id = id;
@@ -203,9 +224,9 @@ class SchulzeElection {
   }
 
   parse(ballot) {
-    let clean = {};
+    const clean = {};
 
-    for (let c of this.candidates) {
+    for (const c of this.candidates) {
       let v = ballot[c];
 
       if (!/^\s*(?:(?!0+$)[0-9]+)?\s*$/.test(v)) {
@@ -216,7 +237,7 @@ class SchulzeElection {
         v = Number.MAX_SAFE_INTEGER;
       } else {
         v = parseInt(v.trim(), 10);
-        if (v <= 0 || v !== v) {
+        if (v <= 0 || Number.isNaN(v)) {
           return null;
         }
       }
@@ -227,9 +248,9 @@ class SchulzeElection {
     return clean;
   }
 
-  insert(ballot) {
-    ballot = this.parse(ballot);
-    let len = this.candidates.length;
+  insert(unparsedBallot) {
+    const ballot = this.parse(unparsedBallot);
+    const len = this.candidates.length;
 
     if (ballot === null) {
       this.invalids++;
@@ -237,14 +258,14 @@ class SchulzeElection {
     }
 
     for (let i = 0; i < len; ++i) {
-      let candI = this.candidates[i];
+      const candI = this.candidates[i];
 
       for (let j = 0; j < len; ++j) {
         if (i === j) {
           continue;
         }
 
-        let candJ = this.candidates[j];
+        const candJ = this.candidates[j];
 
         if (ballot[candI] < ballot[candJ]) {
           this._scores[i][j]++;
@@ -255,10 +276,11 @@ class SchulzeElection {
     return ballot;
   }
 
+  /* eslint-disable complexity */
   calculateStrongestPaths() {
-    let len = this.candidates.length;
-    let scores = this._scores;
-    let paths = createScoreMatrix(len);
+    const len = this.candidates.length;
+    const scores = this._scores;
+    const paths = createScoreMatrix(len);
 
     for (let i = 0; i < len; ++i) {
       for (let j = 0; j < len; ++j) {
@@ -290,10 +312,11 @@ class SchulzeElection {
 
     return paths;
   }
+  /* eslint-enable complexity */
 
   determineRankings(paths) {
-    let len = this.candidates.length;
-    let ranks = [];
+    const len = this.candidates.length;
+    const ranks = [];
 
     for (let i = 0; i < len; ++i) {
       ranks[i] = 0;
@@ -309,7 +332,7 @@ class SchulzeElection {
       }
     }
 
-    let o = {};
+    const o = {};
 
     for (let i = 0; i < len; ++i) {
       o[this.candidates[i]] = ranks[i];
@@ -319,24 +342,25 @@ class SchulzeElection {
   }
 
   determineOrder(ranks) {
-    let rankList = [];
-    for (let cand in ranks) {
+    const rankList = [];
+
+    for (const cand in ranks) {
       rankList.push([ranks[cand], cand]);
     }
 
-    return rankList.sort(function(a, b) {
+    return rankList.sort((a, b) => {
       return b[0] - a[0];
-    }).map(function(x) {
+    }).map(x => {
       return x[1];
     });
   }
 
   toObject() {
-    let paths = this.calculateStrongestPaths();
-    let ranks = this.determineRankings(paths);
+    const paths = this.calculateStrongestPaths();
+    const ranks = this.determineRankings(paths);
     // TODO break ties.
-    let order = this.determineOrder(ranks);
-    let orderedScores = SchulzeElection.reorderScores(
+    const order = this.determineOrder(ranks);
+    const orderedScores = SchulzeElection.reorderScores(
       this.candidates, order, this._scores);
 
     return {
@@ -347,24 +371,26 @@ class SchulzeElection {
       data: {
         invalids: this.invalids,
         scores: this._scores,
-        paths: paths,
-        ranks: ranks,
-        orderedScores: orderedScores
+        paths,
+        ranks,
+        orderedScores
       },
-      order: order
+      order
     };
   }
 
   static reorderScores(originalCands, newCands, scores) {
-    let newOrder = [];
-    for (let c of newCands) {
+    const newOrder = [];
+
+    for (const c of newCands) {
       newOrder.push(originalCands.indexOf(c));
     }
 
-    let newScores = [];
+    const newScores = [];
+
     for (let i = 0; i < newOrder.length; ++i) {
-      let newRow = [];
-      let currRow = scores[newOrder[i]];
+      const newRow = [];
+      const currRow = scores[newOrder[i]];
 
       for (let j = 0; j < newOrder.length; ++j) {
         newRow.push(currRow[newOrder[j]]);
@@ -378,29 +404,15 @@ class SchulzeElection {
 }
 exports.SchulzeElection = SchulzeElection;
 
-function createScoreMatrix(size) {
-  let x = [];
-
-  for (let i = 0; i < size; ++i) {
-    let y = [];
-    for (let j = 0; j < size; ++j) {
-      y.push(0);
-    }
-    x.push(y);
-  }
-
-  return x;
-}
-
 function createElectionCounter(id, method, candidates, winners) {
   // TODO bad hardcoding, bad!
 
   if (method === 'schulze') {
-    return new SchulzeElection(id, candidates, {winners: winners});
+    return new SchulzeElection(id, candidates, { winners });
   } else if (method === 'range') {
-    return new RangeElection(id, candidates, {winners: winners});
+    return new RangeElection(id, candidates, { winners });
   } else if (method === 'approval') {
-    return new ApprovalElection(id, candidates, {winners: winners});
+    return new ApprovalElection(id, candidates, { winners });
   }
 
   throw new Error('unfinished method, oh yes!');

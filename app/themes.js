@@ -2,112 +2,117 @@
 
 const TAG = 'oyster/themes';
 
-var handlebars = require('handlebars'),
-    extend = require('extend'),
-    shuffle = require('lodash').shuffle,
-    marked = require('marked'),
-    Log = require('huggare'),
-    path = require('path'),
-    fs = require('fs'),
-    config = require('./config');
+const handlebars = require('handlebars'),
+      extend = require('extend'),
+      shuffle = require('lodash').shuffle,
+      marked = require('marked'),
+      Log = require('huggare'),
+      path = require('path'),
+      fs = require('fs'),
+      config = require('./config');
 
 function registerPartialDir(hbs, p, prefix) {
   let fns;
 
   try {
     fns = fs.readdirSync(p);
-  } catch(err) {
+  } catch (err) {
     if (err.code !== 'ENOENT') {
       throw err;
     }
     return;
   }
 
-  for (let fn of fns) {
+  for (const fn of fns) {
     if (!fn.endsWith('.hbs')) {
       continue;
     }
 
-    let name = path.basename(fn, '.hbs');
-    let template = fs.readFileSync(path.resolve(p, fn), 'utf8');
+    const name = path.basename(fn, '.hbs');
+    const template = fs.readFileSync(path.resolve(p, fn), 'utf8');
+
     hbs.registerPartial(prefix ? prefix + name : name, hbs.compile(template));
   }
 }
 
 function compileTemplate(hbs, tmplPath) {
-  let template = fs.readFileSync(tmplPath, 'utf8');
+  const template = fs.readFileSync(tmplPath, 'utf8');
+
   return hbs.compile(template);
 }
 
-var themeHelpers = {
-  asset: function(assetPath, options) {
+const themeHelpers = {
+  asset(assetPath, options) {
     return handlebars.Utils.escapeExpression(path.join(
         config.themeAssetsURL, options.data.theme.name, assetPath));
   },
 
-  __: function() {
-    let args = [].slice.call(arguments);
-    let options = args.pop();
-    let i18n = options.data.ctx.i18n;
+  __() {
+    const args = [].slice.call(arguments);
+    const options = args.pop();
+    const i18n = options.data.ctx.i18n;
 
-    return i18n.__.apply(i18n, args);
+    return i18n.__.apply(...args);
   },
 
-  __n: function() {
-    let args = [].slice.call(arguments);
-    let options = args.pop();
-    let i18n = options.data.ctx.i18n;
+  __n() {
+    const args = [].slice.call(arguments);
+    const options = args.pop();
+    const i18n = options.data.ctx.i18n;
 
-    return i18n.__n.apply(i18n, args);
+    return i18n.__n.apply(...args);
   },
 
-  candidate: function(candidateName, id, method, options) {
-    let partials = options.data.theme.hbs.partials;
-    let name = handlebars.Utils.escapeExpression('elections.' + id + '.' + candidateName);
+  candidate(candidateName, id, method, options) {
+    const partials = options.data.theme.hbs.partials;
+    const name = handlebars.Utils.escapeExpression(`elections.${id}.${candidateName}`);
 
     let classes = 'oyster-candidate-input';
+
     if (options.hash.class) {
-      classes += ' ' + handlebars.Utils.escapeExpression(options.hash.class);
+      classes += ` ${handlebars.Utils.escapeExpression(options.hash.class)}`;
     }
 
-    let context = {
+    const context = {
       id: name,
       name: candidateName,
-      classes: classes
+      classes
     };
 
     // TODO implement context options for these properties
     context.minScore = 0;
     context.maxScore = 9;
 
-    let partial = partials['method/' + method];
+    const partial = partials[`method/${method}`];
+
     if (!partial) {
-      throw new TypeError('Unsupported method by theme: ' + method);
+      throw new TypeError(`Unsupported method by theme: ${method}`);
     }
 
     return new handlebars.SafeString(partial(context, options));
   },
 
-  shuffle: function(list, options) {
+  shuffle(list, options) {
     return handlebars.helpers.each.call(this, shuffle(list), options);
   },
 
-  eachRelevant: function() {
+  eachRelevant() {
     // TODO:fix stub
     return handlebars.helpers.each.apply(this, arguments);
   },
 
-  markdown: function(context, options) {
+  markdown(context, options) {
     return new handlebars.SafeString(marked(context, options.hash));
   },
 
-  json: function(obj, options) {
-    var indent = options.hash.indent || 2;
+  json(obj, options) {
+    const indent = options.hash.indent || 2;
+
     return JSON.stringify(obj, null, indent);
   },
 
   // TODO: this is a hack for a PPAU theme. We'll remove this one day.
-  gvtHack: function(ctx, options) { // eslint-disable-line
+  gvtHack(ctx, options) { // eslint-disable-line
     return JSON.stringify(ctx.sections[0].fields[0].candidates, null, 2);
   }
 };
@@ -121,17 +126,17 @@ class Theme {
 
     try {
       fs.stat(this.path);
-    } catch(err) {
-      throw new Error("No theme found at path: '" + this.path + "'.");
+    } catch (err) {
+      throw new Error(`No theme found at path: '${this.path}.`);
     }
 
     // Halpers!
-    for (let name in themeHelpers) {
-      this.hbs.registerHelper(name, themeHelpers[name]);
+    for (const helper in themeHelpers) {
+      this.hbs.registerHelper(helper, themeHelpers[helper]);
     }
 
     /*
-    for (let tmplName of this.basePartials) {
+    for (const tmplName of this.basePartials) {
       registerPartial(this.hbs, path.join(this.path, tmplName + '.hbs'));
     }
     */
@@ -162,7 +167,7 @@ class Theme {
   */
 
   render() {
-    return this.index.apply(this, arguments);
+    return this.index.apply(...arguments);
   }
 }
 
@@ -181,39 +186,39 @@ class ThemeManager {
       return this.cache[themeName];
     }
 
-    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') { // if development mode
+    // if development mode
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
       return this.load(themeName);
     } else {
-      return this.cache[themeName] = this.load(themeName);
+      return (this.cache[themeName] = this.load(themeName));
     }
   }
 }
 
-Log.setLevel(0);
-
-module.exports = function(opts) {
-  opts = opts || {};
+module.exports = function themes(modOpts) {
+  const opts = modOpts || {};
 
   if (!opts.path) {
     throw new TypeError('Missing opts.path.');
   }
 
-  let themeMgr = new ThemeManager(opts.path);
+  const themeMgr = new ThemeManager(opts.path);
 
-  return function *(next) {
-    this.renderTheme = function *(themeName, locals, options) {
+  return function* appThemes(next) {
+    this.renderTheme = function* renderTheme(themeName, locals, options) {
       Log.d(TAG, themeName, this);
 
-      let l = extend(true, {}, this.state, locals);
-      let o = extend(true, { data: {} }, options);
+      const l = extend(true, {}, this.state, locals);
+      const o = extend(true, { data: {} }, options);
 
       o.data.ctx = this;
 
-      let theme = themeMgr.get(themeName);
+      const theme = themeMgr.get(themeName);
+
       o.data.theme = theme;
 
       this.type = 'html';
-      return this.body = theme.render(l, o);
+      return (this.body = theme.render(l, o));
     };
 
     yield next;

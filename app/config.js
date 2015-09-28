@@ -1,26 +1,28 @@
 'use strict';
+/* eslint-disable no-process-env */
 
 // TODO: ENV settings etc
 
-var baseConfig,
-    mailer = require('./mailer'),
-    crypto = require('crypto'),
-    _ = require('lodash'),
-    transports = {
-      //sendmail: require('nodemailer-sendmail-transport'),
-      ses: require('nodemailer-ses-transport')
-    };
+const mailer = require('./mailer'),
+      crypto = require('crypto'),
+      _ = require('lodash'),
+      transports = {
+        // sendmail: require('nodemailer-sendmail-transport'),
+        ses: require('nodemailer-ses-transport')
+      };
+
+let baseConfig;
 
 try {
-  baseConfig = require(process.env.PWD + '/config.json');
-} catch(e) {
+  baseConfig = require(`${process.env.PWD}/config.json`);
+} catch (e) {
   if (e.code !== 'MODULE_NOT_FOUND') {
     throw e;
   }
   baseConfig = {};
 }
 
-var config = _.defaults({}, baseConfig, {
+const config = _.defaults({}, baseConfig, {
   production: false,
   host: 'localhost',
   port: 3000,
@@ -47,10 +49,10 @@ var config = _.defaults({}, baseConfig, {
   cookieMaxAge: 900000,
 
   get mongoURL() {
-    return 'mongodb://' + this.mongoHost + ':' + this.mongoPort + '/' + this.mongoDB;
+    return `mongodb://${this.mongoHost}:${this.mongoPort}/${this.mongoDB}`;
   },
 
-  createMailer: function() {
+  createMailer: function createMailer() {
     return mailer.createTransport(config.mailerTransport(config.mailerConfig));
   }
 });
@@ -59,7 +61,7 @@ if (baseConfig.mailerTransport) {
   config.mailerTransport = transports[baseConfig.mailerTransport];
 
   if (config.mailerTransport == null) {
-    throw new Error("invalid mailerTransport defined: '" + baseConfig.mailerTransport + "'");
+    throw new Error(`invalid mailerTransport defined: '${baseConfig.mailerTransport }'`);
   }
 }
 
