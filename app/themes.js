@@ -52,7 +52,7 @@ const themeHelpers = {
     const options = args.pop();
     const i18n = options.data.ctx.i18n;
 
-    return i18n.__.apply(...args);
+    return i18n.__.apply(i18n, args);
   },
 
   __n() {
@@ -60,7 +60,7 @@ const themeHelpers = {
     const options = args.pop();
     const i18n = options.data.ctx.i18n;
 
-    return i18n.__n.apply(...args);
+    return i18n.__n.apply(i18n, args);
   },
 
   candidate(candidateName, id, method, options) {
@@ -167,7 +167,7 @@ class Theme {
   */
 
   render() {
-    return this.index.apply(...arguments);
+    return this.index.apply(this, arguments);
   }
 }
 

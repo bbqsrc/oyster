@@ -3,7 +3,7 @@
 const nodemailer = require('nodemailer');
 
 module.exports.createTransport = function createTransport(transporter) {
-  const transport = nodemailer.createTransport.apply(...arguments);
+  const transport = nodemailer.createTransport.apply(nodemailer, arguments);
 
   const _sendMail = transport.sendMail.bind(transport);
 

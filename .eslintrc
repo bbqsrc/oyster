@@ -133,7 +133,7 @@
     "object-shorthand": 1,
     "prefer-arrow-callback": 1,
     "prefer-const": 1,
-    "prefer-spread": 1,
+    "prefer-spread": 0,
     "prefer-reflect": 0,
     "prefer-template": 1,
     "require-yield": 0,
