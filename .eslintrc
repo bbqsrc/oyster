@@ -91,7 +91,7 @@
     "key-spacing": [2, {"beforeColon": false, "afterColon": true}],
     "linebreak-style": [2, "unix"],
     "max-nested-callbacks": [2, 2],
-    "new-cap": 2,
+    "new-cap": [2, {"properties": false}],
     "new-parens": 1,
     "newline-after-var": [2, "always"],
     "no-array-constructor": 2,

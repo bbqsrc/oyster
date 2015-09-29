@@ -2,23 +2,25 @@
 
 const TAG = 'oyster';
 
-var process = require('process'),
-    Log = require('huggare').defaults(),
-    mongoose = require('mongoose'),
-    co = require('co');
+const process = require('process'),
+      Log = require('huggare').defaults(),
+      mongoose = require('mongoose'),
+      path = require('path'),
+      co = require('co');
 
-if (process.env.NODE_ENV == null ||
-    process.env.NODE_ENV === 'development') {
-  Log.setLevel(0);
+const configPath = path.join(__dirname, 'config.json');
+
+Log.i(TAG, `Loading config: ${configPath}`);
+const config = require('./app/config')(require(configPath));
+
+if (config.development) {
+  Log.setLevel(Log.VERBOSE);
   Log.d(TAG, 'Development mode: setting log level to VERBOSE');
 }
 
-Log.i(TAG, 'Loading config: ' + process.env.PWD + '/config.json');
-
-var config = require('./app/config'),
-    models = require('./app/models'),
-    loggers = require('./app/loggers'),
-    createApp = require('./app');
+const models = require('./app/models'),
+      loggers = require('./app/loggers'),
+      createApp = require('./app');
 
 // Pre-routing
 if (config.logPath) {
@@ -31,34 +33,34 @@ if (config.logPath) {
 
 Log.i(TAG, 'Connecting to mongodb...');
 mongoose.connect(config.mongoURL);
-var db = mongoose.connection;
+const db = mongoose.connection;
 
-db.on('error', function(err) {
+db.on('error', err => {
   Log.e(TAG, 'mongodb connection error:', err);
 });
 
-db.on('disconnected', function(e) {
+db.on('disconnected', e => {
   Log.e(TAG, 'mongodb disconnected.', e);
 });
 
-db.on('reconnected', function() {
+db.on('reconnected', () => {
   Log.w(TAG, 'mongodb reconnected.');
 });
 
-let app = createApp(__dirname, config);
+const app = createApp(__dirname, config);
 
 // Post-routing
-process.on('unhandledRejection', function(reason, p) {
-  Log.e(TAG, 'Unhandled Rejection at: Promise ', p, ' reason: ', reason);
+process.on('unhandledRejection', (reason, p) => {
+  Log.e(TAG, `Unhandled Rejection at: Promise ${p}, reason: ${reason}`);
 });
 
-db.once('open', function() {
-  Log.i(TAG, 'db connected.');
-  co(function*() {
+db.once('open', () => {
+  co(function* onOpen() {
+    Log.i(TAG, 'db connected.');
     Log.i(TAG, 'starting results scheduler.');
     yield models.Poll.startScheduler();
-  }).then(function() {
+
     app.listen(config.port);
-    Log.i(TAG, 'listening on port ' + config.port);
+    Log.i(TAG, `listening on port ${config.port}`);
   });
 });

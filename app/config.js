@@ -9,18 +9,7 @@ const mailer = require('./mailer'),
         ses: require('nodemailer-ses-transport')
       };
 
-let baseConfig;
-
-try {
-  baseConfig = require(`${process.env.PWD}/config.json`);
-} catch (e) {
-  if (e.code !== 'MODULE_NOT_FOUND') {
-    throw e;
-  }
-  baseConfig = {};
-}
-
-const config = _.defaults({}, baseConfig, {
+const template = Object.freeze({
   development: process.env.NODE_ENV === 'development' ||
                process.env.NODE_ENV == null,
   host: 'localhost',
@@ -52,16 +41,22 @@ const config = _.defaults({}, baseConfig, {
   },
 
   createMailer: function createMailer() {
-    return mailer.createTransport(config.mailerTransport(config.mailerConfig));
+    return mailer.createTransport(this.mailerTransport(this.mailerConfig));
   }
 });
 
-if (baseConfig.mailerTransport) {
-  config.mailerTransport = transports[baseConfig.mailerTransport];
+function makeConfig(baseConfig) {
+  const config = _.defaults({}, baseConfig, template);
 
-  if (config.mailerTransport == null) {
-    throw new Error(`invalid mailerTransport defined: '${baseConfig.mailerTransport }'`);
+  if (baseConfig.mailerTransport) {
+    config.mailerTransport = transports[baseConfig.mailerTransport];
+
+    if (config.mailerTransport == null) {
+      throw new Error(`invalid mailerTransport defined: '${baseConfig.mailerTransport }'`);
+    }
   }
+
+  return config;
 }
 
-module.exports = Object.freeze(config);
+module.exports = makeConfig;
