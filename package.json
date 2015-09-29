@@ -46,6 +46,7 @@
     "node-schedule": "^0.2.9",
     "node-uuid": "^1.4.3",
     "nodemailer": "^1.4.0",
+    "nodemailer-sendmail-transport": "^1.0.0",
     "nodemailer-ses-transport": "^1.3.0",
     "passport-mongodb": "^1.2.0",
     "resolve-path": "^1.3.0",

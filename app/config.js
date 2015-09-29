@@ -5,7 +5,7 @@ const mailer = require('./mailer'),
       crypto = require('crypto'),
       _ = require('lodash'),
       transports = {
-        // sendmail: require('nodemailer-sendmail-transport'),
+        sendmail: require('nodemailer-sendmail-transport'),
         ses: require('nodemailer-ses-transport')
       };
 
