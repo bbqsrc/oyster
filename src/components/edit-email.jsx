@@ -23,12 +23,11 @@ class EditEmail extends Component {
   }
 
   onChange(field, e) {
-    let email = this.state.email;
+    const email = this.state.email;
+
     email[field] = e.target.value;
 
-    this.setState({
-      email: email
-    });
+    this.setState({ email });
   }
 
   onWindowResize() {
@@ -53,17 +52,17 @@ class EditEmail extends Component {
   }
 
   onModalSubmit() {
-    const self = this;
+    const email = this.state.email;
 
     // Get ahead of primary source of truth update
-    this.props.poll.email = this.state.email;
+    this.props.poll.email = email;
 
-    $.ajax('/api/poll/' + this.props.poll.slug, {
+    $.ajax(`/api/poll/${this.props.poll.slug}`, {
       method: 'put',
       data: {
-        email: self.state.email.toObject()
+        email: email.toObject()
       }
-    }).success(function(res) {
+    }).success(res => {
       $(window).trigger('poll:updated', res.poll);
     });
   }
@@ -78,7 +77,7 @@ class EditEmail extends Component {
           visible={this.state.editMode}
           onHide={this.onModalHide.bind(this)}
           onClick={this.onModalSubmit.bind(this)}
-          options={{show: false, backdrop: 'static'}}
+          options={{ show: false, backdrop: 'static' }}
           btnClass='success' btnText='Save'
       >
         <div className='form'>
@@ -94,7 +93,8 @@ class EditEmail extends Component {
 
           <div className='form-group'>
             <label className='control-label' htmlFor='email-body'>Content</label>
-            <textarea className='form-control' id='email-body' style={{minHeight: this.state.windowHeight - 420}} value={this.state.email.content} onChange={this.onChange.bind(this, 'content')}/>
+            <textarea className='form-control' id='email-body' style={{ minHeight: this.state.windowHeight - 420 }}
+                      value={this.state.email.content} onChange={this.onChange.bind(this, 'content')}/>
           </div>
         </div>
       </Modal>
@@ -119,7 +119,7 @@ class EditEmail extends Component {
             </div>
           </header>
           <div className="panel-body">
-            <div style={{'whiteSpace': 'pre-wrap'}}>
+            <div style={{ whiteSpace: 'pre-wrap' }}>
               {email.content}
             </div>
           </div>

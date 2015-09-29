@@ -34,17 +34,18 @@ export default class EditPoll extends Component {
   }
 
   applyAceEditor() {
-    let node = React.findDOMNode(this.refs.editor);
+    const node = React.findDOMNode(this.refs.editor);
 
-    let editor = ace.edit(node);
+    const editor = ace.edit(node);
+
     editor.setTheme('ace/theme/monokai');
     editor.getSession().setMode('ace/mode/toml');
 
-    editor.on('input', function() {
+    editor.on('input', () => {
       this.setState({
         content: editor.getValue()
       });
-    }.bind(this));
+    });
 
     this.editor = editor;
   }
@@ -54,27 +55,24 @@ export default class EditPoll extends Component {
       content: this.props.poll.contentAsTOML(),
       theme: this.props.poll.theme,
       editMode: false
-    }, function() {
+    }, () => {
       // Ensure it gets the correct content
       this.editor.setValue(this.state.content);
     });
   }
 
   onModalSubmit() {
-
     const content = TOML.parse(this.state.content);
+    const theme = this.state.theme;
 
     // Get ahead of the 'primary source of truth' updates
     this.props.poll.content = content;
-    this.props.poll.theme = this.state.theme;
+    this.props.poll.theme = theme;
 
-    $.ajax('/api/poll/' + this.props.poll.slug, {
+    $.ajax(`/api/poll/${this.props.poll.slug}`, {
       method: 'put',
-      data: {
-        content: content,
-        theme: this.state.theme
-      }
-    }).success(function(res) {
+      data: { content, theme }
+    }).success(res => {
       $(window).trigger('poll:updated', res.poll);
     });
   }
@@ -107,7 +105,7 @@ export default class EditPoll extends Component {
         visible={this.state.editMode}
         onHide={this.onModalHide.bind(this)}
         onClick={this.onModalSubmit.bind(this)}
-        options={{show: false, backdrop: 'static'}}
+        options={{ show: false, backdrop: 'static' }}
         btnClass='success' btnText='Save'
         btnEnabled={this.state.canSubmit}
       >
@@ -115,7 +113,7 @@ export default class EditPoll extends Component {
           <label htmlFor='theme' className='control-label'>Theme</label>
           <ThemeSelector id='theme' className='form-control' value={this.state.theme} onChange={this.onChangeTheme.bind(this)}/>
         </div>
-        <pre ref='editor' style={{minHeight: this.state.windowHeight - 370}}></pre>
+        <pre ref='editor' style={{ minHeight: this.state.windowHeight - 370 }}></pre>
         <TomlValidator onChange={v => this.setState({ canSubmit: v })} source={this.state.content} />
       </Modal>
     );
@@ -127,14 +125,14 @@ export default class EditPoll extends Component {
             <button ref='editBtn' className='btn btn-default btn-sm' onClick={this.onClickEdit.bind(this)}>Edit</button>
           </div>
           <h2>Ballot
-            <small style={{marginLeft: '1em'}}>
+            <small style={{ marginLeft: '1em' }}>
               <strong>Theme:</strong> {this.state.theme || 'no theme!'}
             </small>
           </h2>
 
         </header>
 
-        <pre style={{height: '36em'}}>
+        <pre style={{ height: '36em' }}>
           {this.state.content}
         </pre>
 

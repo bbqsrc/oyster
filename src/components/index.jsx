@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign,no-undefined */
+
 import React from 'react';
 
 import AdminPollPage from './admin-poll-page';

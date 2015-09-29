@@ -56,11 +56,13 @@ export default class PollOverview extends Component {
 
   renderStart() {
     const time = moment(this.props.poll.startTime);
+
     return timeRow('Start', time);
   }
 
   renderEnd() {
     const time = moment(this.props.poll.endTime);
+
     return timeRow('End', time);
   }
 

@@ -19,13 +19,11 @@ export default class TomlValidator extends Component {
     };
   }
 
-  componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate(nextProps) {
     if (nextProps.source !== this.props.source) {
       const result = validateTOML(nextProps.source);
 
-      this.setState({
-        result: result
-      });
+      this.setState({ result });
 
       if (this.props.onChange) {
         this.props.onChange(result === true);
@@ -38,8 +36,8 @@ export default class TomlValidator extends Component {
       return <div className='alert alert-success toml-valid'>{this.props.validMessage || 'OK'}</div>;
     } else {
       const err = this.state.result;
-      let msg = 'Parsing error on line ' + err.line +
-                ', column ' + err.column + ': ' + err.message;
+      const msg = `Parsing error on line ${err.line}, column ${err.column}: ${err.message}`;
+
       return <div className='alert alert-danger toml-invalid'>{msg}</div>;
     }
   }

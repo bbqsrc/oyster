@@ -73,8 +73,7 @@ module.exports = function createApp(root, config) {
       this.status = err.status || 500;
       const msg = 'Internal server error. Please contact an administrator.';
 
-      if (process.env.NODE_ENV == null ||
-          process.env.NODE_ENV === 'development') {
+      if (config.development) {
         this.body = `<pre>${err.stack}</pre>`;
       } else {
         this.body = msg;

@@ -13,9 +13,9 @@ class ThemeSelector extends Component {
   }
 
   componentDidMount() {
-    let self = this;
+    const self = this;
 
-    $.get('/api/themes', function(res) {
+    $.get('/api/themes', res => {
       self.setState({
         options: res.themes
       });

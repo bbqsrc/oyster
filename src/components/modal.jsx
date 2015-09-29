@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 
 import $ from 'jquery';
 
@@ -13,7 +13,7 @@ class Modal extends Component {
   }
 
   componentDidMount() {
-    let m = $(React.findDOMNode(this));
+    const m = $(React.findDOMNode(this));
 
     m.modal(this.props.options || { show: false });
 
@@ -66,13 +66,13 @@ class Modal extends Component {
   }
 
   isButtonEnabled() {
-    return this.props.btnEnabled === undefined || this.props.btnEnabled;
+    return typeof this.props.btnEnabled === 'undefined' || this.props.btnEnabled;
   }
 
   render() {
     return (
       <div className='modal fade' id={this.props.id}>
-        <div className={'modal-dialog ' + (this.props.size ? ('modal-' + this.props.size) : '')}>
+        <div className={ `modal-dialog ${(this.props.size ? `modal-${this.props.size}` : '')}` }>
           <div className="modal-content">
             <div className="modal-header">
               <button type="button" className="close" data-dismiss="modal" aria-label="Close">
@@ -85,7 +85,9 @@ class Modal extends Component {
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-              <button type="button" disabled={!this.isButtonEnabled.bind(this)} className={'btn btn-' + (this.props.btnClass || 'primary')} onClick={this.onClick.bind(this)} >
+              <button type="button" disabled={!this.isButtonEnabled.bind(this)}
+                      className={`btn btn-${(this.props.btnClass || 'primary')}`}
+                      onClick={this.onClick.bind(this)} >
                 {this.props.btnText}
               </button>
             </div>

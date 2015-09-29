@@ -1,8 +1,6 @@
 'use strict';
 /* eslint-disable no-process-env */
 
-// TODO: ENV settings etc
-
 const mailer = require('./mailer'),
       crypto = require('crypto'),
       _ = require('lodash'),
@@ -23,7 +21,8 @@ try {
 }
 
 const config = _.defaults({}, baseConfig, {
-  production: false,
+  development: process.env.NODE_ENV === 'development' ||
+               process.env.NODE_ENV == null,
   host: 'localhost',
   port: 3000,
 
