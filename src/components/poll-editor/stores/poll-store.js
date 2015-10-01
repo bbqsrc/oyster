@@ -233,6 +233,7 @@ class PollStore {
       handleUpdateInfo: PollActions.UPDATE_INFO,
       handleAddNewSection: PollActions.ADD_NEW_SECTION,
       handleRemoveSection: PollActions.REMOVE_SECTION,
+      handleUpdateSection: PollActions.UPDATE_SECTION,
       handleNewFieldForSection: PollActions.NEW_FIELD_FOR_SECTION,
       handleUpdateField: PollActions.UPDATE_FIELD,
       handleRemoveField: PollActions.REMOVE_FIELD
@@ -287,6 +288,12 @@ class PollStore {
 
   handleRemoveSection(index) {
     this.sections.splice(index, 1);
+  }
+
+  handleUpdateSection(o) {
+    const { section, state } = o;
+
+    Object.assign(this.sections[section], state);
   }
 
   handleNewFieldForSection(index) {

@@ -29,6 +29,10 @@ class PollActions {
     this.dispatch(index);
   }
 
+  updateSection(o) {
+    this.dispatch(o);
+  }
+
   newFieldForSection(index) {
     this.dispatch(index);
   }

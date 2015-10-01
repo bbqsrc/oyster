@@ -21,8 +21,6 @@ class MotionFieldEditor extends Component {
     const field = this.props.index;
     const state = this.state;
 
-    console.log(section, field, state);
-
     PollActions.updateField({ section, field, state });
 
     this.props.onDone();
@@ -39,7 +37,7 @@ class MotionFieldEditor extends Component {
 
   render() {
     return (
-      <div style={{ margin: '1em', 'padding': '1em', 'border': '1px solid gray' }}>
+      <div style={{ 'padding': '1em', 'border': '1px solid gray' }}>
         <div className='row'>
           <div className='col-md-10 form form-horizontal'>
             <FormInput label='Identifier' id='id' horizontal={true} value={this.state.id} onChange={this.onChange.bind(this)} />
@@ -64,9 +62,21 @@ class Markdown extends Component {
   }
 
   render() {
-    return (
-      <div dangerouslySetInnerHTML={this.generate()} />
-    );
+    if (!this.props.children) {
+      return <div/>;
+    }
+
+    try {
+      return <div dangerouslySetInnerHTML={this.generate()} />;
+    } catch (err) {
+      return (
+        <div>
+          <div className='alert alert-danger'>{err}</div>
+          <pre>
+          </pre>
+        </div>
+      );
+    }
   }
 }
 
@@ -159,34 +169,136 @@ class FieldEditor extends Component {
 }
 
 class SectionEditor extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = this.props.section;
+  }
+
+  update() {
+    PollActions.updateSection({
+      section: this.props.index,
+      state: this.state
+    });
+
+    this.props.onDone();
+  }
+
+  onChange(e) {
+    const { value } = e.target;
+    const id = e.target.dataset.id;
+    const state = {};
+
+    state[id] = value;
+
+    this.setState(state);
+  }
+
   render() {
     const section = this.props.section;
 
     return (
-      <div style={{ margin: '1em', padding: '1em', border: '1px solid gray' }}>
-        <Controls>
-          <Button level='primary' onClick={this.props.newFieldForSection.bind(this, this.props.index)}>New field</Button>
-          <div className='pull-right'>
-            <Button level='danger' size='sm' onClick={this.props.removeSection.bind(this, this.props.index)}>&times;</Button>
-          </div>
-        </Controls>
-        <div className='row'>
-          <div className='form form-horizontal col-md-10'>
-            <FormInput label='Section Title' id={`section-title-${this.props.index}`} value={section.title} horizontal={true} />
+      <div>
+        <div className='form form-horizontal row'>
+          <div className='col-md-10'>
+            <FormInput label='Section Title' data-id='title' id={`section-title-${this.props.index}`} value={this.state.title} horizontal={true} onChange={this.onChange.bind(this)} />
+
             <div className='form-group'>
               <label htmlFor={`section-type-${this.props.index}`} className='control-label col-md-2'>Section Type</label>
               <div className='col-md-10'>
                 <p className="form-control-static">{section.type}</p>
               </div>
             </div>
-            <FormTextarea label='Section Information' id={`section-info-${this.props.index}`} value={section.info} horizontal={true} rows='8' />
+
+            <FormTextarea label='Section Information' data-id='info' id={`section-info-${this.props.index}`} value={this.state.info} onChange={this.onChange.bind(this)} horizontal={true} rows='8' />
           </div>
         </div>
-        <AltContainer store={PollStore} actions={PollActions}>
-          {section.fields.map((field, i) => {
-            return <FieldEditor section={this.props.index} type={section.type} field={field} key={i} index={i} />;
-          })}
-        </AltContainer>
+        <div>
+          <Button level='success' onClick={this.update.bind(this)}>Save</Button>
+          <Button level='link' onClick={this.props.onDone}>Cancel</Button>
+        </div>
+      </div>
+    );
+  }
+}
+
+class Section extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      editMode: false
+    };
+  }
+
+  clickEdit() {
+    this.setState({
+      editMode: true
+    });
+  }
+
+  clickCancel() {
+    this.setState({
+      editMode: false
+    });
+  }
+
+  renderSectionHeader() {
+    const section = this.props.section;
+
+    if (this.state.editMode) {
+      return (
+        <SectionEditor section={section} index={this.props.index} onDone={this.clickCancel.bind(this)} />
+      );
+    } else {
+      return (
+        <div>
+          <div className='pull-right'>
+            <Button level='default' onClick={this.clickEdit.bind(this)}>Edit</Button>
+          </div>
+
+          <h2>
+            {section.title}
+            <small style={{ marginLeft: '.5em' }}>
+              Type: {section.type}
+            </small>
+          </h2>
+
+          <blockquote>
+            <Markdown>
+              {section.info}
+            </Markdown>
+          </blockquote>
+        </div>
+      );
+    }
+  }
+
+  render() {
+    const section = this.props.section;
+
+    return (
+      <div style={{ padding: '1em', border: '1px solid gray' }}>
+        <Controls>
+          <Button level='primary' onClick={this.props.newFieldForSection.bind(this, this.props.index)}>New field</Button>
+          <div className='pull-right'>
+            <Button level='danger' size='sm' onClick={this.props.removeSection.bind(this, this.props.index)}>&times;</Button>
+          </div>
+        </Controls>
+
+        <div className='panel panel-default'>
+          <div className='panel-body'>
+            {this.renderSectionHeader()}
+
+            <hr />
+
+            <AltContainer store={PollStore} actions={PollActions}>
+              {section.fields.map((field, i) => {
+                return <FieldEditor section={this.props.index} type={section.type} field={field} key={i} index={i} />;
+              })}
+            </AltContainer>
+          </div>
+        </div>
       </div>
     );
   }
@@ -198,7 +310,7 @@ class Sections extends Component {
       <div>
         <AltContainer store={PollStore} actions={PollActions}>
           {this.props.sections.map((section, i) => {
-            return <SectionEditor key={i} index={i} section={section} />;
+            return <Section key={i} index={i} section={section} />;
           })}
         </AltContainer>
       </div>
