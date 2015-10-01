@@ -1,4 +1,4 @@
-var path = require('path');
+const path = require('path');
 
 module.exports = {
   entry: {
@@ -16,8 +16,8 @@ module.exports = {
     ]
   },
   externals: {
-    'react': 'React',
-    'jquery': '$',
+    //'react': 'React',
+    'jquery': 'jQuery',
     'ace': 'ace',
     'toml': 'toml',
     'moment': 'moment',

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import AdminPollPage from './admin-poll-page';
+//import AdminPollPage from './admin-poll-page';
 import PollEditor from './poll-editor/app';
 
 function insertComponent(component, props, target) {
@@ -20,6 +20,6 @@ function insertComponent(component, props, target) {
 
 export default {
   insertComponent,
-  AdminPollPage,
+  //AdminPollPage,
   PollEditor
 };

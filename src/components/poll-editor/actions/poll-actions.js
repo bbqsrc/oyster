@@ -28,6 +28,18 @@ class PollActions {
   removeSection(index) {
     this.dispatch(index);
   }
+
+  newFieldForSection(index) {
+    this.dispatch(index);
+  }
+
+  updateField(state) {
+    this.dispatch(state);
+  }
+
+  removeField(state) {
+    this.dispatch(state);
+  }
 }
 
 export default alt.createActions(PollActions);

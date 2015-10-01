@@ -1,7 +1,30 @@
 import { Component } from 'react';
 
 export class FormGroup extends Component {
+  renderHorizontal() {
+    // horizontal can be an int or true. True does default.
+    const horizontal = this.props.horizontal === true
+                          ? 2
+                          : this.props.horizontal;
+    const diff = 12 - horizontal;
+
+    return (
+      <div className='form-group'>
+        <label htmlFor={this.props.id} className={`control-label col-md-${horizontal}`}>
+          {this.props.label}
+        </label>
+        <div className={`col-md-${diff}`}>
+          {this.props.children}
+        </div>
+      </div>
+    );
+  }
+
   render() {
+    if (this.props.horizontal) {
+      return this.renderHorizontal();
+    }
+
     return (
       <div className='form-group'>
         <label htmlFor={this.props.id} className='control-label'>
@@ -16,7 +39,7 @@ export class FormGroup extends Component {
 export class FormInput extends Component {
   render() {
     return (
-      <FormGroup id={this.props.id} label={this.props.label}>
+      <FormGroup id={this.props.id} label={this.props.label} horizontal={this.props.horizontal}>
         <input {...this.props} className={`form-control ${this.props.className || ''}`.trim()}/>
       </FormGroup>
     );
@@ -26,7 +49,7 @@ export class FormInput extends Component {
 export class FormTextarea extends Component {
   render() {
     return (
-      <FormGroup id={this.props.id} label={this.props.label}>
+      <FormGroup id={this.props.id} label={this.props.label} horizontal={this.props.horizontal}>
         <textarea {...this.props} className={`form-control ${this.props.className || ''}`.trim()} />
       </FormGroup>
     );
@@ -35,10 +58,21 @@ export class FormTextarea extends Component {
 
 export class Button extends Component {
   render() {
+    const classes = ['btn'];
+
+    if (this.props.level) {
+      classes.push(`btn-${this.props.level}`);
+    }
+
+    if (this.props.size) {
+      classes.push(`btn-${this.props.size}`);
+    }
+
     return (
       <button
+        style={{ marginRight: '.5em' }}
         type={this.props.type || 'button'}
-        className={`btn btn-${this.props.level || 'default'}`}
+        className={classes.join(' ')}
         onClick={this.props.onClick}
       >{this.props.children}</button>
     );
