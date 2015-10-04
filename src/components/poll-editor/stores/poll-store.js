@@ -236,7 +236,8 @@ class PollStore {
       handleUpdateSection: PollActions.UPDATE_SECTION,
       handleNewFieldForSection: PollActions.NEW_FIELD_FOR_SECTION,
       handleUpdateField: PollActions.UPDATE_FIELD,
-      handleRemoveField: PollActions.REMOVE_FIELD
+      handleRemoveField: PollActions.REMOVE_FIELD,
+      handleUpdateBaseProperties: PollActions.UPDATE_BASE_PROPERTIES
     });
 
     this.exportAsync(PollSource);
@@ -310,6 +311,10 @@ class PollStore {
     const { section, field } = o;
 
     delete this.sections[section].fields[field];
+  }
+
+  handleUpdateBaseProperties(o) {
+    Object.assign(this, o);
   }
 }
 

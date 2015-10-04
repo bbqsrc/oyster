@@ -44,6 +44,10 @@ class PollActions {
   removeField(state) {
     this.dispatch(state);
   }
+
+  updateBaseProperties(o) {
+    this.dispatch(o);
+  }
 }
 
 export default alt.createActions(PollActions);

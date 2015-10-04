@@ -78,3 +78,13 @@ export class Button extends Component {
     );
   }
 }
+
+export class Controls extends Component {
+  render() {
+    return (
+      <div className='well'>
+        {this.props.children}
+      </div>
+    );
+  }
+}

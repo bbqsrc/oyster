@@ -4,10 +4,9 @@ import AltContainer from 'alt/AltContainer';
 import PollStore from './stores/poll-store';
 import PollActions from './actions/poll-actions';
 
+import Markdown from './components/markdown';
 import BasePropertiesEditor from './components/base-properties-editor';
-import { Button, FormInput, FormTextarea } from './components/bootstrap';
-
-import marked from 'marked';
+import { Controls, Button, FormInput, FormTextarea } from './components/bootstrap';
 
 class MotionFieldEditor extends Component {
   constructor(props) {
@@ -54,42 +53,6 @@ class MotionFieldEditor extends Component {
   }
 }
 
-class Markdown extends Component {
-  generate() {
-    return {
-      __html: marked(this.props.children)
-    };
-  }
-
-  render() {
-    if (!this.props.children) {
-      return <div/>;
-    }
-
-    try {
-      return <div dangerouslySetInnerHTML={this.generate()} />;
-    } catch (err) {
-      return (
-        <div>
-          <div className='alert alert-danger'>{err}</div>
-          <pre>
-          </pre>
-        </div>
-      );
-    }
-  }
-}
-
-class Controls extends Component {
-  render() {
-    return (
-      <div className='well'>
-        {this.props.children}
-      </div>
-    );
-  }
-}
-
 class FieldEditor extends Component {
    constructor(props) {
      super(props);
@@ -98,12 +61,6 @@ class FieldEditor extends Component {
        editMode: false
      };
    }
-
-  renderElection() {
-    const field = this.props.field;
-
-    return <div/>;
-  }
 
   clickEdit() {
     this.setState({
@@ -123,6 +80,26 @@ class FieldEditor extends Component {
       field: this.props.index
     });
   }
+
+  renderElection() {
+    const field = this.props.field;
+
+    return (
+      <div className='panel panel-default'>
+        <div className='panel-heading'>
+          <h3 className='panel-title'>{field.id}</h3>
+        </div>
+        <div className='panel-body'>
+          <ul>
+            {field.candidates.map((candidate, i) => {
+              return <li key={i}>{candidate}</li>;
+            })}
+          </ul>
+        </div>
+      </div>
+    );
+  }
+
 
   renderMotion() {
     if (this.state.editMode) {
@@ -243,8 +220,30 @@ class Section extends Component {
     });
   }
 
+  renderTypeSpecific() {
+    const { section } = this.props;
+
+    if (section.type === 'motion') {
+      return (
+        <div>
+          <strong>Threshold: </strong>
+          <span>{section.threshold || 'simple'}</span>
+        </div>
+      );
+    }
+
+    if (section.type === 'election') {
+      return (
+        <div>
+          <strong>Method: </strong>
+          <span>{section.method || 'schulze'}</span>
+        </div>
+      );
+    }
+  }
+
   renderSectionHeader() {
-    const section = this.props.section;
+    const { section } = this.props;
 
     if (this.state.editMode) {
       return (
@@ -263,6 +262,8 @@ class Section extends Component {
               Type: {section.type}
             </small>
           </h2>
+
+          {this.renderTypeSpecific()}
 
           <blockquote>
             <Markdown>
@@ -287,6 +288,14 @@ class Section extends Component {
         </Controls>
 
         <div className='panel panel-default'>
+          <div className='panel-heading'>
+            <div className="input-group">
+              <h4 className='panel-title'>Text goes here</h4>
+              <div className="input-group-btn">
+                <button className="btn btn-default btn-xs" type="button">Edit</button>
+              </div>
+            </div>
+          </div>
           <div className='panel-body'>
             {this.renderSectionHeader()}
 
