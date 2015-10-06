@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import AltContainer from 'alt/AltContainer';
 
 import PollStore from './stores/poll-store';
@@ -7,6 +7,8 @@ import PollActions from './actions/poll-actions';
 import Markdown from './components/markdown';
 import BasePropertiesEditor from './components/base-properties-editor';
 import { Controls, Button, FormInput, FormTextarea } from './components/bootstrap';
+
+import $ from 'jquery';
 
 class MotionFieldEditor extends Component {
   constructor(props) {
@@ -34,12 +36,16 @@ class MotionFieldEditor extends Component {
     this.setState(state);
   }
 
+  componentDidMount() {
+    $(React.findDOMNode(this.refs.first)).find('input').focus();
+  }
+
   render() {
     return (
       <div style={{ 'padding': '1em', 'border': '1px solid gray' }}>
         <div className='row'>
           <div className='col-md-10 form form-horizontal'>
-            <FormInput label='Identifier' id='id' horizontal={true} value={this.state.id} onChange={this.onChange.bind(this)} />
+            <FormInput ref='first' label='Identifier' id='id' horizontal={true} value={this.state.id} onChange={this.onChange.bind(this)} />
             <FormInput label='Title' id='title' horizontal={true} value={this.state.title} onChange={this.onChange.bind(this)} />
             <FormTextarea label='Body' id='body' horizontal={true} value={this.state.body} rows='8' onChange={this.onChange.bind(this)} />
           </div>
@@ -58,7 +64,7 @@ class FieldEditor extends Component {
      super(props);
 
      this.state = {
-       editMode: false
+       editMode: props.field.isNew || false
      };
    }
 
@@ -99,7 +105,6 @@ class FieldEditor extends Component {
       </div>
     );
   }
-
 
   renderMotion() {
     if (this.state.editMode) {
@@ -171,6 +176,10 @@ class SectionEditor extends Component {
     this.setState(state);
   }
 
+  componentDidMount() {
+    $(React.findDOMNode(this.refs.first)).find('input').focus();
+  }
+
   render() {
     const section = this.props.section;
 
@@ -178,12 +187,16 @@ class SectionEditor extends Component {
       <div>
         <div className='form form-horizontal row'>
           <div className='col-md-10'>
-            <FormInput label='Section Title' data-id='title' id={`section-title-${this.props.index}`} value={this.state.title} horizontal={true} onChange={this.onChange.bind(this)} />
+            <FormInput ref='first' label='Section Title' data-id='title' id={`section-title-${this.props.index}`} value={this.state.title} horizontal={true} onChange={this.onChange.bind(this)} />
 
             <div className='form-group'>
               <label htmlFor={`section-type-${this.props.index}`} className='control-label col-md-2'>Section Type</label>
               <div className='col-md-10'>
-                <p className="form-control-static">{section.type}</p>
+                <select data-id='type' disabled={!this.props.section.isNew} className="form-control" value={section.type} onChange={this.onChange.bind(this)}>
+                  <option value=''>--</option>
+                  <option value='motion'>Motions</option>
+                  <option value='election'>Elections</option>
+                </select>
               </div>
             </div>
 
@@ -204,7 +217,7 @@ class Section extends Component {
     super(props);
 
     this.state = {
-      editMode: false
+      editMode: props.section.isNew || false
     };
   }
 
@@ -288,14 +301,16 @@ class Section extends Component {
         </Controls>
 
         <div className='panel panel-default'>
-          <div className='panel-heading'>
-            <div className="input-group">
-              <h4 className='panel-title'>Text goes here</h4>
-              <div className="input-group-btn">
-                <button className="btn btn-default btn-xs" type="button">Edit</button>
+          {/*
+            <div className='panel-heading'>
+              <div className="input-group">
+                <h4 className='panel-title'>Text goes here</h4>
+                <div className="input-group-btn">
+                  <button className="btn btn-default btn-xs" type="button">Edit</button>
+                </div>
               </div>
             </div>
-          </div>
+          */}
           <div className='panel-body'>
             {this.renderSectionHeader()}
 
@@ -336,6 +351,11 @@ class App extends Component {
   render() {
     return (
       <AltContainer store={PollStore} actions={PollActions}>
+        <header className='page-header'>
+
+          <div className='label label-danger' style={{fontSize: '1em'}}>Early Prototype</div>
+          <h1>Poll Editor</h1>
+        </header>
         <BasePropertiesEditor />
 
         <Controls>

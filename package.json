@@ -10,6 +10,7 @@
     "prepublish": "npm run build-assets",
     "build-assets": "npm run bower && npm run webpack",
     "bower": "sh scripts/post-bower.sh",
+    "dev:webpack": "webpack -w --config src/webpack.config.js",
     "webpack": "npm run webpack:components && npm run webpack:toml",
     "webpack:toml": "webpack -p --output-library toml src/toml.js assets/static/js/toml.min.js",
     "webpack:components": "webpack -p --config src/webpack.config.js"

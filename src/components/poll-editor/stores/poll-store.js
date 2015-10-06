@@ -222,7 +222,8 @@ class PollStore {
       pageTitle: '',
       title: '',
       info: '',
-      sections: []
+      sections: [],
+      isNew: true
     });
 
     this.bindListeners({
@@ -237,10 +238,15 @@ class PollStore {
       handleNewFieldForSection: PollActions.NEW_FIELD_FOR_SECTION,
       handleUpdateField: PollActions.UPDATE_FIELD,
       handleRemoveField: PollActions.REMOVE_FIELD,
-      handleUpdateBaseProperties: PollActions.UPDATE_BASE_PROPERTIES
+      handleUpdateBaseProperties: PollActions.UPDATE_BASE_PROPERTIES,
+      handleNewPoll: PollActions.NEW_POLL
     });
 
     this.exportAsync(PollSource);
+
+    this.exportPublicMethods({
+      newPoll: this.handleNewPoll
+    });
 
     this.on('afterEach', (o) => {
       const { payload, state } = o;
@@ -283,7 +289,10 @@ class PollStore {
 
   handleAddNewSection() {
     this.sections.push({
-      fields: []
+      title: '',
+      info: '',
+      fields: [],
+      isNew: true
     });
   }
 
@@ -293,18 +302,25 @@ class PollStore {
 
   handleUpdateSection(o) {
     const { section, state } = o;
+    const node = this.sections[section];
 
-    Object.assign(this.sections[section], state);
+    Object.assign(node, state);
+    node.isNew = false;
   }
 
   handleNewFieldForSection(index) {
-    this.sections[index].fields.push({});
+    this.sections[index].fields.push({
+      isNew: true
+    });
   }
 
   handleUpdateField(o) {
     const { section, field, state } = o;
 
-    Object.assign(this.sections[section].fields[field], state);
+    const node = this.sections[section].fields[field];
+
+    Object.assign(node, state);
+    node.isNew = false;
   }
 
   handleRemoveField(o) {
@@ -315,6 +331,17 @@ class PollStore {
 
   handleUpdateBaseProperties(o) {
     Object.assign(this, o);
+    this.isNew = false;
+  }
+
+  handleNewPoll() {
+    Object.assign(this, {
+      pageTitle: '',
+      title: '',
+      info: '',
+      sections: [],
+      isNew: true
+    });
   }
 }
 

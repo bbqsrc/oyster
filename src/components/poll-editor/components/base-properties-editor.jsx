@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 
 import Markdown from './markdown';
 import { Controls, Button, FormInput, FormTextarea } from './bootstrap';
@@ -28,19 +28,29 @@ class BasePropertiesEditor extends Component {
     this.setState(o);
   }
 
+  componentDidMount() {
+    if (this.props.isNew) {
+      $(React.findDOMNode(this.refs.first)).find('input').focus();
+    }
+  }
+
   render() {
     return (
       <div>
-        <div className='row'>
-          <div className='col-md-10'>
-            <FormInput label='Page Title' id='pageTitle' value={this.state.pageTitle} onChange={this.onChange.bind(this)} />
-            <FormInput label='Title' id='title' value={this.state.title} onChange={this.onChange.bind(this)} />
-            <FormTextarea rows='8' label='Info' id='info' value={this.state.info} onChange={this.onChange.bind(this)} />
+        <div className='panel panel-default'>
+          <div className='panel-body'>
+            <div className='row'>
+              <div className='col-md-10'>
+                <FormInput ref='first' label='Page Title' id='pageTitle' value={this.state.pageTitle} onChange={this.onChange.bind(this)} />
+                <FormInput label='Title' id='title' value={this.state.title} onChange={this.onChange.bind(this)} />
+                <FormTextarea rows='8' label='Info' id='info' value={this.state.info} onChange={this.onChange.bind(this)} />
+              </div>
+            </div>
           </div>
-        </div>
-        <div>
-          <Button level='primary' onClick={this.clickSave.bind(this)}>Save</Button>
-          <Button level='link' onClick={this.props.onDone}>Cancel</Button>
+          <div className='panel-footer'>
+            <Button level='primary' onClick={this.clickSave.bind(this)}>Save</Button>
+            <Button level='link' onClick={this.props.onDone}>Cancel</Button>
+          </div>
         </div>
       </div>
     );
@@ -52,7 +62,7 @@ class BaseProperties extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { editMode: false };
+    this.state = { editMode: props.isNew || false };
   }
 
   clickEdit() {

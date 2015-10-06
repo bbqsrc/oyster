@@ -17,6 +17,10 @@ class PollActions {
     this.dispatch();
   }
 
+  newPoll() {
+    this.dispatch();
+  }
+
   updatePoll(poll) {
     this.dispatch(poll);
   }
