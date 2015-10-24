@@ -34,7 +34,7 @@ class PollActions {
   }
 
   moveSection(dragTitle, hoverTitle) {
-    this.dispatch([ dragTitle, hoverTitle ]);
+    this.dispatch([dragTitle, hoverTitle]);
   }
 
   updateSection(o) {
@@ -54,7 +54,7 @@ class PollActions {
   }
 
   moveField(sectionIndex, dragId, hoverId) {
-    this.dispatch([ sectionIndex, dragId, hoverId ]);
+    this.dispatch([sectionIndex, dragId, hoverId]);
   }
 
   updateBaseProperties(o) {

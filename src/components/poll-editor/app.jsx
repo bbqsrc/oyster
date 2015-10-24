@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 
-import { findDOMNode } from 'react-dom'
+import { findDOMNode } from 'react-dom';
 
 import { DragSource, DropTarget, DragDropContext } from 'react-dnd';
 
@@ -18,13 +18,13 @@ import { Controls, Button, FormInput, FormTextarea } from './components/bootstra
 import $ from 'jquery';
 
 const Types = {
-  SECTION: Symbol("Section"),
-  FIELD: Symbol("Field")
-}
+  SECTION: Symbol('Section'),
+  FIELD: Symbol('Field')
+};
 
 function canDrop(propName, props, monitor) {
   const dragId = monitor.getItem()[propName];
-  const hoverId = props[propName]
+  const hoverId = props[propName];
 
   if (dragId === hoverId) {
     // Over self, can't drop here
@@ -105,7 +105,7 @@ class MotionFieldEditor extends Component {
 
   render() {
     return (
-      <div style={{ 'padding': '1em', 'border': '1px solid gray' }}>
+      <div style={{ padding: '1em', border: '1px solid gray' }}>
         <div className='row'>
           <div className='col-md-10 form form-horizontal'>
             <FormInput ref='first' label='Identifier' id='id' horizontal={true} value={this.state.id} onChange={this.onChange.bind(this)} />
@@ -138,13 +138,13 @@ class MotionFieldEditor extends Component {
   isDragging: monitor.isDragging()
 }))
 @DropTarget(Types.FIELD, {
-  canDrop: canDrop.bind(null, "fieldId"),
-  hover: hoverHandler.bind(null, "moveField", (props, item) => ([
+  canDrop: canDrop.bind(null, 'fieldId'),
+  hover: hoverHandler.bind(null, 'moveField', (props, item) => ([
     props.section,
     item.fieldId,
     props.fieldId
   ]))
-}, (connect, monitor) => ({
+}, (connect) => ({
   connectDropTarget: connect.dropTarget()
 }))
 class FieldEditor extends Component {
@@ -320,12 +320,12 @@ class SectionEditor extends Component {
   isDragging: monitor.isDragging()
 }))
 @DropTarget(Types.SECTION, {
-  canDrop: canDrop.bind(null, "sectionTitle"),
-  hover: hoverHandler.bind(null, "moveSection", (props, item) => ([
+  canDrop: canDrop.bind(null, 'sectionTitle'),
+  hover: hoverHandler.bind(null, 'moveSection', (props, item) => ([
     item.sectionTitle,
     props.sectionTitle
   ]))
-}, (connect, monitor) => ({
+}, (connect) => ({
   connectDropTarget: connect.dropTarget()
 }))
 class Section extends Component {
@@ -477,7 +477,7 @@ class App extends Component {
       <AltContainer store={PollStore} actions={PollActions}>
         <header className='page-header'>
 
-          <div className='label label-danger' style={{fontSize: '1em'}}>Early Prototype</div>
+          <div className='label label-danger' style={{ fontSize: '1em' }}>Early Prototype</div>
           <h1>Poll Editor</h1>
         </header>
         <BasePropertiesEditor />
