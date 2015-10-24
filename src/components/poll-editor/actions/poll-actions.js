@@ -33,6 +33,10 @@ class PollActions {
     this.dispatch(index);
   }
 
+  moveSection(dragIndex, hoverIndex) {
+    this.dispatch({ dragIndex, hoverIndex });
+  }
+
   updateSection(o) {
     this.dispatch(o);
   }
