@@ -135,6 +135,7 @@ class MotionFieldEditor extends Component {
   }
 }, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
+  connectDragPreview: connect.dragPreview(),
   isDragging: monitor.isDragging()
 }))
 @DropTarget(Types.FIELD, {
@@ -176,13 +177,13 @@ class FieldEditor extends Component {
   }
 
   renderElection() {
-    const { field, isDragging } = this.props;
+    const { field, isDragging, connectDragSource } = this.props;
     const opacity = isDragging ? 0 : 1;
 
     return (
       <div className='panel panel-default' style={{ opacity }}>
         <div className='panel-heading'>
-          <h3 className='panel-title'>{field.id}</h3>
+          {connectDragSource(<h3 className='panel-title'>{field.id}</h3>)}
         </div>
         <div className='panel-body'>
           <ul>
@@ -199,22 +200,24 @@ class FieldEditor extends Component {
     if (this.state.editMode) {
       return <MotionFieldEditor index={this.props.index} section={this.props.section} field={this.props.field} onDone={this.clickCancel.bind(this)}/>;
     } else {
-      const { field, isDragging, connectDragSource, connectDropTarget } = this.props;
+      const { field, isDragging, connectDragSource, connectDragPreview, connectDropTarget } = this.props;
       const opacity = isDragging ? 0 : 1;
 
-      return connectDragSource(connectDropTarget(
+      return connectDragPreview(connectDropTarget(
         <div className='panel panel-default' style={{ opacity }}>
           <div className='panel-heading'>
             <div className='pull-right'>
               <Button level='default' size='sm' onClick={this.clickEdit.bind(this)}>Edit</Button>
               <Button level='danger' size='sm' onClick={this.clickRemove.bind(this)}>&times;</Button>
             </div>
+            {connectDragSource(
             <h4 className='panel-title'>
               {field.title}
               <small style={{ marginLeft: '1em' }}>
                 {field.id}
               </small>
             </h4>
+            )}
           </div>
 
           <div className='panel-body'>
@@ -226,10 +229,10 @@ class FieldEditor extends Component {
   }
 
   render() {
-    const { connectDragSource, connectDropTarget } = this.props;
+    const { connectDragPreview, connectDropTarget } = this.props;
 
     if (this.props.type === 'election') {
-      return connectDragSource(connectDropTarget(this.renderElection()));
+      return connectDragPreview(connectDropTarget(this.renderElection()));
     } else if (this.props.type === 'motion') {
       return this.renderMotion();
     } else {
@@ -317,6 +320,7 @@ class SectionEditor extends Component {
   }
 }, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
+  connectDragPreview: connect.dragPreview(),
   isDragging: monitor.isDragging()
 }))
 @DropTarget(Types.SECTION, {
@@ -405,23 +409,22 @@ class Section extends Component {
   }
 
   render() {
-    const {
-      section,
-      isDragging,
-      connectDragSource,
-      connectDropTarget
-    } = this.props;
+    const { section, isDragging, connectDragSource, connectDragPreview, connectDropTarget } = this.props;
 
     const opacity = isDragging ? 0 : 1;
 
-    return connectDragSource(connectDropTarget(
+    return connectDragPreview(connectDropTarget(
       <div style={{ padding: '1em', border: '1px solid gray', opacity }}>
-        <Controls>
-          <Button level='primary' onClick={this.props.newFieldForSection.bind(this, this.props.index)}>New field</Button>
-          <div className='pull-right'>
-            <Button level='danger' size='sm' onClick={this.props.removeSection.bind(this, this.props.index)}>&times;</Button>
-          </div>
-        </Controls>
+        {connectDragSource(
+        <div>
+          <Controls>
+            <Button level='primary' onClick={this.props.newFieldForSection.bind(this, this.props.index)}>New field</Button>
+            <div className='pull-right'>
+              <Button level='danger' size='sm' onClick={this.props.removeSection.bind(this, this.props.index)}>&times;</Button>
+            </div>
+          </Controls>
+        </div>
+        )}
 
         <div className='panel panel-default'>
           {/*
