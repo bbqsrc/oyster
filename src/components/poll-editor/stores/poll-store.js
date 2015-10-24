@@ -302,8 +302,12 @@ class PollStore {
     this.sections.splice(index, 1);
   }
 
+  findSectionIndex(sectionTitle) {
+    return this.sections.findIndex(section => section.title === sectionTitle);
+  }
+
   handleMoveSection(o) {
-    const { dragIndex, hoverIndex} = o;
+    const [ dragIndex, hoverIndex ] = o.map(this.findSectionIndex.bind(this));
     const dragSection = this.sections[dragIndex];
 
     this.sections = update(this.sections, {
