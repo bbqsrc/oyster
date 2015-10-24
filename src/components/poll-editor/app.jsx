@@ -45,16 +45,16 @@ function hoverHandler(actionName, actionParamGetter, props, monitor, component) 
     return;
   }
 
-  // WHAR IS THE HOVAR
+  // Bounding box for the item being hovered over
   const hoverBounds = findDOMNode(component).getBoundingClientRect();
 
-  // Can has vertical middlez?
+  // Vertical midpoint of the item being hovered over
   const hoverMiddleY = (hoverBounds.bottom - hoverBounds.top) / 2;
 
-  // Mus, var är du?
+  // Pointer coordinates
   const clientOffset = monitor.getClientOffset();
 
-  // How far are we from the top?
+  // Determine how far the pointer is from the top of the hovered element
   const hoverClientY = clientOffset.y - hoverBounds.top;
 
   // Dragging down
@@ -69,7 +69,7 @@ function hoverHandler(actionName, actionParamGetter, props, monitor, component) 
     return;
   }
 
-  // Zhu Li, do the thing!
+  // Invoke the action with parameters from getter (func of props & item)
   props[actionName](...actionParamGetter(props, monitor.getItem()));
 }
 
