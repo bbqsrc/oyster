@@ -37,7 +37,7 @@ class MotionFieldEditor extends Component {
   }
 
   componentDidMount() {
-    $(React.findDOMNode(this.refs.first)).find('input').focus();
+    $(findDOMNode(this.refs.first)).find('input').focus();
   }
 
   render() {
@@ -177,7 +177,7 @@ class SectionEditor extends Component {
   }
 
   componentDidMount() {
-    $(React.findDOMNode(this.refs.first)).find('input').focus();
+    $(findDOMNode(this.refs.first)).find('input').focus();
   }
 
   render() {
