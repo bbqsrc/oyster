@@ -19,7 +19,7 @@ import $ from 'jquery';
 
 const Types = {
   SECTION: Symbol("Section"),
-  FIELD_EDITOR: Symbol("FieldEditor")
+  FIELD: Symbol("Field")
 }
 
 class MotionFieldEditor extends Component {
@@ -71,6 +71,78 @@ class MotionFieldEditor extends Component {
   }
 }
 
+@DragSource(Types.FIELD, {
+  beginDrag(props) {
+    return {
+      section: props.section,
+      fieldId: props.fieldId,
+      index: props.index
+    };
+  },
+  isDragging(props, monitor) {
+    return props.fieldId === monitor.getItem().fieldId;
+  }
+}, (connect, monitor) => ({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging()
+}))
+@DropTarget(Types.FIELD, {
+  canDrop(props, monitor) {
+    const dragId = monitor.getItem().fieldId;
+    const hoverId = props.fieldId;
+
+    if (dragId === hoverId) {
+      // Over self, can't drop here
+      return false;
+    }
+
+    return true;
+  },
+  hover(props, monitor, component) {
+    // Index of the item being dragged
+    const dragIndex = monitor.getItem().index;
+    // Index of the item being hovered over
+    const hoverIndex = props.index;
+
+    if (!monitor.canDrop()) {
+      // Not a valid target, do nothing
+      return;
+    }
+
+    // WHAR IS THE HOVAR
+    const hoverBounds = findDOMNode(component).getBoundingClientRect();
+
+    // Can has vertical middlez?
+    const hoverMiddleY = (hoverBounds.bottom - hoverBounds.top) / 2;
+
+    // Mus, var är du?
+    const clientOffset = monitor.getClientOffset();
+
+    // How far are we from the top?
+    const hoverClientY = clientOffset.y - hoverBounds.top;
+
+    // Dragging down
+    if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+      // Not past vertical midpoint yet, do nothing
+      return;
+    }
+
+    // Dragging up
+    if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+      // Not past vertical midpoint yet, do nothing
+      return;
+    }
+
+    const sectionIndex = props.section;
+    const dragId = monitor.getItem().fieldId;
+    const hoverId = props.fieldId;
+
+    // Zhu Li, do the thing!
+    props.moveField(sectionIndex, dragId, hoverId);
+  }
+}, (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget()
+}))
 class FieldEditor extends Component {
    constructor(props) {
      super(props);
@@ -100,10 +172,12 @@ class FieldEditor extends Component {
   }
 
   renderElection() {
-    const field = this.props.field;
+    const { field, isDragging } = this.props;
+    const opacity = isDragging ? 0 : 1;
+    
 
     return (
-      <div className='panel panel-default'>
+      <div className='panel panel-default' style={{ opacity }}>
         <div className='panel-heading'>
           <h3 className='panel-title'>{field.id}</h3>
         </div>
@@ -119,13 +193,16 @@ class FieldEditor extends Component {
   }
 
   renderMotion() {
+    const { isDragging } = this.props;
+    const opacity = isDragging ? 0 : 1;
+
     if (this.state.editMode) {
-      return <MotionFieldEditor index={this.props.index} section={this.props.section} field={this.props.field} onDone={this.clickCancel.bind(this)}/>;
+      return <MotionFieldEditor style={{ opacity }} index={this.props.index} section={this.props.section} field={this.props.field} onDone={this.clickCancel.bind(this)}/>;
     } else {
       const field = this.props.field;
 
       return (
-        <div className='panel panel-default'>
+        <div className='panel panel-default' style={{ opacity }}>
           <div className='panel-heading'>
             <div className='pull-right'>
               <Button level='default' size='sm' onClick={this.clickEdit.bind(this)}>Edit</Button>
@@ -148,11 +225,14 @@ class FieldEditor extends Component {
   }
 
   render() {
+    const { connectDragSource, connectDropTarget } = this.props;
+
     if (this.props.type === 'election') {
-      return this.renderElection();
+      return connectDragSource(connectDropTarget(this.renderElection()));
     } else if (this.props.type === 'motion') {
-      return this.renderMotion();
+      return connectDragSource(connectDropTarget(this.renderMotion()));
     } else {
+      // No point setting up drag and drop for an error
       return (
         <div className='alert alert-danger'>
           Unknown type '{this.props.type}'!
@@ -240,25 +320,10 @@ class SectionEditor extends Component {
 }))
 @DropTarget(Types.SECTION, {
   canDrop(props, monitor) {
-    // Index of the item being dragged
-    const dragIndex = monitor.getItem().index;
-    // Index of the item being hovered over
-    const hoverIndex = props.index;
-
     const dragTitle = monitor.getItem().sectionTitle;
     const hoverTitle = props.sectionTitle;
 
-    const sameIndex = dragIndex === hoverIndex;
-    const sameTitle = dragTitle === hoverTitle;
-
-/*
-    if (sameIndex && !sameTitle) {
-      // Over self, can't drop here
-      return false;
-    }
-*/
-
-    if (sameTitle) {
+    if (dragTitle === hoverTitle) {
       // Over self, can't drop here
       return false;
     }
@@ -422,7 +487,7 @@ class Section extends Component {
 
             <AltContainer store={PollStore} actions={PollActions}>
               {section.fields.map((field, i) => {
-                return <FieldEditor section={this.props.index} type={section.type} field={field} key={i} index={i} />;
+                return <FieldEditor section={this.props.index} type={section.type} field={field} fieldId={field.id} key={i} index={i} />;
               })}
             </AltContainer>
           </div>

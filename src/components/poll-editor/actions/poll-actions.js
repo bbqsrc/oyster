@@ -53,6 +53,10 @@ class PollActions {
     this.dispatch(state);
   }
 
+  moveField(sectionIndex, dragId, hoverId) {
+    this.dispatch([ sectionIndex, dragId, hoverId ]);
+  }
+
   updateBaseProperties(o) {
     this.dispatch(o);
   }
