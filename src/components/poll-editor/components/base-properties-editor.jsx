@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom'
 
 import Markdown from './markdown';
 import { Controls, Button, FormInput, FormTextarea } from './bootstrap';
@@ -30,7 +31,7 @@ class BasePropertiesEditor extends Component {
 
   componentDidMount() {
     if (this.props.isNew) {
-      $(React.findDOMNode(this.refs.first)).find('input').focus();
+      $(findDOMNode(this.refs.first)).find('input').focus();
     }
   }
 
