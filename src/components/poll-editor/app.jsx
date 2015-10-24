@@ -196,15 +196,13 @@ class FieldEditor extends Component {
   }
 
   renderMotion() {
-    const { isDragging } = this.props;
-    const opacity = isDragging ? 0 : 1;
-
     if (this.state.editMode) {
-      return <MotionFieldEditor style={{ opacity }} index={this.props.index} section={this.props.section} field={this.props.field} onDone={this.clickCancel.bind(this)}/>;
+      return <MotionFieldEditor index={this.props.index} section={this.props.section} field={this.props.field} onDone={this.clickCancel.bind(this)}/>;
     } else {
-      const field = this.props.field;
+      const { field, isDragging, connectDragSource, connectDropTarget } = this.props;
+      const opacity = isDragging ? 0 : 1;
 
-      return (
+      return connectDragSource(connectDropTarget(
         <div className='panel panel-default' style={{ opacity }}>
           <div className='panel-heading'>
             <div className='pull-right'>
@@ -223,7 +221,7 @@ class FieldEditor extends Component {
             <Markdown>{field.body}</Markdown>
           </div>
         </div>
-      );
+      ));
     }
   }
 
@@ -233,7 +231,7 @@ class FieldEditor extends Component {
     if (this.props.type === 'election') {
       return connectDragSource(connectDropTarget(this.renderElection()));
     } else if (this.props.type === 'motion') {
-      return connectDragSource(connectDropTarget(this.renderMotion()));
+      return this.renderMotion();
     } else {
       // No point setting up drag and drop for an error
       return (
