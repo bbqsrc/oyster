@@ -230,6 +230,9 @@ class SectionEditor extends Component {
       sectionTitle: props.section.title,
       index: props.index
     };
+  },
+  isDragging(props, monitor) {
+    return props.section.title === monitor.getItem().sectionTitle;
   }
 }, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
@@ -237,23 +240,26 @@ class SectionEditor extends Component {
 }))
 @DropTarget(Types.SECTION, {
   canDrop(props, monitor) {
-/*
     // Index of the item being dragged
     const dragIndex = monitor.getItem().index;
     // Index of the item being hovered over
     const hoverIndex = props.index;
 
-    if (dragIndex === hoverIndex) {
-      // Over self, can't drop here 
+    const dragTitle = monitor.getItem().sectionTitle;
+    const hoverTitle = props.section.title;
+
+    const sameIndex = dragIndex === hoverIndex;
+    const sameTitle = dragTitle === hoverTitle;
+
+/*
+    if (sameIndex && !sameTitle) {
+      // Over self, can't drop here
       return false;
     }
 */
 
-    const dragTitle = monitor.getItem().sectionTitle;
-    const hoverTitle = props.section.title;
-
-    if (dragTitle === hoverTitle) {
-      // Over self, can't drop here 
+    if (sameTitle) {
+      // Over self, can't drop here
       return false;
     }
 
@@ -294,8 +300,11 @@ class SectionEditor extends Component {
       return;
     }
 
+    const dragTitle = monitor.getItem().sectionTitle;
+    const hoverTitle = props.section.title;
+
     // Zhu Li, do the thing!
-    props.moveSection(dragIndex, hoverIndex); 
+    props.moveSection(dragTitle, hoverTitle);
   }
 }, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget()
@@ -384,8 +393,7 @@ class Section extends Component {
       connectDropTarget
     } = this.props;
 
-//    const opacity = isDragging ? 0 : 1;
-    const opacity = 1;
+    const opacity = isDragging ? 0 : 1;
 
     return connectDragSource(connectDropTarget(
       <div style={{ padding: '1em', border: '1px solid gray', opacity }}>
