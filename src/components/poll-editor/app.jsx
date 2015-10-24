@@ -227,12 +227,12 @@ class SectionEditor extends Component {
 @DragSource(Types.SECTION, {
   beginDrag(props) {
     return {
-      sectionTitle: props.section.title,
+      sectionTitle: props.sectionTitle,
       index: props.index
     };
   },
   isDragging(props, monitor) {
-    return props.section.title === monitor.getItem().sectionTitle;
+    return props.sectionTitle === monitor.getItem().sectionTitle;
   }
 }, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
@@ -246,7 +246,7 @@ class SectionEditor extends Component {
     const hoverIndex = props.index;
 
     const dragTitle = monitor.getItem().sectionTitle;
-    const hoverTitle = props.section.title;
+    const hoverTitle = props.sectionTitle;
 
     const sameIndex = dragIndex === hoverIndex;
     const sameTitle = dragTitle === hoverTitle;
@@ -301,7 +301,7 @@ class SectionEditor extends Component {
     }
 
     const dragTitle = monitor.getItem().sectionTitle;
-    const hoverTitle = props.section.title;
+    const hoverTitle = props.sectionTitle;
 
     // Zhu Li, do the thing!
     props.moveSection(dragTitle, hoverTitle);
@@ -438,7 +438,7 @@ class Sections extends Component {
       <div>
         <AltContainer store={PollStore} actions={PollActions}>
           {this.props.sections.map((section, i) => {
-            return <Section key={i} index={i} section={section} />;
+            return <Section key={i} index={i} section={section} sectionTitle={section.title} />;
           })}
         </AltContainer>
       </div>
