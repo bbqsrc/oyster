@@ -69,6 +69,7 @@
     "react": "^0.14.0",
     "react-dnd": "^2.0.2",
     "react-dnd-html5-backend": "^2.0.0",
+    "react-dom": "^0.14.0",
     "supertest": "^1.1.0",
     "toml": "^2.3.0",
     "uglify-js": "^2.4.24",
