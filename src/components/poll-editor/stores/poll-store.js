@@ -240,6 +240,7 @@ class PollStore {
       handleNewFieldForSection: PollActions.NEW_FIELD_FOR_SECTION,
       handleUpdateField: PollActions.UPDATE_FIELD,
       handleRemoveField: PollActions.REMOVE_FIELD,
+      handleMoveField: PollActions.MOVE_FIELD,
       handleUpdateBaseProperties: PollActions.UPDATE_BASE_PROPERTIES,
       handleNewPoll: PollActions.NEW_POLL
     });
@@ -345,6 +346,29 @@ class PollStore {
     const { section, field } = o;
 
     delete this.sections[section].fields[field];
+  }
+
+  findFieldIndex(sectionIndex, fieldId) {
+    return this.sections[sectionIndex].fields.findIndex(field => field.id === fieldId);
+  }
+
+  handleMoveField(o) {
+    const [ sectionIndex, ...fieldIds ] = o;
+    const [ dragIndex, hoverIndex ] = fieldIds.map(
+      this.findFieldIndex.bind(this, sectionIndex)
+    );
+
+    const sectionFields = this.sections[sectionIndex].fields;
+
+    const dragField = sectionFields[dragIndex];
+
+    // Does this would with section = ???
+    this.sections[sectionIndex].fields = update(sectionFields, {
+      $splice: [
+        [dragIndex, 1],
+        [hoverIndex, 0, dragField]
+      ]
+    });
   }
 
   handleUpdateBaseProperties(o) {
