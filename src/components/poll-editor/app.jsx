@@ -22,6 +22,57 @@ const Types = {
   FIELD: Symbol("Field")
 }
 
+function canDrop(propName, props, monitor) {
+  const dragId = monitor.getItem()[propName];
+  const hoverId = props[propName]
+
+  if (dragId === hoverId) {
+    // Over self, can't drop here
+    return false;
+  }
+
+  return true;
+}
+
+function hoverHandler(actionName, actionParamGetter, props, monitor, component) {
+  // Index of the item being dragged
+  const dragIndex = monitor.getItem().index;
+  // Index of the item being hovered over
+  const hoverIndex = props.index;
+
+  if (!monitor.canDrop()) {
+    // Not a valid target, do nothing
+    return;
+  }
+
+  // WHAR IS THE HOVAR
+  const hoverBounds = findDOMNode(component).getBoundingClientRect();
+
+  // Can has vertical middlez?
+  const hoverMiddleY = (hoverBounds.bottom - hoverBounds.top) / 2;
+
+  // Mus, var är du?
+  const clientOffset = monitor.getClientOffset();
+
+  // How far are we from the top?
+  const hoverClientY = clientOffset.y - hoverBounds.top;
+
+  // Dragging down
+  if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+    // Not past vertical midpoint yet, do nothing
+    return;
+  }
+
+  // Dragging up
+  if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+    // Not past vertical midpoint yet, do nothing
+    return;
+  }
+
+  // Zhu Li, do the thing!
+  props[actionName](...actionParamGetter(props, monitor.getItem()));
+}
+
 class MotionFieldEditor extends Component {
   constructor(props) {
     super(props);
@@ -87,59 +138,12 @@ class MotionFieldEditor extends Component {
   isDragging: monitor.isDragging()
 }))
 @DropTarget(Types.FIELD, {
-  canDrop(props, monitor) {
-    const dragId = monitor.getItem().fieldId;
-    const hoverId = props.fieldId;
-
-    if (dragId === hoverId) {
-      // Over self, can't drop here
-      return false;
-    }
-
-    return true;
-  },
-  hover(props, monitor, component) {
-    // Index of the item being dragged
-    const dragIndex = monitor.getItem().index;
-    // Index of the item being hovered over
-    const hoverIndex = props.index;
-
-    if (!monitor.canDrop()) {
-      // Not a valid target, do nothing
-      return;
-    }
-
-    // WHAR IS THE HOVAR
-    const hoverBounds = findDOMNode(component).getBoundingClientRect();
-
-    // Can has vertical middlez?
-    const hoverMiddleY = (hoverBounds.bottom - hoverBounds.top) / 2;
-
-    // Mus, var är du?
-    const clientOffset = monitor.getClientOffset();
-
-    // How far are we from the top?
-    const hoverClientY = clientOffset.y - hoverBounds.top;
-
-    // Dragging down
-    if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-      // Not past vertical midpoint yet, do nothing
-      return;
-    }
-
-    // Dragging up
-    if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-      // Not past vertical midpoint yet, do nothing
-      return;
-    }
-
-    const sectionIndex = props.section;
-    const dragId = monitor.getItem().fieldId;
-    const hoverId = props.fieldId;
-
-    // Zhu Li, do the thing!
-    props.moveField(sectionIndex, dragId, hoverId);
-  }
+  canDrop: canDrop.bind(null, "fieldId"),
+  hover: hoverHandler.bind(null, "moveField", (props, item) => ([
+    props.section,
+    item.fieldId,
+    props.fieldId
+  ]))
 }, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget()
 }))
@@ -174,7 +178,6 @@ class FieldEditor extends Component {
   renderElection() {
     const { field, isDragging } = this.props;
     const opacity = isDragging ? 0 : 1;
-    
 
     return (
       <div className='panel panel-default' style={{ opacity }}>
@@ -319,58 +322,11 @@ class SectionEditor extends Component {
   isDragging: monitor.isDragging()
 }))
 @DropTarget(Types.SECTION, {
-  canDrop(props, monitor) {
-    const dragTitle = monitor.getItem().sectionTitle;
-    const hoverTitle = props.sectionTitle;
-
-    if (dragTitle === hoverTitle) {
-      // Over self, can't drop here
-      return false;
-    }
-
-    return true;
-  },
-  hover(props, monitor, component) {
-    // Index of the item being dragged
-    const dragIndex = monitor.getItem().index;
-    // Index of the item being hovered over
-    const hoverIndex = props.index;
-
-    if (!monitor.canDrop()) {
-      // Not a valid target, do nothing
-      return;
-    }
-
-    // WHAR IS THE HOVAR
-    const hoverBounds = findDOMNode(component).getBoundingClientRect();
-
-    // Can has vertical middlez?
-    const hoverMiddleY = (hoverBounds.bottom - hoverBounds.top) / 2;
-
-    // Mus, var är du?
-    const clientOffset = monitor.getClientOffset();
-
-    // How far are we from the top?
-    const hoverClientY = clientOffset.y - hoverBounds.top;
-
-    // Dragging down
-    if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-      // Not past vertical midpoint yet, do nothing
-      return;
-    }
-
-    // Dragging up
-    if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-      // Not past vertical midpoint yet, do nothing
-      return;
-    }
-
-    const dragTitle = monitor.getItem().sectionTitle;
-    const hoverTitle = props.sectionTitle;
-
-    // Zhu Li, do the thing!
-    props.moveSection(dragTitle, hoverTitle);
-  }
+  canDrop: canDrop.bind(null, "sectionTitle"),
+  hover: hoverHandler.bind(null, "moveSection", (props, item) => ([
+    item.sectionTitle,
+    props.sectionTitle
+  ]))
 }, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget()
 }))
