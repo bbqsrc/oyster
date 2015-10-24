@@ -1,4 +1,11 @@
 import React, { Component } from 'react';
+
+import { findDOMNode } from 'react-dom'
+
+import { DragSource, DropTarget, DragDropContext } from 'react-dnd';
+
+import HTML5Backend from 'react-dnd-html5-backend';
+
 import AltContainer from 'alt/AltContainer';
 
 import PollStore from './stores/poll-store';
@@ -9,6 +16,11 @@ import BasePropertiesEditor from './components/base-properties-editor';
 import { Controls, Button, FormInput, FormTextarea } from './components/bootstrap';
 
 import $ from 'jquery';
+
+const Types = {
+  SECTION: Symbol("Section"),
+  FIELD_EDITOR: Symbol("FieldEditor")
+}
 
 class MotionFieldEditor extends Component {
   constructor(props) {
@@ -212,6 +224,82 @@ class SectionEditor extends Component {
   }
 }
 
+@DragSource(Types.SECTION, {
+  beginDrag(props) {
+    return {
+      sectionTitle: props.section.title,
+      index: props.index
+    };
+  }
+}, (connect, monitor) => ({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging()
+}))
+@DropTarget(Types.SECTION, {
+  canDrop(props, monitor) {
+/*
+    // Index of the item being dragged
+    const dragIndex = monitor.getItem().index;
+    // Index of the item being hovered over
+    const hoverIndex = props.index;
+
+    if (dragIndex === hoverIndex) {
+      // Over self, can't drop here 
+      return false;
+    }
+*/
+
+    const dragTitle = monitor.getItem().sectionTitle;
+    const hoverTitle = props.section.title;
+
+    if (dragTitle === hoverTitle) {
+      // Over self, can't drop here 
+      return false;
+    }
+
+    return true;
+  },
+  hover(props, monitor, component) {
+    // Index of the item being dragged
+    const dragIndex = monitor.getItem().index;
+    // Index of the item being hovered over
+    const hoverIndex = props.index;
+
+    if (!monitor.canDrop()) {
+      // Not a valid target, do nothing
+      return;
+    }
+
+    // WHAR IS THE HOVAR
+    const hoverBounds = findDOMNode(component).getBoundingClientRect();
+
+    // Can has vertical middlez?
+    const hoverMiddleY = (hoverBounds.bottom - hoverBounds.top) / 2;
+
+    // Mus, var är du?
+    const clientOffset = monitor.getClientOffset();
+
+    // How far are we from the top?
+    const hoverClientY = clientOffset.y - hoverBounds.top;
+
+    // Dragging down
+    if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+      // Not past vertical midpoint yet, do nothing
+      return;
+    }
+
+    // Dragging up
+    if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+      // Not past vertical midpoint yet, do nothing
+      return;
+    }
+
+    // Zhu Li, do the thing!
+    props.moveSection(dragIndex, hoverIndex); 
+  }
+}, (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget()
+}))
 class Section extends Component {
   constructor(props) {
     super(props);
@@ -289,10 +377,18 @@ class Section extends Component {
   }
 
   render() {
-    const section = this.props.section;
+    const {
+      section,
+      isDragging,
+      connectDragSource,
+      connectDropTarget
+    } = this.props;
 
-    return (
-      <div style={{ padding: '1em', border: '1px solid gray' }}>
+//    const opacity = isDragging ? 0 : 1;
+    const opacity = 1;
+
+    return connectDragSource(connectDropTarget(
+      <div style={{ padding: '1em', border: '1px solid gray', opacity }}>
         <Controls>
           <Button level='primary' onClick={this.props.newFieldForSection.bind(this, this.props.index)}>New field</Button>
           <div className='pull-right'>
@@ -324,7 +420,7 @@ class Section extends Component {
           </div>
         </div>
       </div>
-    );
+    ));
   }
 }
 
@@ -342,6 +438,7 @@ class Sections extends Component {
   }
 }
 
+@DragDropContext(HTML5Backend)
 export default
 class App extends Component {
   componentDidMount() {

@@ -1,4 +1,5 @@
 import alt from '../alt';
+import update from 'react-addons-update';
 import PollActions from '../actions/poll-actions';
 
 //import $ from 'jquery';
@@ -234,6 +235,7 @@ class PollStore {
       handleUpdateInfo: PollActions.UPDATE_INFO,
       handleAddNewSection: PollActions.ADD_NEW_SECTION,
       handleRemoveSection: PollActions.REMOVE_SECTION,
+      handleMoveSection: PollActions.MOVE_SECTION,
       handleUpdateSection: PollActions.UPDATE_SECTION,
       handleNewFieldForSection: PollActions.NEW_FIELD_FOR_SECTION,
       handleUpdateField: PollActions.UPDATE_FIELD,
@@ -298,6 +300,18 @@ class PollStore {
 
   handleRemoveSection(index) {
     this.sections.splice(index, 1);
+  }
+
+  handleMoveSection(o) {
+    const { dragIndex, hoverIndex} = o;
+    const dragSection = this.sections[dragIndex];
+
+    this.sections = update(this.sections, {
+      $splice: [
+        [dragIndex, 1],
+        [hoverIndex, 0, dragSection]
+      ]
+    });
   }
 
   handleUpdateSection(o) {
