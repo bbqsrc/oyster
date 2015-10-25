@@ -16,6 +16,7 @@ notifications:
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/d7389dc3d4a07e283046
+      - https://hooks.brendan.so/
     on_success: change
     on_failure: always
     on_start: never
