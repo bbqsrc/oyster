@@ -16,14 +16,6 @@ module.exports = {
       }
     ]
   },
-  externals: {
-    //'react': 'React',
-    'jquery': 'jQuery',
-    'ace': 'ace',
-    'toml': 'toml',
-    'moment': 'moment',
-    'mongoose': 'mongoose'
-  },
   output: {
     library: 'Oyster',
     path: path.resolve(__dirname, '../assets/static/js'),

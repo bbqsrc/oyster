@@ -4,11 +4,11 @@ node_js:
 services:
   - mongodb
 script:
-  - npm run test:coverage
+  - gulp test:coverage
 after_failure:
   - cat ./test-server.log
 after_script:
-  - npm run test:coverage:upload
+  - gulp test:coverage:upload
 env:
   global:
     - secure: Y9DgIBVqCLRRxCSSpYnvQB9ROw+zaE1+MiSCb0we8T20uvIhEkF4Uyt53pEnJwDDQhW9yg09JouP0FhMzttHhwu2qEN50nx3JkVDeLGeCc3kdzls8sma+wKzkddiZiHsJa7GtBfC+y+I7ZBG/t92oYIP06nYlohUxCerP2j0q87Fg21r61TQu4yL+BVZu54QVIqx9ED9guQfGjt8pxpoH/t9b7nDt8/GAt4QuWMGirrHjAhpKdxZHeioKKf4996fQaSbRgMZFPLQfKMsnBAEyOy13Mrr7Ni7Enex+e4VwWFvQIB5ixiO/rxoakZzK4tUSVNKToYnoq9tm91IxDBP4waKzItqRWbWnyecueRL6vSOppr4kDlEU8gKjMeNvPyTJrw8sA7Lmx88n6WTrQd1INSnR0CUH9mq/NBK/P+VUOFPJkbeSVhNj5k5eOjKxKx34oCc/IHKARyYXy28JfwWkKooeUoHdy9n8d22428aj5nMMiV7yRnEBcefMoNQEh84LOL+LSYzAOCl3mDi7HTgCuJ3nCl8vLIa/3qE3mQBel7YQCMxQWav5F1jqDuHe2e11ccRZFiI5Qk1rW4F6I+HS78eeud8nUPiXy1dvlM96tmFyN1ATqBlEKY+GZVapbCOv9TS3gBcBfYXOzFoMsgMcNzxgnbBjC9ey1oNfd7uJow=
