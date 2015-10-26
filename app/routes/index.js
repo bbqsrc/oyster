@@ -11,15 +11,9 @@ const Log = require('huggare'),
 router
 .get('/alt-test', function*() {
   return this.body = `<html><head>
-  <script src="/static/js/jquery.min.js"></script>
-  <script src="/static/js/bootstrap.min.js"></script>
   <link href="/static/css/bootstrap.min.css" rel="stylesheet">
   <link href="/static/css/admin.css" rel="stylesheet">
-  <script src="/static/js/toml.min.js"></script>
-  <script src="/static/js/mongoose.min.js"></script>
-  <script src="/static/js/moment.min.js"></script>
-  <script src="/static/js/ace/ace.js"></script>
-  <script src="/static/js/react.min.js"></script>
+  <script src="/static/js/vendor.min.js"></script>
   <script src="/static/js/components.min.js"></script>
   </head><body><div class='container'><div class='row'><div class='col-md-12' id='yay'></div></div></div><script>
   Oyster.insertComponent(Oyster.PollEditor, {}, '#yay');
