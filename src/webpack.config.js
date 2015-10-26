@@ -1,12 +1,12 @@
 const path = require('path');
 
-const CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
+const webpack = require('webpack');
 
 module.exports = {
   context: __dirname,
   entry: {
     components: "./index",
-    vendor: ['jquery', 'brace', 'moment', 'toml', 'bootstrap']
+    vendor: ['jquery', 'brace', 'moment', 'mongoose', 'toml', 'bootstrap']
   },
   resolve: {
     extensions: ['', '.js', '.jsx']
@@ -36,7 +36,8 @@ module.exports = {
     filename: '[name].min.js'
   },
   plugins: [
-    new CommonsChunkPlugin({
+    new webpack.IgnorePlugin(/^mongoose$/),
+    new webpack.optimize.CommonsChunkPlugin({
       name: "vendor",
       filename: "vendor.min.js",
       minChunks: Infinity
