@@ -12,7 +12,7 @@ gulp.task('instrument-js', function() {
     .pipe(istanbul())
     // XXX: This breaks the stream, and doesn't appear to be required anyway
     //.pipe(istanbul.hookRequire())
-    .pipe(gulp.dest('instrumented/'));
+    .pipe(gulp.dest('instrumented/app/'));
 });
 
 gulp.task('test:coverage', ['instrument-js'], function() {
