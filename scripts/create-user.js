@@ -1,8 +1,8 @@
 'use strict'; /* eslint-disable no-console */
 
 var mongoose = require('mongoose'),
-    config = require('../src/config'),
-    models = require('../src/models'),
+    config = require('../app/config')({}),
+    models = require('../app/models'),
     readline = require('readline'),
     co = require('co');
 

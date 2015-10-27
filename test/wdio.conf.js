@@ -139,7 +139,12 @@ var config = {
         console.log('[-] Preparation promise started.');
         var path = require('path');
 
-        var basePath = path.resolve(__dirname, '..');
+
+        if (process.env.CI) {
+          var basePath = path.resolve(__dirname, '../instrumented');
+        } else {
+          var basePath = path.resolve(__dirname, '..');
+        }
 
         console.log('[-] Requiring dependencies…');
         var Log = require('huggare');
