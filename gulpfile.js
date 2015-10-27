@@ -15,7 +15,12 @@ gulp.task('instrument-js', function() {
     .pipe(gulp.dest('instrumented/app/'));
 });
 
-gulp.task('test:coverage', ['instrument-js'], function() {
+gulp.task('copy-test-content', function() {
+  return gulp.src('content')
+    .pipe(gulp.dest('instrumented/app/'));
+});
+
+gulp.task('test:coverage', ['instrument-js', 'copy-test-content'], function() {
   return gulp.src('test/wdio.conf.js')
     .pipe(webdriver({
       reporter: 'spec' 
