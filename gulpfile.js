@@ -16,8 +16,8 @@ gulp.task('instrument-js', function() {
 });
 
 gulp.task('copy-test-content', function() {
-  return gulp.src('content')
-    .pipe(gulp.dest('instrumented/'));
+  return gulp.src('content/**/*')
+    .pipe(gulp.dest('instrumented/content'));
 });
 
 gulp.task('test:coverage', ['instrument-js', 'copy-test-content'], function() {
