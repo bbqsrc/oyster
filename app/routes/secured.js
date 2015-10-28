@@ -26,7 +26,7 @@ const Log = require('huggare'),
       passport = require('koa-passport'),
       models = require('../models'),
       util = require('../util'),
-      config = require('../config'),
+      config = require('../config')(require('../../config.json')),
       fs = require('mz/fs');
 
 // TODO don't repeat yourself
