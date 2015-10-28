@@ -20,7 +20,21 @@ gulp.task('copy-test-content', function() {
     .pipe(gulp.dest('instrumented/content'));
 });
 
-gulp.task('test:coverage', ['instrument-js', 'copy-test-content'], function() {
+gulp.task('copy-test-views', function() {
+  return gulp.src('app/views/**/*')
+    .pipe(gulp.dest('instrumented/app/views'));
+});
+
+gulp.task('copy-test-assets', function() {
+  return gulp.src('assets/**/*')
+    .pipe(gulp.dest('instrumented/assets/'));
+});
+
+gulp.task('copy-test-files', [
+  'copy-test-views', 'copy-test-content', 'copy-test-assets'
+]);
+
+gulp.task('test:coverage', ['instrument-js', 'copy-test-files'], function() {
   return gulp.src('test/wdio.conf.js')
     .pipe(webdriver({
       reporter: 'spec' 
