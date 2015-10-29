@@ -139,7 +139,6 @@ var config = {
         console.log('[-] Preparation promise started.');
         var path = require('path');
 
-
         if (process.env.CI) {
           var basePath = path.resolve(__dirname, '../instrumented');
         } else {
@@ -150,6 +149,8 @@ var config = {
         var Log = require('huggare');
         var mongoose = require('mongoose');
         var createApp = require(path.resolve(basePath, 'app'));
+        var provider = require(path.resolve(basePath, 'app/provider'));
+        provider.config = testConfig;
 
         console.log('[-] Setting up logging…');
 
