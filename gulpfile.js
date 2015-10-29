@@ -11,7 +11,7 @@ gulp.task('instrument-js', function() {
   return gulp.src('app/**/*.js')
     .pipe(istanbul())
     // XXX: This breaks the stream, and doesn't appear to be required anyway
-    //.pipe(istanbul.hookRequire())
+    // .pipe(istanbul.hookRequire())
     .pipe(gulp.dest('instrumented/app/'));
 });
 
@@ -37,7 +37,7 @@ gulp.task('copy-test-files', [
 gulp.task('test:coverage', ['instrument-js', 'copy-test-files'], function() {
   return gulp.src('test/wdio.conf.js')
     .pipe(webdriver({
-      reporter: 'spec' 
+      reporter: 'spec'
     }))
     .pipe(istanbul.writeReports());
 });
@@ -50,10 +50,10 @@ gulp.task('test:coverage:upload', function() {
 
 gulp.task('copy-js', function() {
   return gulp.src([
-      './node_modules/bootstrap/dist/js/bootstrap.min.js',
-      './node_modules/jquery/dist/jquery.min.js'
-    ])
-    .pipe(gulp.dest('./assets/static/js'));
+    './node_modules/bootstrap/dist/js/bootstrap.min.js',
+    './node_modules/jquery/dist/jquery.min.js'
+  ])
+  .pipe(gulp.dest('./assets/static/js'));
 });
 
 gulp.task('copy-css', function() {
@@ -63,7 +63,9 @@ gulp.task('copy-css', function() {
 
 gulp.task('webpack', function(cb) {
   webpack(webpackConfig, (err, stats) => {
-    if (err) throw new gutil.PluginError('webpack', err);
+    if (err) {
+      throw new gutil.PluginError('webpack', err);
+    }
 
     gutil.log('[webpack]', stats.toString());
 
