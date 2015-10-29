@@ -26,10 +26,14 @@ const process = require('process'),
       path = require('path'),
       co = require('co');
 
+const provider = require('./app/provider');
+
 const configPath = path.join(__dirname, 'config.json');
 
 Log.i(TAG, `Loading config: ${configPath}`);
 const config = require('./app/config')(require(configPath));
+
+provider.config = config;
 
 if (config.development) {
   Log.setLevel(Log.VERBOSE);
