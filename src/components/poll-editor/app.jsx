@@ -73,6 +73,107 @@ function hoverHandler(actionName, actionParamGetter, props, monitor, component) 
   props[actionName](...actionParamGetter(props, monitor.getItem()));
 }
 
+class ElectionFieldEditor extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = this.props.field;
+
+    if (!this.state.candidates) {
+      this.state.candidates = [];
+    }
+  }
+
+  update() {
+    const section = this.props.section;
+    const field = this.props.index;
+    const state = this.state;
+
+    PollActions.updateField({ section, field, state });
+
+    this.props.onDone();
+  }
+
+  onChange(e) {
+    const { id, value } = e.target;
+    const state = {};
+
+    state[id] = value;
+
+    this.setState(state);
+  }
+
+  componentDidMount() {
+    $(findDOMNode(this.refs.first)).find('input').focus();
+  }
+
+  onChangeCandidate(index, e) {
+    const { candidates } = this.state;
+
+    candidates[index] = e.target.value;
+
+    this.setState({ candidates });
+  }
+
+  onRemoveCandidate(index) {
+    const { candidates } = this.state;
+
+    candidates.splice(index, 1);
+
+    this.setState({ candidates });
+  }
+
+  onAddCandidate() {
+    const { candidates } = this.state;
+
+    candidates.push('');
+
+    this.setState({ candidates }, function() {
+      $(this.refs.rows).find('input').last().focus();
+    });
+  }
+
+  render() {
+    return (
+      <div style={{ padding: '1em', border: '1px solid gray' }}>
+        <div className='row'>
+          <div className='col-md-10 form form-horizontal'>
+            <FormInput ref='first' label='Position' id='id' horizontal={true} value={this.state.id} onChange={this.onChange.bind(this)} />
+
+            <header>
+              <h4>Candidates</h4>
+            </header>
+
+            <div>
+              {this.state.candidates.map((candidate, i) => {
+                return (
+                  <div className='panel panel-default' key={i}>
+                    <div className='panel-body' ref='rows'>
+                      <div className='row'>
+                        <div className='col-md-10'>
+                          <FormInput label='Name' horizontal={true} value={candidate} onChange={this.onChangeCandidate.bind(this, i)} />
+                        </div>
+                        <div className='col-md-2'>
+                          <Button level='danger' size='sm' onClick={this.onRemoveCandidate.bind(this, i)}>Remove</Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        <div>
+          <Button level='primary' onClick={this.onAddCandidate.bind(this)} style={{marginRight: '2em'}}>Add</Button>
+          <Button level='success' onClick={this.update.bind(this)}>Save</Button>
+          <Button level='link' onClick={this.props.onDone}>Cancel</Button>
+        </div>
+      </div>
+    );
+  }
+}
+
 class MotionFieldEditor extends Component {
   constructor(props) {
     super(props);
@@ -177,23 +278,33 @@ class FieldEditor extends Component {
   }
 
   renderElection() {
-    const { field, isDragging, connectDragSource } = this.props;
+    const { field, isDragging, connectDragSource, connectDragPreview, connectDropTarget } = this.props;
     const opacity = isDragging ? 0 : 1;
 
-    return (
-      <div className='panel panel-default' style={{ opacity }}>
-        <div className='panel-heading'>
-          {connectDragSource(<h3 className='panel-title'>{field.id}</h3>)}
+    const candidates = field.candidates || [];
+
+    if (this.state.editMode) {
+      return <ElectionFieldEditor index={this.props.index} section={this.props.section} field={this.props.field} onDone={this.clickCancel.bind(this)} />;
+    } else {
+      return connectDragPreview(connectDropTarget(
+        <div className='panel panel-default' style={{ opacity }}>
+          <div className='panel-heading'>
+            <div className='pull-right'>
+              <Button level='default' size='sm' onClick={this.clickEdit.bind(this)}>Edit</Button>
+              <Button level='danger' size='sm' onClick={this.clickRemove.bind(this)}>&times;</Button>
+            </div>
+            {connectDragSource(<h3 className='panel-title'>{field.id}</h3>)}
+          </div>
+          <div className='panel-body'>
+            <ul>
+              {candidates.map((candidate, i) => {
+                return <li key={i}>{candidate}</li>;
+              })}
+            </ul>
+          </div>
         </div>
-        <div className='panel-body'>
-          <ul>
-            {field.candidates.map((candidate, i) => {
-              return <li key={i}>{candidate}</li>;
-            })}
-          </ul>
-        </div>
-      </div>
-    );
+      ));
+    }
   }
 
   renderMotion() {
@@ -229,10 +340,8 @@ class FieldEditor extends Component {
   }
 
   render() {
-    const { connectDragPreview, connectDropTarget } = this.props;
-
     if (this.props.type === 'election') {
-      return connectDragPreview(connectDropTarget(this.renderElection()));
+      return this.renderElection();
     } else if (this.props.type === 'motion') {
       return this.renderMotion();
     } else {
@@ -473,11 +582,28 @@ export default
 class App extends Component {
   componentDidMount() {
     PollStore.fetchPoll();
+
+    // Hijack links.
+    $(this.refs.container.getDOMNode()).on('click', 'a', e => {
+      e.preventDefault();
+      return false;
+    });
+
+    $(this.refs.container.getDOMNode()).popover({
+      trigger: 'click',
+      selector: 'a[href]',
+      placement: 'auto top',
+      content: 'Clicking links blocked.'
+    })
+  }
+
+  componentWillUnmount() {
+    $(this.refs.containers).off('click', 'a');
   }
 
   render() {
     return (
-      <AltContainer store={PollStore} actions={PollActions}>
+      <AltContainer ref='container' store={PollStore} actions={PollActions}>
         <header className='page-header'>
 
           <div className='label label-danger' style={{ fontSize: '1em' }}>Early Prototype</div>

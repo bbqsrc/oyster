@@ -3,7 +3,7 @@
 const
     mongoose = require('mongoose'),
     Schema = mongoose.Schema,
-    TOML = require('toml');
+    TOML = require('../toml');
 
 var pollSchema = new Schema({
   slug: { type: String, unique: true },
