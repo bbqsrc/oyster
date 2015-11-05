@@ -56,6 +56,18 @@ export class FormTextarea extends Component {
   }
 }
 
+export class FormSelect extends Component {
+  render() {
+    return (
+      <FormGroup id={this.props.id} label={this.props.label} horizontal={this.props.horizontal}>
+        <select {...this.props} className={`form-control ${this.props.className || ''}`.trim()}>
+          {this.props.children}
+        </select>
+      </FormGroup>
+    );
+  }
+}
+
 export class Button extends Component {
   render() {
     const classes = ['btn'];

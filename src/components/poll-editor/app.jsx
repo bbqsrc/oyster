@@ -13,7 +13,7 @@ import PollActions from './actions/poll-actions';
 
 import Markdown from './components/markdown';
 import BasePropertiesEditor from './components/base-properties-editor';
-import { Controls, Button, FormInput, FormTextarea } from './components/bootstrap';
+import { Controls, Button, FormInput, FormTextarea, FormSelect } from './components/bootstrap';
 
 import $ from 'jquery';
 
@@ -360,6 +360,10 @@ class SectionEditor extends Component {
     super(props);
 
     this.state = this.props.section;
+
+    if (!this.state.type) {
+      this.state.type = 'motion';
+    }
   }
 
   update() {
@@ -385,27 +389,45 @@ class SectionEditor extends Component {
     $(findDOMNode(this.refs.first)).find('input').focus();
   }
 
-  render() {
-    const section = this.props.section;
+  renderTypeSpecific() {
+    const section = this.state;
 
+    if (section.type === 'election') {
+      return (
+        <FormSelect label='Election method' data-id='method' horizontal
+                     id={`section-method-${this.props.index}`} value={section.method}
+                     onChange={this.onChange.bind(this)}>
+          <option value='schulze'>Schulze</option>
+          <option value='approval'>Approval</option>
+        </FormSelect>
+      );
+    } else if (section.type === 'motion') {
+      return (
+        <FormSelect label='Motion threshold' data-id='threshold' horizontal
+                     id={`section-threshold-${this.props.index}`} value={section.threshold}
+                     onChange={this.onChange.bind(this)}>
+          <option value='simple'>Simple majority (> 50%)</option>
+          <option value='two-thirds'>Two-thirds majority</option>
+        </FormSelect>
+      )
+    }
+  }
+
+  render() {
     return (
       <div>
         <div className='form form-horizontal row'>
           <div className='col-md-10'>
-            <FormInput ref='first' label='Section Title' data-id='title' id={`section-title-${this.props.index}`} value={this.state.title} horizontal={true} onChange={this.onChange.bind(this)} />
+            <FormInput ref='first' label='Section Title' data-id='title' id={`section-title-${this.props.index}`} value={this.state.title} horizontal onChange={this.onChange.bind(this)} />
 
-            <div className='form-group'>
-              <label htmlFor={`section-type-${this.props.index}`} className='control-label col-md-2'>Section Type</label>
-              <div className='col-md-10'>
-                <select data-id='type' disabled={!this.props.section.isNew} className="form-control" value={section.type} onChange={this.onChange.bind(this)}>
-                  <option value=''>--</option>
-                  <option value='motion'>Motions</option>
-                  <option value='election'>Elections</option>
-                </select>
-              </div>
-            </div>
+            <FormSelect label='Section Type' data-id='type' disabled={!this.props.section.isNew} value={this.state.type} onChange={this.onChange.bind(this)} horizontal>
+              <option value='motion'>Motion</option>
+              <option value='election'>Election</option>
+            </FormSelect>
 
-            <FormTextarea label='Section Information' data-id='info' id={`section-info-${this.props.index}`} value={this.state.info} onChange={this.onChange.bind(this)} horizontal={true} rows='8' />
+            {this.renderTypeSpecific()}
+
+            <FormTextarea label='Section Information' data-id='info' id={`section-info-${this.props.index}`} value={this.state.info} onChange={this.onChange.bind(this)} horizontal rows='8' />
           </div>
         </div>
         <div>
