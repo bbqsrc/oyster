@@ -28,7 +28,7 @@ const handlebars = require('handlebars'),
       path = require('path'),
       fs = require('fs'),
       // I18n = require('i18n-2'),
-      config = require('./config');
+      config = require('./provider').config;
 
 function registerPartialDir(hbs, p, prefix) {
   let fns;

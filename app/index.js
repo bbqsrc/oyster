@@ -50,7 +50,7 @@ function routeThemes(router, prefix, root) {
   router.get(`${prefix}/:theme([-_A-Za-z0-9]+?)/:staticPath([^\\.].+)`,
   function* sendThemeStatic() {
     yield send(this, this.params.staticPath, {
-      root: resolvePath(root, this.params.theme, 'assets')
+      root: resolvePath(root, `${this.params.theme}/assets`)
     });
   });
 }

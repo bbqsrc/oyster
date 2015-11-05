@@ -27,6 +27,7 @@ const Log = require('huggare'),
       models = require('../models');
 
 router
+/*
 .get('/alt-test', function*() {
   return this.body = `<html><head>
   <link href="/static/css/bootstrap.min.css" rel="stylesheet">
@@ -41,6 +42,7 @@ router
 .put('/alt-test', bodyParser(), function*() {
   Log.i(TAG, '', this.request.body);
 })
+*/
   .param('poll', function* paramPoll(slug, next) {
     this.poll = yield models.Poll.findBySlug(slug);
 
