@@ -31,6 +31,7 @@ router
   return this.body = `<html><head>
   <link href="/static/css/bootstrap.min.css" rel="stylesheet">
   <link href="/static/css/admin.css" rel="stylesheet">
+  <script src="/static/js/mongoose.min.js"></script>
   <script src="/static/js/vendor.min.js"></script>
   <script src="/static/js/components.min.js"></script>
   </head><body><div class='container'><div class='row'><div class='col-md-12' id='yay'></div></div></div><script>

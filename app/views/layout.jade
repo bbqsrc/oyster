@@ -25,12 +25,12 @@ html(lang="#{locale}")
     <script src="/static/js/es5-shim.min.js"></script>
     <script src="/static/js/html5shiv.min.js"></script>
     <![endif]-->
-    script(src="/static/js/jquery.min.js")
-    script(src="/static/js/bootstrap.min.js")
     link(href="/static/css/bootstrap.min.css", rel="stylesheet")
     link(href="/static/css/admin.css", rel="stylesheet")
-    block head
-
+    
+    script(src='/static/js/mongoose.min.js')
+    script(src='/static/js/vendor.min.js')
+    script(src='/static/js/components.min.js')
   body
     nav.navbar.navbar-default.navbar-fixed-top(role='navigation')
       .container-fluid

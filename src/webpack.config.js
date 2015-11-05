@@ -6,10 +6,13 @@ module.exports = {
   context: __dirname,
   entry: {
     components: "./index",
-    vendor: ['jquery', 'brace', 'moment', 'mongoose', 'toml', 'bootstrap']
+    vendor: ['jquery', 'brace', 'moment', 'mongoose', './toml', 'bootstrap']
   },
   resolve: {
     extensions: ['', '.js', '.jsx']
+  },
+  externals: {
+    mongoose: 'mongoose'
   },
 //  devtool: "source-map",
   module: {
@@ -26,7 +29,11 @@ module.exports = {
       },
       {
         test: require.resolve("jquery"),
-        loader: "expose?$"
+        loader: "expose?$!expose?jQuery"
+      },
+      {
+        test: require.resolve('./toml'),
+        loader: "expose?TOML"
       }
     ]
   },
@@ -36,7 +43,7 @@ module.exports = {
     filename: '[name].min.js'
   },
   plugins: [
-    new webpack.IgnorePlugin(/^mongoose$/),
+    //new webpack.IgnorePlugin(/^mongoose$/),
     new webpack.optimize.CommonsChunkPlugin({
       name: "vendor",
       filename: "vendor.min.js",
