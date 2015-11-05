@@ -21,6 +21,7 @@ class SectionEditor extends Component {
 
     if (!this.state.type) {
       this.state.type = 'motion';
+
     }
   }
 
@@ -138,6 +139,11 @@ class Section extends Component {
   }
 
   clickCancel() {
+    if (this.props.section.isNew) {
+      this.props.removeSection(this.props.index);
+      return;
+    }
+
     this.setState({
       editMode: false
     });

@@ -14,12 +14,27 @@ import BasePropertiesEditor from './components/base-properties-editor';
 import Sections from './components/sections';
 
 import $ from 'jquery';
+import TOML from '../../toml';
+
+class Output extends Component {
+  render() {
+    return (<pre>
+      {TOML.stringify(PollStore.getState(), k => {
+        if (k === 'isNew') {
+          return;
+        }
+        return false;
+      }, 0)}
+    </pre>);
+  }
+}
 
 @DragDropContext(HTML5Backend)
 export default
 class App extends Component {
   componentDidMount() {
-    PollStore.fetchPoll();
+    PollActions.newPoll();
+    // PollStore.fetchPoll();
 
     // Hijack links.
     const node = findDOMNode(this.refs.container);
@@ -36,7 +51,7 @@ class App extends Component {
   }
 
   componentWillUnmount() {
-    $(this.refs.containers).off('click', 'a');
+    $(findDOMNode(this.refs.container)).off('click', 'a').popover('destroy');
   }
 
   render() {
@@ -55,6 +70,8 @@ class App extends Component {
         </Controls>
 
         <Sections />
+
+        <Output />
       </AltContainer>
     );
   }

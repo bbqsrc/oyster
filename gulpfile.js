@@ -61,18 +61,22 @@ gulp.task('copy-css', function() {
     .pipe(gulp.dest('./assets/static/css'));
 });
 
-gulp.task('webpack', function(cb) {
+gulp.task('webpack:build', function(cb) {
   webpack(webpackConfig, (err, stats) => {
     if (err) {
       throw new gutil.PluginError('webpack', err);
     }
 
-    gutil.log('[webpack]', stats.toString());
+    gutil.log('[webpack:build]', stats.toString());
 
     cb();
   });
 });
 
-gulp.task('build-assets', ['webpack', 'copy-css', 'copy-js']);
+gulp.task('dev', ['webpack:build'], function() {
+  gulp.watch(["src/**/*"], ["webpack:build"]);
+});
+
+gulp.task('build-assets', ['webpack:build', 'copy-css', 'copy-js']);
 
 // TODO: Also hook up webpack-dev-server
