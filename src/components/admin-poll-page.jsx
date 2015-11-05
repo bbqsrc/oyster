@@ -35,7 +35,7 @@ export default class AdminPollPage extends Component {
     $(window).on('poll:updated', this._onPollUpdated);
   }
 
-  componentDidUnmount() {
+  componentWillUnmount() {
     $(window).off('poll:updated', this._onPollUpdated);
   }
 

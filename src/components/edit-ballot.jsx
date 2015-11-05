@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 
 import Modal from './modal';
 import TomlValidator from './toml-validator';
 import ThemeSelector from './theme-selector';
 
-import ace from 'ace';
 import $ from 'jquery';
 import TOML from 'toml';
 
@@ -21,43 +20,11 @@ export default class EditPoll extends Component {
     };
   }
 
-  onClickEdit() {
-    if (!this.editor) {
-      this.applyAceEditor();
-    }
-
-    this.editor.setValue(this.state.content);
-
-    this.setState({
-      editMode: true
-    });
-  }
-
-  applyAceEditor() {
-    const node = React.findDOMNode(this.refs.editor);
-
-    const editor = ace.edit(node);
-
-    editor.setTheme('ace/theme/monokai');
-    editor.getSession().setMode('ace/mode/toml');
-
-    editor.on('input', () => {
-      this.setState({
-        content: editor.getValue()
-      });
-    });
-
-    this.editor = editor;
-  }
-
   onModalHide() {
     this.setState({
       content: this.props.poll.contentAsTOML(),
       theme: this.props.poll.theme,
       editMode: false
-    }, () => {
-      // Ensure it gets the correct content
-      this.editor.setValue(this.state.content);
     });
   }
 
@@ -93,8 +60,14 @@ export default class EditPoll extends Component {
     $(window).on('resize', this.onWindowResize.bind(this));
   }
 
-  componentDidUnmount() {
+  componentWillUnmount() {
     $(window).off('resize', this.onWindowResize.bind(this));
+  }
+
+  onClickEdit() {
+    this.setState({
+      editMode: true
+    });
   }
 
   render() {
@@ -113,7 +86,7 @@ export default class EditPoll extends Component {
           <label htmlFor='theme' className='control-label'>Theme</label>
           <ThemeSelector id='theme' className='form-control' value={this.state.theme} onChange={this.onChangeTheme.bind(this)}/>
         </div>
-        <pre ref='editor' style={{ minHeight: this.state.windowHeight - 370 }}></pre>
+        <pre style={{ minHeight: this.state.windowHeight - 370 }}></pre>
         <TomlValidator onChange={v => this.setState({ canSubmit: v })} source={this.state.content} />
       </Modal>
     );
