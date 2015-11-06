@@ -383,3 +383,13 @@ blockquote.oyster-candidate-info {
 pre.ballot {
   margin-top: 1em;
 }
+
+.oyster-method-approval .btn {
+  -webkit-transition: all .5s;
+  -moz-transition: all .5s;
+  transition: all .5s;
+  width: 3em;
+}
+.oyster-method-approval .btn.active {
+  width: 6em;
+}
