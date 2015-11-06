@@ -32,3 +32,8 @@ poll:
   ended: This poll has finished.
   alreadyResponded: You have already responded to this poll.
 index: Index
+admin: Admin
+home:
+  intro: The server is up!
+  description: This is {product}, an open source voting system written by {author}.
+  more: Read more

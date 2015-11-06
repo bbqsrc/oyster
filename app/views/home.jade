@@ -22,18 +22,13 @@ block nav
         a(class="navbar-brand" href="/") Oyster
       .nav.navbar-form.navbar-right
         a(href="/admin", class='btn btn-link')
-          | Admin 
+          = translate("admin")
 block content
   .row
     .col-md-12
       .jumbotron(style='margin-top: 6em')
         .page-header
-          h1= __("The server is up!")
+          h1= translate("home.intro")
+        p!= translate("home.description", { product: "<strong>Oyster</strong>", author: "<a href='http://brendan.so'>Brendan Molloy</a>" })
         p
-          = __("This is")
-          strong  Oyster
-          = __(", an open source voting system written by") 
-          a(href='https://brendan.so')  Brendan Molloy
-          | .
-        p
-          a(class='btn btn-primary btn-lg', href="https://bbqsrc.github.io/oyster")= __("Read more")
+          a(class='btn btn-primary btn-lg' href="https://bbqsrc.github.io/oyster")= translate("home.more")

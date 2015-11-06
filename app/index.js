@@ -84,10 +84,24 @@ module.exports = function createApp(root, config) {
     path: resolvePath(root, 'content/locales')
   }));
 
+  const translateCache = {};
+
   app.use(function*(next) {
-    this.translate = function(key, opts) {
-      const msg = dot.pick(key, this.intl.get(this.state.locale));
-      const tmpl = new IntlMessageFormat(msg, this.state.locale);
+    this.translate = function translate(key, opts) {
+      const k = `${this.state.locale}:${key}`;
+      let tmpl;
+
+      if (translateCache[k]) {
+        tmpl = translateCache[k];
+      } else {
+        const msg = dot.pick(key, this.intl.get(this.state.locale));
+
+        tmpl = new IntlMessageFormat(msg, this.state.locale);
+
+        if (config.production) {
+          translateCache[k] = tmpl;
+        }
+      }
 
       return tmpl.format(opts || {});
     };
@@ -146,6 +160,7 @@ module.exports = function createApp(root, config) {
       moment,
       __: this.i18n.__.bind(this.i18n),
       __n: this.i18n.__n.bind(this.i18n),
+      translate: this.translate.bind(this),
       user,
       locale
     };
