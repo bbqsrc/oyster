@@ -25,7 +25,7 @@ const mongoose = require('mongoose'),
       uuid = require('node-uuid'),
       Schedule = require('node-schedule'),
       co = require('co'),
-      config = require('../config'),
+      config = require('../provider').config,
       counters = require('../counters'),
       Schema = mongoose.Schema,
       tomlify = require('tomlify-j0.4'),
@@ -168,7 +168,9 @@ pollSchema.methods.sendEmails = function sendEmails() {
     const mailer = config.createMailer();
 
     for (const pg of pgs) {
-      for (const addr of pg.emails) {
+      for (const p of pg.participants) {
+        const addr = p.email;
+
         if (this.emailsSent.indexOf(addr) > -1) {
           continue;
         }
@@ -253,8 +255,13 @@ pollSchema.methods.generateResults = function generateResults() {
     }
 
     for (const election of pollData.elections) {
+      // Handle candidates now having info props
+      const candidates = election.candidates.map(c => {
+        return typeof c === 'string' ? c : c.name;
+      });
+
       eCounters[election.id] = counters.createElectionCounter(
-        election.id, election.method, election.candidates, election.winners);
+        election.id, election.method, candidates, election.winners);
     }
 
     // Count errthang

@@ -48,12 +48,12 @@ class MotionCounter {
     let p, s, pc;
 
     if (this.threshold === 'two-thirds') {
-      p = total / 3 * 2 | 0 + 1;
+      p = (total / 3 * 2 | 0) + 1;
       s = this.c.aye >= p;
       pc = `${(this.c.aye / total * 100).toFixed(2)}%`;
     } else {
       // simple majority
-      p = total / 2 | 0 + 1;
+      p = (total / 2 | 0) + 1;
       s = this.c.aye >= p;
       pc = `${(this.c.aye / total * 100).toFixed(2)}%`;
     }
@@ -176,7 +176,7 @@ class ApprovalElection extends RangeElection {
   constructor(id, candidates, opts) {
     opts.min = 0;
     opts.max = 1;
-    opts.threshold = opts.threshold || 'majority';
+    opts.threshold = opts.threshold || 'none';
 
     super(id, candidates, opts);
   }
@@ -186,10 +186,12 @@ class ApprovalElection extends RangeElection {
 
     if (this.threshold === 'majority') {
       method = c => {
-        const p = this.total / 2 | 0 + 1;
+        const p = (this.total / 2 | 0) + 1;
 
         return this.scores[c] >= p;
       };
+    } else if (this.threshold === 'none') {
+      method = () => true;
     }
 
     const o = {};

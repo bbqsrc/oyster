@@ -276,8 +276,6 @@ module.exports = function themes(modOpts) {
 
       o.data.ctx = this;
 
-      console.log(o);
-
       const theme = themeMgr.get(themeName);
 
       o.data.theme = theme;

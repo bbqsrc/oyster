@@ -135,23 +135,24 @@ block content
                         tr
                           th= __("Candidate")
                           th= __("Votes")
-                          if election.threshold
+                          if election.threshold && election.threshold !== 'none'
                             th= __("Threshold met")
                           th= __("Result")
                       tbody
-                        each c in election.order
+                        each c, i in election.order
                           tr 
                             td= c
                             td= election.data.scores[c]
-                            if election.threshold
+                            if election.threshold && election.threshold !== 'none'
                               if election.data.thresholdMet[c]
                                 td.success= __("Yes")
-                                td.success Elected
                               else
                                 td.danger= __("No")
-                                td.danger Not elected
+                            
+                            if election.data.thresholdMet[c] && i < election.winners
+                              td.success Elected
                             else
-                              td STUB
+                              td.danger Not elected
       
       .alert.alert-info.text-center
         p

@@ -104,7 +104,11 @@ router
   })
   .get('/poll/:poll/:token', function* getPollForToken() {
     // TODO implement flags
-    yield this.renderTheme(this.poll.theme, this.poll.content);
+    const localeData = this.intl.get(this.state.locale);
+
+    yield this.renderTheme(this.poll.theme, this.poll.content, {
+      data: { intl: localeData }
+    });
   })
   .post('/poll/:poll/:token', bodyParser(), function* postPollForToken() {
     const data = util.parseNestedKeys(this.request.body.fields);
@@ -166,7 +170,7 @@ router
       return yield this.render('results', {
         title: `${this.i18n.__('Results')} - ${this.poll.title}`,
         poll: this.poll,
-        totalDeletedBallots: totalBallots
+        totalCompleteBallots: totalBallots
       });
     } else {
       this.body = this.i18n.__('The results have not finished ' +

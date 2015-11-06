@@ -242,8 +242,6 @@ router
 
     const localeData = this.intl.get(this.state.locale);
 
-    Log.d(TAG, 'Mmm.', localeData);
-
     yield this.renderTheme(this.poll.theme, this.poll.content, {
       data: { intl: localeData }
     });
