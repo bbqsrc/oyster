@@ -36,7 +36,7 @@ html(lang="#{locale}")
       .container-fluid
         .navbar-header
           button.navbar-toggle(data-toggle="collapse", data-target="#navbar-content")
-            span.sr-only= __("Toggle navigation")
+            span.sr-only= translate("nav.toggle")
             span.icon-bar
             span.icon-bar
             span.icon-bar
@@ -46,12 +46,12 @@ html(lang="#{locale}")
             a.btn.btn-primary#btn-new-poll(href='/admin/polls/new')
               span.glyphicon.glyphicon-file
               | 
-              = __("New Poll")
+              = translate("nav.newPoll")
           ul.nav.navbar-nav
             li
-              a#btn-all-polls(href='/admin/polls')= __("All Polls")
+              a#btn-all-polls(href='/admin/polls')= translate("nav.allPolls")
             li
-              a#btn-participants(href='/admin/participants')= __("Participants")
+              a#btn-participants(href='/admin/participants')= translate("nav.participants")
           ul.nav.navbar-nav.navbar-right
             li.dropdown
               a.toggle-dropdown#btn-dropdown-settings(href='#' data-toggle='dropdown')
@@ -59,26 +59,26 @@ html(lang="#{locale}")
                 | 
                 span.caret
               ul.dropdown-menu
-                li.dropdown-header!= __("System Management")
+                li.dropdown-header!= translate('nav.sysManagement')
                 li
-                  a(href='/admin/users')= __("Users")
+                  a(href='/admin/users')= translate("nav.users")
             li.dropdown
               a.toggle-dropdown#btn-dropdown-user(href='#' data-toggle='dropdown')
                 span.glyphicon.glyphicon-user
                 | 
                 span.caret
               ul.dropdown-menu#dropdown-user
-                li.dropdown-header!= __("Logged in as %s", "<strong>" + user.username + "</strong>")
+                li.dropdown-header!= translate("nav.loggedInAs", { username: `<strong>${user.username}</strong>` })
                 li.divider(role='separator')
                 li
-                  a#btn-change-password(href='/admin/change-password')= __("Change password")
+                  a#btn-change-password(href='/admin/change-password')= translate('nav.changePassword')
                 li
-                  a#btn-change-language(href='/admin/change-language')= __("Change language")
+                  a#btn-change-language(href='/admin/change-language')= translate('nav.changeLanguage')
                 li.divider(role='separator')
                 li
                   a#btn-logout(href='/admin/logout') 
                     span.glyphicon.glyphicon-log-out
                     | 
-                    = __("Log out")
+                    = translate('nav.logOut')
     .container
       block content

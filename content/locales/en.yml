@@ -1,3 +1,5 @@
+## Ballot related strings
+
 javascript: |
   This application requires JavaScript to be enabled to function.
   Please enable JavaScript and reload the page.
@@ -31,9 +33,23 @@ poll:
   notEnded: The poll has not ended yet.
   ended: This poll has finished.
   alreadyResponded: You have already responded to this poll.
+
+## Administration related strings
+
 index: Index
 admin: Admin
 home:
   intro: The server is up!
   description: This is {product}, an open source voting system written by {author}.
   more: Read more
+nav:
+  toggle: Toggle navigation
+  newPoll: New Poll
+  allPolls: All Polls
+  participants: Participants
+  sysManagement: System Management
+  users: Users
+  loggedInAs: Logged in as {username}
+  changePassword: Change password
+  changeLanguage: Change language
+  logOut: Log out
