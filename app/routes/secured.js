@@ -27,7 +27,8 @@ const Log = require('huggare'),
       models = require('../models'),
       util = require('../util'),
       config = require('../provider').config,
-      fs = require('mz/fs');
+      fs = require('mz/fs'),
+      extend = require('extend');
 
 // TODO don't repeat yourself
 function* isAdmin(next) {
@@ -239,7 +240,13 @@ router
       this.poll.theme = 'slovenia';
     }
 
-    yield this.renderTheme(this.poll.theme, this.poll.content);
+    const localeData = this.intl.get(this.state.locale);
+
+    Log.d(TAG, 'Mmm.', localeData);
+
+    yield this.renderTheme(this.poll.theme, this.poll.content, {
+      data: { intl: localeData }
+    });
   })
   .delete('/poll/:poll', isAdmin, function* deletePoll() {
     if (this.poll.isEditable()) {

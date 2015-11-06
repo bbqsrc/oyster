@@ -21,14 +21,16 @@
 const TAG = 'oyster/themes';
 
 const handlebars = require('handlebars'),
+      HandlebarsIntl = require('handlebars-intl'),
       extend = require('extend'),
       shuffle = require('lodash').shuffle,
       marked = require('marked'),
       Log = require('huggare'),
       path = require('path'),
       fs = require('fs'),
-      // I18n = require('i18n-2'),
       config = require('./provider').config;
+
+HandlebarsIntl.registerWith(handlebars);
 
 function registerPartialDir(hbs, p, prefix) {
   let fns;
@@ -189,6 +191,7 @@ class Theme {
     for (const helper in themeHelpers) {
       this.hbs.registerHelper(helper, themeHelpers[helper]);
     }
+    HandlebarsIntl.registerWith(this.hbs);
 
     /*
     for (const tmplName of this.basePartials) {
@@ -214,7 +217,7 @@ class Theme {
   }
 
   render() {
-    return this.index.apply(this, arguments);
+    return this.index.apply(this.index, arguments);
   }
 }
 
@@ -272,6 +275,8 @@ module.exports = function themes(modOpts) {
       const o = extend(true, { data: {} }, options);
 
       o.data.ctx = this;
+
+      console.log(o);
 
       const theme = themeMgr.get(themeName);
 

@@ -33,7 +33,8 @@ const koa = require('koa'),
       i18n = require('koa-i18n'),
       send = require('koa-send'),
       compress = require('koa-compress'),
-      moment = require('moment');
+      moment = require('moment'),
+      locales = require('./locales');
 
 const MONTH = 2629740;
 
@@ -70,10 +71,15 @@ module.exports = function createApp(root, config) {
 
   koaLocale(app);
 
+  // TODO remove
   app.use(i18n(app, {
     directory: resolvePath(root, 'content/locales'),
     locales: config.locales,
     modes: ['query', 'cookie', 'header']
+  }));
+
+  app.use(locales({
+    path: resolvePath(root, 'content/locales')
   }));
 
   app.use(views('./views', {
