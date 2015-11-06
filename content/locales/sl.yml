@@ -1,7 +1,7 @@
 javascript: |
   Za pravilno delovanje aplikacije potrebujete JavaScript.
   Prosimo, da omogočite JavaScript in osvežite spletno stran.
-submit: Predloži
+submit: Oddaj glas
 motion:
   text: Kako želite glasovati o tem predlogu?
   aye: Za
@@ -9,8 +9,8 @@ motion:
   nay: Proti
 ballot:
   warning: |
-    Poskrbite, da ste Zaključili z glasovanjem.
-    Ko glas predložite, ga ne morete več spremeniti.
+    Poskrbite, da ste zaključili z glasovanjem.
+    Ko glas oddate, ga ne morete več spremeniti.
   submission:
     error: |
       Zaradi nepredvidene napake vašega glasa ne moremo shraniti.
@@ -28,7 +28,6 @@ poll:
   notEnded: Glasovanje še ni zaključeno.
   ended: Glasovanje je zaključeno.
   alreadyResponded: V glasovanju ste že podali svoj glas.
-
 
 ## Results related strings
 results:
