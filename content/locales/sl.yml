@@ -1,0 +1,90 @@
+javascript: |
+  Za pravilno delovanje aplikacije potrebujete JavaScript.
+  Prosimo, da omogočite JavaScript in osvežite spletno stran.
+submit: Predloži
+motion:
+  text: Kako želite glasovati o tem predlogu?
+  aye: Za
+  abstain: Vzdržan
+  nay: Proti
+ballot:
+  warning: |
+    Poskrbite, da ste Zaključili z glasovanjem.
+    Ko glas predložite, ga ne morete več spremeniti.
+  submission:
+    error: |
+      Zaradi nepredvidene napake vašega glasa ne moremo shraniti.
+      Zasledili smo napako. Prosimo, da čez nekaj minut poizkusite znova
+      ali pa se obrnite na skrbnika.
+    received: Volilni strežnik je uspešno prejel vaš glas.
+    thanks: Zahvaljujemo se vam za udeležbo v glasovanju!
+    closeWindow: Sedaj lahko zaprete to okno.
+    techUsers: "Za tehnično bolj podkovane uporabnike:"
+    json: Spodaj se nahaja glasovnica, kot jo je prejel strežnik, upodobljena v JSON.
+poweredBy: Delovanje omogoča {product}.
+poweredByFull: Delovanje omogoča {product}. Narejeno v Sydneyu z {heartSymbol}
+poll:
+  notStarted: Glasovanje se še ni začelo.
+  notEnded: Glasovanje še ni zaključeno.
+  ended: Glasovanje je zaključeno.
+  alreadyResponded: V glasovanju ste že podali svoj glas.
+
+
+## Results related strings
+results:
+  genIncomplete: |
+    Rezultati še niso generirani. Preverite znova kasneje.
+  download:
+    data: Prenesi podatke
+    results: Prenesi rezultate
+    poll: Prenesi glasovanje
+    ballots: Prenesi glasovnice
+  title: Rezultati {title}
+  total: |
+    <strong>{received, number}</strong> prejetih glasovnic od skupaj možnih
+    <strong>{total, number}</strong> ({totalPercent, number, percent}).
+  motions: Predlogi
+  motion: Predlog
+  for: Za
+  against: Proti
+  abstain: Vzdržan
+  threshold: Prag
+  percentInFavour: "% za"
+  result: Rezultat
+  carried: Sprejeto
+  lapsed: Zavrnjeno
+  elections: Volitve
+  method: Metoda
+  winners: Zmagovalci
+  rankings: Uvrstitve
+  invalidBallots: Neveljavne glasovnice
+  candidate: Kandidat
+  votes: Glasovi
+  thresholdMet: Prag dosežen
+  elected: Izvoljen
+  notElected: Ni izvoljen
+  yes: da
+  no: ne
+  end: Konec rezultatov.
+  summary: |
+    Generacija se je začela ob <strong><time>{start, date, full}, {start, time, short}</time></strong>
+    in bila končana v <strong>{seconds, number}</strong> sekundah.
+
+## Administration related strings
+index: Indeks
+admin: Skrbnik
+home:
+  intro: Strežnik je postavljen!
+  description: To je {product}, odprtokodni volilni sistem, ki ga je napisal {author}.
+  more: Preberi več
+nav:
+  toggle: Vklopite navigacijo
+  newPoll: Novo glasovanje
+  allPolls: Vsa glasovanja
+  participants: Udeleženci
+  sysManagement: Upravljanje sistema
+  users: Uporabniki
+  loggedInAs: Vpisani ste kot {username}
+  changePassword: Sprememba gesla
+  changeLanguage: Jezik
+  logOut: Odjava
