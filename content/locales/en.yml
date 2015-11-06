@@ -1,0 +1,9 @@
+javascript: This application requires JavaScript to be enabled to function. Please enable JavaScript and reload the page.
+motion:
+  text: How do you wish to vote on this motion?
+  aye: Aye
+  abstain: Abstain
+  nay: Nay
+submitWarning: Please ensure that you have completed your ballot. Once you submit, you cannot go back.
+submit: Submit
+poweredBy: Powered by {product}.
