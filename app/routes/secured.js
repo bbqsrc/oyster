@@ -286,7 +286,7 @@ router
     });
   })
   .post('/change-password', isAdmin, bodyParser(), function* postChangePassword() {
-    const body = this.request.body;
+    const body = this.request.body.fields;
 
     if (!body.currPassword || !body.password || !body.password2) {
       this.status = 400;
