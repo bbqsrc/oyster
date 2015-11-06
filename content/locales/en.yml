@@ -11,6 +11,6 @@ submission:
   received: Your ballot has been received by the voting server.
   thanks: Thank you for taking part in this poll!
   closeWindow: You may now close this window.
-  techUsers: For the more technically inclined users:
+  techUsers: "For the more technically inclined users:"
   json: Below is your ballot as the server received it, rendered in JSON.
 poweredBy: Powered by {product}.
