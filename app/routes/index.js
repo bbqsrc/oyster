@@ -65,11 +65,14 @@ router
     if (this.ballot.data != null) {
       this.status = 403;
 
-      return yield this.render('success', {
+      const localeData = this.intl.get(this.state.locale);
+
+      return yield this.renderTheme(this.poll.theme, 'complete', {
         message: this.i18n.__('You have already responded to this poll.'),
-        pageTitle: this.poll.content.pageTitle,
         title: this.poll.content.title,
         ballot: util.reverseObject(this.ballot.data)
+      }, {
+        data: { intl: localeData }
       });
     }
 
@@ -79,19 +82,26 @@ router
     if (+this.poll.startTime > now) {
       this.status = 403;
 
-      return yield this.render('error', {
-        pageTitle: this.poll.content.pageTitle,
+      const localeData = this.intl.get(this.state.locale);
+
+      return yield this.renderTheme(this.poll.theme, 'complete', {
         title: this.poll.content.title,
         message: this.i18n.__('This poll has not yet begun.')
+      }, {
+        data: { intl: localeData }
       });
     }
+
     if (+this.poll.endTime < now) {
       this.status = 403;
 
-      return yield this.render('error', {
-        pageTitle: this.poll.content.pageTitle,
+      const localeData = this.intl.get(this.state.locale);
+
+      return yield this.renderTheme(this.poll.theme, 'complete', {
         title: this.poll.content.title,
         message: this.i18n.__('This poll has finished.')
+      }, {
+        data: { intl: localeData }
       });
     }
 
@@ -106,7 +116,7 @@ router
     // TODO implement flags
     const localeData = this.intl.get(this.state.locale);
 
-    yield this.renderTheme(this.poll.theme, this.poll.content, {
+    yield this.renderTheme(this.poll.theme, 'index', this.poll.content, {
       data: { intl: localeData }
     });
   })
@@ -116,24 +126,28 @@ router
     this.ballot.set('data', data);
     this.ballot.markModified('data');
 
+    const localeData = this.intl.get(this.state.locale);
+
     try {
       yield this.ballot.save();
     } catch (e) {
       Log.e(TAG, 'failure to save ballot', e);
       this.status = 500;
-      return yield this.render('error', {
-        pageTitle: this.poll.content.pageTitle,
+      return yield this.renderTheme(this.poll.theme, 'complete', {
         title: this.poll.content.title,
         message: this.i18n.__('For some reason, your ballot could not be saved. ' +
                               'An error has been logged. Please try again in a ' +
                               'few minutes, or contact the administrator.')
+      }, {
+        data: { intl: localeData }
       });
     }
 
-    yield this.render('success', {
-      pageTitle: this.poll.content.pageTitle,
+    yield this.renderTheme(this.poll.theme, 'complete', {
       title: this.poll.content.title,
       ballot: data
+    }, {
+      data: { intl: localeData }
     });
   })
   .get('/export/:poll/results', pollPrecheck,

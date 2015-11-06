@@ -242,7 +242,7 @@ router
 
     const localeData = this.intl.get(this.state.locale);
 
-    yield this.renderTheme(this.poll.theme, this.poll.content, {
+    yield this.renderTheme(this.poll.theme, 'index', this.poll.content, {
       data: { intl: localeData }
     });
   })

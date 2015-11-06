@@ -176,7 +176,7 @@ class Theme {
     this.name = name;
     this.path = path.join(themePath, name);
 
-    this.hbs = handlebars.create();
+    const hbs = this.hbs = handlebars.create();
     // this.i18n = new I18n({
     //    // TODO get all the locales from the locales directory.
     // });
@@ -200,7 +200,10 @@ class Theme {
     */
 
     // The base of the theme.
-    this.index = compileTemplate(this.hbs, path.join(this.path, 'index.hbs'));
+    this.tmpls = {
+      index: compileTemplate(hbs, path.join(this.path, 'index.hbs')),
+      complete: compileTemplate(hbs, path.join(this.path, 'complete.hbs'))
+    };
 
     // Extra partials might be needed, add them.
     registerPartialDir(this.hbs, path.join(this.path, 'partials'));
@@ -216,8 +219,10 @@ class Theme {
     return path.join(this.path, 'assets');
   }
 
-  render() {
-    return this.index.apply(this.index, arguments);
+  render(tmplName, locals, options) {
+    const tmpl = this.tmpls[tmplName];
+
+    return tmpl.call(tmpl, locals, options);
   }
 }
 
@@ -268,9 +273,7 @@ module.exports = function themes(modOpts) {
   return function* appThemes(next) {
     this.themeManager = themeMgr;
 
-    this.renderTheme = function* renderTheme(themeName, locals, options) {
-      Log.d(TAG, themeName, this);
-
+    this.renderTheme = function* renderTheme(themeName, tmplName, locals, options) {
       const l = extend(true, {}, this.state, locals);
       const o = extend(true, { data: {} }, options);
 
@@ -281,7 +284,7 @@ module.exports = function themes(modOpts) {
       o.data.theme = theme;
 
       this.type = 'html';
-      return (this.body = theme.render(l, o));
+      return (this.body = theme.render(tmplName, l, o));
     };
 
     yield next;

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang='{{locale}}'>
+  <head>
+    <base target='_blank'>
+    <meta charset='utf-8'>
+
+    <title>{{title}}</title>
+
+    <!--[if lt IE 10]>
+    <script src="{{asset 'js/es5-shim.min.js'}}"></script>
+    <script src="{{asset 'js/html5shiv.min.js'}}"></script>
+    <![endif]-->
+
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+
+    <link href="{{asset 'css/bootstrap.min.css'}}" rel='stylesheet'>
+    <link href="{{asset 'css/style.css'}}" rel="stylesheet">
+  </head>
+  <body>
+    <main role='main' class='oyster-main' style='display: block'>
+      <div class='container'>
+        <header>
+          {{> header}}
+        </header>
+
+        <hr>
+
+        {{#if message}}
+          <div class="alert alert-danger">
+            {{message}}
+          </div>
+        {{/if}}
+
+        {{#if ballot}}
+          <div class="alert alert-info">
+            <p>
+              <strong>Your ballot has been received by the voting server.</strong>
+              Thank you for taking part in this poll!
+            </p>
+            <p>
+              You may now close this window.
+            </p>
+          </div>
+
+          <hr>
+
+          <div class='alert alert-info'>
+            <p>
+              <strong>For the more technically inclined users:</strong>
+            </p>
+            <p>
+              Below is your ballot as the server received it, rendered in JSON.
+            </p>
+
+            <pre class='ballot'>{{json ballot}}</pre>
+          </div>
+        {{/if}}
+      </div>
+    </main>
+
+    <footer class='powered-by-oyster'>
+      {{{formatMessage (intlGet "poweredBy") product="<a rel='nofollow' href='https://bbqsrc.github.io/oyster'>Oyster</a>"}}}
+    </footer>
+  </body>
+</html>

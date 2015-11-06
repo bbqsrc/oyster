@@ -379,3 +379,7 @@ blockquote.oyster-candidate-info {
   padding-top: 6px;
   margin-left: 0;
 }
+
+pre.ballot {
+  margin-top: 1em;
+}
