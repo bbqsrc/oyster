@@ -21,11 +21,7 @@
 
 const mailer = require('./mailer'),
       crypto = require('crypto'),
-      _ = require('lodash'),
-      transports = {
-        sendmail: require('nodemailer-sendmail-transport'),
-        ses: require('nodemailer-ses-transport')
-      };
+      _ = require('lodash');
 
 const template = Object.freeze({
   development: process.env.NODE_ENV === 'development' ||
@@ -67,11 +63,7 @@ function makeConfig(baseConfig) {
   const config = _.defaults({}, baseConfig, template);
 
   if (baseConfig.mailerTransport) {
-    config.mailerTransport = transports[baseConfig.mailerTransport];
-
-    if (config.mailerTransport == null) {
-      throw new Error(`invalid mailerTransport defined: '${baseConfig.mailerTransport }'`);
-    }
+    config.mailerTransport = require(`nodemailer-${baseConfig.mailerTransport}-transport`);
   }
 
   return config;
