@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * <one line to give the program's name and a brief idea of what it does.>
  */
-'use strict';
+'use strict'; /* global Intl */
 
 const TAG = 'oyster';
 
@@ -25,6 +25,12 @@ const process = require('process'),
       mongoose = require('mongoose'),
       path = require('path'),
       co = require('co');
+
+// Adds missing locales
+const IntlPolyfill = require('intl');
+
+Intl.NumberFormat = IntlPolyfill.NumberFormat;
+Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
 
 const provider = require('./app/provider');
 

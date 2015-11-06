@@ -151,10 +151,13 @@ module.exports = function createApp(root, config) {
       user = this.req.user;
     }
 
-    if (user && user.data.locale) {
+    if (this.getLocaleFromQuery()) {
+      locale = this.getLocaleFromQuery();
+    } else if (user && user.data.locale) {
       locale = user.data.locale;
-      this.i18n.setLocale(locale);
     }
+
+    this.i18n.setLocale(locale);
 
     this.state = {
       moment,
