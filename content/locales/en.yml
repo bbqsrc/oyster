@@ -24,18 +24,54 @@ ballot:
     techUsers: "For the more technically inclined users:"
     json: Below is your ballot as the server received it, rendered in JSON.
 poweredBy: Powered by {product}.
-results:
-  title: Results - {title}
-  genIncomplete: |
-    The results have not finished generating yet. Please try again later.
 poll:
   notStarted: The poll has not started yet.
   notEnded: The poll has not ended yet.
   ended: This poll has finished.
   alreadyResponded: You have already responded to this poll.
 
-## Administration related strings
+## Results related strings
+results:
+  genIncomplete: |
+    The results have not finished generating yet. Please try again later.
+  download:
+    data: Download data
+    results: Download results
+    poll: Download poll
+    ballots: Download ballots
+  title: Results of {title}
+  total: |
+    <strong>{received, number}</strong> ballots received out of a potential
+    total of <strong>{total, number}</strong> ({totalPercent, number, percent}).
+  motions: Motions
+  motion: Motion
+  for: For
+  against: Against
+  abstain: Abstain
+  threshold: Threshold
+  percentInFavour: "% in favour"
+  result: Result
+  carried: Carried
+  lapsed: Lapsed
+  elections: Elections
+  method: Method
+  winners: Winners
+  rankings: Rankings
+  invalidBallots: Invalid ballots
+  candidate: Candidate
+  votes: Votes
+  thresholdMet: Threshold met
+  elected: Elected
+  notElected: Not elected
+  yes: "yes"
+  no: "no"
+  end: End of results.
+  summary: |
+    Generation started on <strong><time>{start, date, full}, {start, time, short}</time></strong>
+    and finished in <strong>{seconds, number}</strong> seconds.
 
+
+## Administration related strings
 index: Index
 admin: Admin
 home:

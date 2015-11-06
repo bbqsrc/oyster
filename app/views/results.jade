@@ -35,43 +35,43 @@ block content
         button.btn.btn-primary.dropdown-toggle(type='button', data-toggle="dropdown", 
                 aria-haspopup="true", aria-expanded="false", id='advanced-menu')
           span.glyphicon.glyphicon-cloud-download
-          .sr-only= __("Download data")
+          .sr-only= translate('results.download.data')
         ul.dropdown-menu(aria-labelledby="advanced-menu")
           li
             a(href='/export/#{poll.slug}/results')
-              = __("Download results")
+              = translate('results.download.results')
               small  (JSON)
           li
             a(href='/export/#{poll.slug}/poll')
-              = __("Download poll")
+              = translate('results.download.poll')
               small  (JSON)
           li 
             a(href='/export/#{poll.slug}/ballots')
-              = __("Download ballots")
+              = translate('results.download.ballots')
               small  (JSON)
-      = __("Results of %s", poll.title)
+      = translate("results.title", {title: poll.title})
 
   .row
     .col-md-12
-      .alert.alert-info
-        strong= totalCompleteBallots
-        | 
-        = __("ballots received out of a potential total of")
-        | 
-        strong= poll.emailsSent.length
-        |  (#{(totalCompleteBallots / poll.emailsSent.length * 100).toFixed(2)}%).
+      -
+        var o = {
+          received: totalCompleteBallots,
+          total: poll.emailsSent.length,
+          totalPercent: totalCompleteBallots / poll.emailsSent.length
+        }
+      .alert.alert-info!= translate("results.total", o)
       if poll.results.motions.length
-        h2= __("Motions")
+        h2= translate("results.motions")
         table.table
           thead
             tr
-              th= __("Motion")
-              th= __("For")
-              th= __("Against")
-              th= __("Abstain")
-              th= __("Threshold")
-              th= __("% in favour")
-              th= __("Result")
+              th= translate("results.motion")
+              th= translate("results.for")
+              th= translate("results.against")
+              th= translate("results.abstain")
+              th= translate("results.threshold")
+              th= translate("results.percentInFavour")
+              th= translate("results.result")
           tbody
             each motion in poll.results.motions
               tr
@@ -83,11 +83,11 @@ block content
                 td= motion.threshold
                 td= motion.result.percentage
                 if motion.result.success
-                  td.success= __("Carried")
+                  td.success= translate("results.carried")
                 else
-                  td.danger= __("Lapsed")
+                  td.danger= translate("results.lapsed")
       if poll.results.elections.length
-        h2= __("Elections")
+        h2= translate("results.elections")
         each election in poll.results.elections
           .panel.panel-default
             .panel-heading
@@ -98,26 +98,26 @@ block content
                     li
                       small
                         strong
-                          = __("Method")
+                          = translate("results.method")
                           | : 
                         span= election.method
                     li
                       small
                         strong
-                          = __("Winners")
+                          = translate("results.winners")
                           | : 
                         span= election.winners
             .panel-body
               .row
                 .col-md-6
-                  h4= __("Rankings")
+                  h4= translate("results.rankings")
                   ol
                     each c in election.order
                       li= c
                   if election.data.invalids
                     p
                       strong
-                        = __("Invalid ballots")
+                        = translate("results.invalidBallots")
                         | :
                       = election.data.invalids
                 if election.method === "schulze"
@@ -133,11 +133,11 @@ block content
                     table.table
                       thead
                         tr
-                          th= __("Candidate")
-                          th= __("Votes")
+                          th= translate("results.candidate")
+                          th= translate("results.votes")
                           if election.threshold && election.threshold !== 'none'
-                            th= __("Threshold met")
-                          th= __("Result")
+                            th= translate("results.thresholdMet")
+                          th= translate("results.result")
                       tbody
                         each c, i in election.order
                           tr 
@@ -145,27 +145,28 @@ block content
                             td= election.data.scores[c]
                             if election.threshold && election.threshold !== 'none'
                               if election.data.thresholdMet[c]
-                                td.success= __("Yes")
+                                td.success= translate("results.yes")
                               else
-                                td.danger= __("No")
+                                td.danger= translate("results.no")
                             
                             if election.data.thresholdMet[c] && i < election.winners
-                              td.success Elected
+                              td.success= translate("results.elected")
                             else
-                              td.danger Not elected
+                              td.danger= translate('results.notElected')
       
       .alert.alert-info.text-center
         p
-          strong= __("End of results.")
-        p
-          = __("Generation started on")
-          | 
-          strong 
-            time(datetime="#{poll.results.ts.start.toISOString()}")
-              = moment(poll.results.ts.start).format('D MMM YYYY, HH:mm:ssZ')
-          | 
-          = __("and finished in")
-          | 
-          strong= moment(poll.results.ts.finish).diff(poll.results.ts.start, 'seconds', true)
-          | 
-          = __("seconds.")
+          strong= translate('results.end')
+        p!= translate('results.summary', { start: poll.results.ts.start, seconds: moment(poll.results.ts.finish).diff(poll.results.ts.start, 'seconds', true) })
+          //-
+            = __("Generation started on")
+            | 
+            strong 
+              time(datetime="#{poll.results.ts.start.toISOString()}")
+                = moment(poll.results.ts.start).format('D MMM YYYY, HH:mm:ssZ')
+            | 
+            = __("and finished in")
+            | 
+            strong= moment(poll.results.ts.finish).diff(poll.results.ts.start, 'seconds', true)
+            | 
+            = __("seconds.")
