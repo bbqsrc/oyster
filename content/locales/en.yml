@@ -1,5 +1,4 @@
 ## Ballot related strings
-
 javascript: |
   This application requires JavaScript to be enabled to function.
   Please enable JavaScript and reload the page.
@@ -24,6 +23,7 @@ ballot:
     techUsers: "For the more technically inclined users:"
     json: Below is your ballot as the server received it, rendered in JSON.
 poweredBy: Powered by {product}.
+poweredByFull: Powered by {product}. Made in Sydney with {heartSymbol}
 poll:
   notStarted: The poll has not started yet.
   notEnded: The poll has not ended yet.
@@ -69,7 +69,6 @@ results:
   summary: |
     Generation started on <strong><time>{start, date, full}, {start, time, short}</time></strong>
     and finished in <strong>{seconds, number}</strong> seconds.
-
 
 ## Administration related strings
 index: Index

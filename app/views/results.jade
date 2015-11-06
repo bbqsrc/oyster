@@ -158,15 +158,3 @@ block content
         p
           strong= translate('results.end')
         p!= translate('results.summary', { start: poll.results.ts.start, seconds: moment(poll.results.ts.finish).diff(poll.results.ts.start, 'seconds', true) })
-          //-
-            = __("Generation started on")
-            | 
-            strong 
-              time(datetime="#{poll.results.ts.start.toISOString()}")
-                = moment(poll.results.ts.start).format('D MMM YYYY, HH:mm:ssZ')
-            | 
-            = __("and finished in")
-            | 
-            strong= moment(poll.results.ts.finish).diff(poll.results.ts.start, 'seconds', true)
-            | 
-            = __("seconds.")

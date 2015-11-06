@@ -36,15 +36,12 @@ html(lang="#{locale}")
     style.
       body { padding-top: 0 }
     block head
-
   body
     block nav
     .container
       block content
-    footer.powered-by-oyster
-      = __("Powered by")
-      a(href='https://bbqsrc.github.io/oyster')  Oyster
-      | . 
-      = __("Made in Sydney with")
-      | 
-      span(style="color: #d99", class="glyphicon glyphicon-heart")
+    footer.powered-by-oyster.
+      !{translate("poweredByFull", {'product': '<a href="https://bbqsrc.github.io/oyster">Oyster</a>', 'heartSymbol': '<span style="color: #d99" class="glyphicon glyphicon-heart"></span>'})}
+
+      
+      
