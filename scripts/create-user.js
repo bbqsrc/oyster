@@ -20,7 +20,7 @@ db.once('open', function() {
     rl.question('Password: ', function(password) {
       co(function*() {
         let user = yield models.User.createUser(username, password, {
-          flags: ['admin']
+          flags: ['admin', 'superadmin']
         });
 
         console.log('User "' + user.username + '" created.');
