@@ -289,8 +289,8 @@ input.oyster-candidate-input {
 }
 
 .oyster-motion-success .oyster-motion-selected {
-  background-color: #aadaaa;
-  border-color: #8aba8a;
+  background-color: #9aca9a;
+  border-color: #7aaa7a;
 }
 
 .oyster-motion-danger {
@@ -299,8 +299,8 @@ input.oyster-candidate-input {
 }
 
 .oyster-motion-danger .oyster-motion-selected {
-  background-color: #e48481;
-  border-color: #c46461;
+  background-color: #d47471;
+  border-color: #b45451;
 }
 
 .oyster-motion-warning {

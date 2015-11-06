@@ -56,7 +56,7 @@ $(function() {
   });
 
   $('form').submit(function() {
-    var win = window.confirm("Are you sure you want to submit?");
+    var win = window.confirm("Ste prepričani, da želite oddati glasovnico?");
 
     if (win) {
       // Ensure '0' is sent!
