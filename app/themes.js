@@ -104,7 +104,17 @@ const themeHelpers = {
     return i18n.__n.apply(i18n, args);
   },
 
-  candidate(candidateName, id, method, options) {
+  candidate(ctx, id, method, options) {
+    let candidateName;
+    let candidateInfo;
+
+    if (typeof ctx === 'string') {
+      candidateName = ctx;
+    } else {
+      candidateName = ctx.name;
+      candidateInfo = ctx.info;
+    }
+
     const partials = options.data.theme.hbs.partials;
     const name = handlebars.Utils.escapeExpression(`elections.${id}.${candidateName}`);
 
@@ -117,6 +127,7 @@ const themeHelpers = {
     const context = {
       id: name,
       name: candidateName,
+      info: candidateInfo,
       classes
     };
 

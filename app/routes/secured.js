@@ -236,7 +236,7 @@ router
     // TODO: implement flag support for themes again
     if (!this.poll.theme) {
       Log.e(TAG, 'Poll', this.poll.slug, 'is missing a theme; defaulting to australia.');
-      this.poll.theme = 'australia';
+      this.poll.theme = 'slovenia';
     }
 
     yield this.renderTheme(this.poll.theme, this.poll.content);
