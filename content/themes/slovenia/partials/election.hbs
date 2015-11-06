@@ -1,0 +1,13 @@
+<div class='oyster-election'>
+  <h3 class='oyster-election-title'>
+    {{id}}
+  </h3>
+
+  <ul class='oyster-election-list'>
+    {{#shuffle candidates}}
+      <li class='oyster-candidate'>
+        {{candidate this ../id ../section.method}}
+      </li>
+    {{/shuffle}}
+  </ul>
+</div>

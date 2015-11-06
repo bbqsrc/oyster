@@ -1,0 +1,15 @@
+<section class='oyster-section'>
+  <h2 class='oyster-section-title'>
+    {{title}}
+  </h2>
+
+  <div class='oyster-section-info alert alert-info'>
+    {{markdown info}}
+  </div>
+
+  <div class='oyster-fields'>
+    {{#each fields}}
+      {{> (lookup .. 'type') section=.. }}
+    {{/each}}
+  </div>
+</section>

@@ -1,0 +1,33 @@
+<div class='oyster-motion'>
+  <h3 class='oyster-motion-title'>
+    {{title}}
+  </h3>
+
+  <div class='oyster-motion-body'>
+    {{markdown body}}
+  </div>
+
+  <div class='panel panel-primary'>
+    <div class='panel-heading'>
+      <span class='panel-title'>
+        {{formatMessage (intlGet "motion.text")}}
+      </span>
+    </div>
+    <div class='panel-body'>
+      <div class='btn-group btn-group-justified' data-toggle="buttons">
+        <label class="btn btn-success">
+          {{formatMessage (intlGet "motion.aye")}}
+          <input name="motions.{{id}}" type='radio' value="aye" />
+        </label>
+        <label class="btn btn-warning">
+          {{formatMessage (intlGet "motion.abstain")}}
+          <input name="motions.{{id}}" type='radio' value="abstain" checked />
+        </label>
+        <label class="btn btn-danger">
+          {{formatMessage (intlGet "motion.nay")}}
+          <input name="motions.{{id}}" type='radio' value="nay" />
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
