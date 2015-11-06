@@ -68,7 +68,7 @@ router
       const localeData = this.intl.get(this.state.locale);
 
       return yield this.renderTheme(this.poll.theme, 'complete', {
-        message: this.i18n.__('You have already responded to this poll.'),
+        messageKey: 'poll.alreadyResponded',
         title: this.poll.content.title,
         ballot: util.reverseObject(this.ballot.data)
       }, {
@@ -86,7 +86,7 @@ router
 
       return yield this.renderTheme(this.poll.theme, 'complete', {
         title: this.poll.content.title,
-        message: this.i18n.__('This poll has not yet begun.')
+        messageKey: 'poll.notStarted'
       }, {
         data: { intl: localeData }
       });
@@ -99,7 +99,7 @@ router
 
       return yield this.renderTheme(this.poll.theme, 'complete', {
         title: this.poll.content.title,
-        message: this.i18n.__('This poll has finished.')
+        messageKey: 'poll.ended'
       }, {
         data: { intl: localeData }
       });
@@ -109,7 +109,7 @@ router
   })
   .get('/', function* getRoot() {
     yield this.render('home', {
-      title: this.i18n.__('Index')
+      title: this.translate('index')
     });
   })
   .get('/poll/:poll/:token', function* getPollForToken() {
@@ -135,9 +135,7 @@ router
       this.status = 500;
       return yield this.renderTheme(this.poll.theme, 'complete', {
         title: this.poll.content.title,
-        message: this.i18n.__('For some reason, your ballot could not be saved. ' +
-                              'An error has been logged. Please try again in a ' +
-                              'few minutes, or contact the administrator.')
+        messageKey: 'ballot.submission.error'
       }, {
         data: { intl: localeData }
       });
@@ -182,13 +180,14 @@ router
 
     if (this.poll.results) {
       return yield this.render('results', {
-        title: `${this.i18n.__('Results')} - ${this.poll.title}`,
+        title: this.translate('results.title', {
+          title: this.poll.title
+        }),
         poll: this.poll,
         totalCompleteBallots: totalBallots
       });
     } else {
-      this.body = this.i18n.__('The results have not finished ' +
-                                'generating yet. Please try again later.');
+      this.body = this.translate('results.genIncomplete');
       return;
     }
   });
@@ -204,12 +203,12 @@ function* pollPrecheck(next) {
 
   if (+this.poll.startTime > now) {
     this.status = 403;
-    return (this.body = this.i18n.__('The poll has not started yet.'));
+    return (this.body = this.translate('poll.notStarted'));
   }
 
   if (+this.poll.endTime > now) {
     this.status = 403;
-    return (this.body = this.i18n.__('The poll has not ended yet.'));
+    return (this.body = this.translate('poll.notEnded'));
   }
 
   yield next;

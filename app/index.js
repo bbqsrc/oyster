@@ -34,6 +34,8 @@ const koa = require('koa'),
       send = require('koa-send'),
       compress = require('koa-compress'),
       moment = require('moment'),
+      dot = require('dot-object'),
+      IntlMessageFormat = require('intl-messageformat'),
       locales = require('./locales');
 
 const MONTH = 2629740;
@@ -81,6 +83,17 @@ module.exports = function createApp(root, config) {
   app.use(locales({
     path: resolvePath(root, 'content/locales')
   }));
+
+  app.use(function*(next) {
+    this.translate = function(key, opts) {
+      const msg = dot.pick(key, this.intl.get(this.state.locale));
+      const tmpl = new IntlMessageFormat(msg, this.state.locale);
+
+      return tmpl.format(opts || {});
+    };
+
+    yield next;
+  })
 
   app.use(views('./views', {
     map: { html: 'jade' },

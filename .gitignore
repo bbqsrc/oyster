@@ -4,5 +4,6 @@ assets/static/css/*.min.css
 assets/static/fonts/
 bower_components/
 node_modules/
+instrumented/
 coverage/
 config.json

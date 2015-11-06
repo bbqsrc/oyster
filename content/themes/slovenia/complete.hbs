@@ -25,20 +25,26 @@
 
         <hr>
 
-        {{#if message}}
+        {{#if messageKey}}
           <div class="alert alert-danger">
-            {{message}}
+            {{formatMessage (intlGet messageKey)}}
           </div>
+        {{else}}
+          {{#if message}}
+            <div class="alert alert-danger">
+              {{message}}
+            </div>
+          {{/if}}
         {{/if}}
 
         {{#if ballot}}
           <div class="alert alert-info">
             <p>
-              <strong>{{formatMessage (intlGet "submission.received")}}</strong>
-              {{formatMessage (intlGet "submission.thanks")}}
+              <strong>{{formatMessage (intlGet "ballot.submission.received")}}</strong>
+              {{formatMessage (intlGet "ballot.submission.thanks")}}
             </p>
             <p>
-              {{formatMessage (intlGet "submission.closeWindow")}}
+              {{formatMessage (intlGet "ballot.submission.closeWindow")}}
             </p>
           </div>
 
@@ -46,11 +52,11 @@
 
           <div class='alert alert-info'>
             <p>
-              <strong>{{formatMessage (intlGet "submission.techUsers")}}</strong>
+              <strong>{{formatMessage (intlGet "ballot.submission.techUsers")}}</strong>
             </p>
             <p>
-              {{formatMessage (intlGet "submission.json")}}
-            </p>  
+              {{formatMessage (intlGet "ballot.submission.json")}}
+            </p>
           </div>
 
           <pre class='ballot'>{{json ballot}}</pre>

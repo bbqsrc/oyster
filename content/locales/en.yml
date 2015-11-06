@@ -1,4 +1,6 @@
-javascript: This application requires JavaScript to be enabled to function. Please enable JavaScript and reload the page.
+javascript: |
+  This application requires JavaScript to be enabled to function.
+  Please enable JavaScript and reload the page.
 submit: Submit
 motion:
   text: How do you wish to vote on this motion?
@@ -6,11 +8,27 @@ motion:
   abstain: Abstain
   nay: Nay
 ballot:
-  warning: Please ensure that you have completed your ballot. Once you submit, you cannot go back.
-submission:
-  received: Your ballot has been received by the voting server.
-  thanks: Thank you for taking part in this poll!
-  closeWindow: You may now close this window.
-  techUsers: "For the more technically inclined users:"
-  json: Below is your ballot as the server received it, rendered in JSON.
+  warning: |
+    Please ensure that you have completed your ballot.
+    Once you submit, you cannot go back.
+  submission:
+    error: |
+      For some reason, your ballot could not be saved.
+      An error has been logged. Please try again in a few minutes,
+      or contact the administrator.
+    received: Your ballot has been received by the voting server.
+    thanks: Thank you for taking part in this poll!
+    closeWindow: You may now close this window.
+    techUsers: "For the more technically inclined users:"
+    json: Below is your ballot as the server received it, rendered in JSON.
 poweredBy: Powered by {product}.
+results:
+  title: Results - {title}
+  genIncomplete: |
+    The results have not finished generating yet. Please try again later.
+poll:
+  notStarted: The poll has not started yet.
+  notEnded: The poll has not ended yet.
+  ended: This poll has finished.
+  alreadyResponded: You have already responded to this poll.
+index: Index
