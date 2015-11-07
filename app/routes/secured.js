@@ -27,8 +27,7 @@ const Log = require('huggare'),
       models = require('../models'),
       util = require('../util'),
       config = require('../provider').config,
-      fs = require('mz/fs'),
-      extend = require('extend');
+      fs = require('mz/fs');
 
 // TODO don't repeat yourself
 function* isAdmin(next) {
@@ -50,6 +49,9 @@ router
   })
   .get('login', '/login', function* getLogin() {
     if (this.req.user) {
+      if (this.request.query.r) {
+        return this.redirect(this.request.query.r);
+      }
       return (this.body = this.i18n.__('Already logged in.'));
     } else {
       yield this.render('admin-login', {

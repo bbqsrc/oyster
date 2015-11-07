@@ -18,8 +18,6 @@
  */
 'use strict';
 
-const TAG = 'oyster/locales';
-
 const yaml = require('js-yaml'),
       path = require('path'),
       fs = require('fs'),
@@ -86,7 +84,7 @@ class LocaleManager {
       if (err.name === 'YAMLException') {
         throw err;
       }
-      
+
       return null;
     }
   }

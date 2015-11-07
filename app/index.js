@@ -107,7 +107,7 @@ module.exports = function createApp(root, config) {
     };
 
     yield next;
-  })
+  });
 
   app.use(views('./views', {
     map: { html: 'jade' },

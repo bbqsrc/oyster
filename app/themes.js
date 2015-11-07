@@ -18,14 +18,11 @@
  */
 'use strict';
 
-const TAG = 'oyster/themes';
-
 const handlebars = require('handlebars'),
       HandlebarsIntl = require('handlebars-intl'),
       extend = require('extend'),
       shuffle = require('lodash').shuffle,
       marked = require('marked'),
-      Log = require('huggare'),
       path = require('path'),
       fs = require('fs'),
       config = require('./provider').config;
