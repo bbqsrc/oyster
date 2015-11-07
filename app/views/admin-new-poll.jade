@@ -134,13 +134,7 @@ block content
 
     hr
 
-    script(src='/static/js/toml.min.js')
-    script(src='/static/js/ace/ace.js')
     script.
-      var editor = ace.edit('poll-data-editor');
-      editor.setTheme('ace/theme/monokai');
-      editor.getSession().setMode('ace/mode/toml');
-
       var dateVal = new Date().getTimezoneOffset() * 100 / -60;
 
       $("#timezone").val(dateVal);
@@ -188,7 +182,7 @@ block content
         e.preventDefault();
 
         try {
-          data = toml.parse(editor.getValue());
+          data = toml.parse($("#poll-data-editor").val());
         } catch (err) {
           alert(err);
           return;

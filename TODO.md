@@ -1,5 +1,4 @@
+* Admin UI to be reimplemented as react app
+* No inline scripts or manual lib includes via \<script\> tags. All must be
+  properly included via require()
 * Look at react-ace
-* Rework build system again
-  * Unified build process for client & server
-  * Needs to work on server also for isomorphic shenanigans
-  * Webpack is proving a pain, perhaps try out browserify
