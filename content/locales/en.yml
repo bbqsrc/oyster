@@ -73,6 +73,7 @@ results:
 ## Administration related strings
 index: Index
 admin: Admin
+update: Update
 home:
   intro: The server is up!
   description: This is {product}, an open source voting system written by {author}.
@@ -88,3 +89,40 @@ nav:
   changePassword: Change password
   changeLanguage: Change language
   logOut: Log out
+language:
+  title: Change language
+  text: Language
+password:
+  title: Change password
+  current: Current password
+  new: New password
+  again: New password again
+auth:
+  username: Username
+  password: Password
+  logIn: Log in
+poll:
+  details: Poll Details
+  name: Poll Name
+  slug: Slug
+  makePublic: Make public?
+  dateTime: Date and Time
+  startDate: Start Date
+  startTime: Start Time
+  endDate: End Date
+  endTime: End Time
+  today: Today
+  now: Now
+  sevenDays: "+7 Days"
+  artonKlockan: 6:00 pm
+  timezone: Timezone
+  timezoneHelp: Please set your date and time relative to this timezone.
+  data: Poll Data
+  toml: This is the raw poll data in TOML format.
+  theme: Theme
+  participantGroups: Participant Groups
+  email: Email
+  from: From
+  subject: Subject
+  body: Body
+  create: Create Poll

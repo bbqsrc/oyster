@@ -1,14 +1,14 @@
 extend layout
 block content
   .page-header
-    h1= __("Change Language")
+    h1= translate("language.title")
   
   if success
     .alert.alert-success= success
   
   form.form-horizontal(method='post')
     .form-group
-      label.control-label.col-sm-2(for='locale')= __("Language")
+      label.control-label.col-sm-2(for='locale')= translate("language.text")
       .col-sm-10
         select.form-control#locale(name='locale')
           each l in locales
@@ -17,4 +17,4 @@ block content
               option(value="#{l}" selected)= l
             else
               option(value="#{l}")= l
-    button.col-sm-offset-2.btn.btn-primary(type='submit')= __("Update")
+    button.col-sm-offset-2.btn.btn-primary(type='submit')= translate('update')

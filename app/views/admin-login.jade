@@ -22,14 +22,14 @@ block content
     .alert.alert-info= flash
   form.form-horizontal(method="post")
     .form-group
-      label.control-label.col-sm-4(for='username')= __("Username")
+      label.control-label.col-sm-4(for='username')= translate('auth.username')
       .col-sm-4
         input.form-control#username(type='text' name='username')
     .form-group
-      label.control-label.col-sm-4(for='password')= __("Password")
+      label.control-label.col-sm-4(for='password')= translate('auth.password')
       .col-sm-4
         input.form-control#password(type='password' name='password')
     .form-group
       .col-sm-offset-5.col-sm-1
-        button.btn.btn-primary(type='submit')= __("Log in")
+        button.btn.btn-primary(type='submit')= translate('auth.logIn')
     
