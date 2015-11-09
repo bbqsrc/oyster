@@ -260,8 +260,12 @@ pollSchema.methods.generateResults = function generateResults() {
         return typeof c === 'string' ? c : c.name;
       });
 
-      eCounters[election.id] = counters.createElectionCounter(
-        election.id, election.method, candidates, election.winners);
+      eCounters[election.id] = counters.createElectionCounter({
+        id: election.id,
+        method: election.method,
+        candidates,
+        winners: election.winners
+      });
     }
 
     // Count errthang
