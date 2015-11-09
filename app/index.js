@@ -58,6 +58,85 @@ function routeThemes(router, prefix, root) {
   });
 }
 
+function setAppState(config) {
+  return function* setAppState(next) { // eslint-disable-line
+    let locale = config.locales[0];
+    let user;
+
+    if (this.req.user) {
+      user = this.req.user;
+    }
+
+    if (this.getLocaleFromQuery()) {
+      locale = this.getLocaleFromQuery();
+    } else if (user && user.data.locale) {
+      locale = user.data.locale;
+    }
+
+    this.i18n.setLocale(locale);
+
+    this.state = {
+      moment,
+      __: this.i18n.__.bind(this.i18n),
+      __n: this.i18n.__n.bind(this.i18n),
+      translate: this.translate.bind(this),
+      user,
+      locale
+    };
+
+    yield next;
+  };
+}
+
+
+function translate(config) {
+  const translateCache = {};
+
+  return function* translateMiddleware(next) {
+    this.translate = function translate(key, opts) { // eslint-disable-line
+      const k = `${this.state.locale}:${key}`;
+      let tmpl;
+
+      if (translateCache[k]) {
+        tmpl = translateCache[k];
+      } else {
+        const msg = dot.pick(key, this.intl.get(this.state.locale));
+
+        tmpl = new IntlMessageFormat(msg, this.state.locale);
+
+        if (config.production) {
+          translateCache[k] = tmpl;
+        }
+      }
+
+      return tmpl.format(opts || {});
+    };
+
+    yield next;
+  };
+}
+
+
+function errorCatcher(config) {
+  return function* errorCatcher(next) { // eslint-disable-line
+    try {
+      yield next;
+    } catch (err) {
+      this.status = err.status || 500;
+      const msg = 'Internal server error. Please contact an administrator.';
+
+      if (config.development) {
+        this.body = `<pre>${err.stack}</pre>`;
+      } else {
+        this.body = msg;
+      }
+      this.app.emit('error', err, this);
+      Log.e(TAG, err);
+    }
+  };
+}
+
+
 module.exports = function createApp(root, config) {
   const app = koa();
 
@@ -84,30 +163,7 @@ module.exports = function createApp(root, config) {
     path: resolvePath(root, 'content/locales')
   }));
 
-  const translateCache = {};
-
-  app.use(function*(next) {
-    this.translate = function translate(key, opts) {
-      const k = `${this.state.locale}:${key}`;
-      let tmpl;
-
-      if (translateCache[k]) {
-        tmpl = translateCache[k];
-      } else {
-        const msg = dot.pick(key, this.intl.get(this.state.locale));
-
-        tmpl = new IntlMessageFormat(msg, this.state.locale);
-
-        if (config.production) {
-          translateCache[k] = tmpl;
-        }
-      }
-
-      return tmpl.format(opts || {});
-    };
-
-    yield next;
-  });
+  app.use(translate(config));
 
   app.use(views('./views', {
     map: { html: 'jade' },
@@ -117,22 +173,7 @@ module.exports = function createApp(root, config) {
   app.use(helmet());
 
   // Catch all the errors.
-  app.use(function* errorCatcher(next) {
-    try {
-      yield next;
-    } catch (err) {
-      this.status = err.status || 500;
-      const msg = 'Internal server error. Please contact an administrator.';
-
-      if (config.development) {
-        this.body = `<pre>${err.stack}</pre>`;
-      } else {
-        this.body = msg;
-      }
-      this.app.emit('error', err, this);
-      Log.e(TAG, err);
-    }
-  });
+  app.use(errorCatcher(config));
 
   passportMongo.setup(passport);
 
@@ -143,33 +184,7 @@ module.exports = function createApp(root, config) {
   .use(passport.initialize())
   .use(passport.session());
 
-  app.use(function* setAppState(next) {
-    let locale = config.locales[0];
-    let user;
-
-    if (this.req.user) {
-      user = this.req.user;
-    }
-
-    if (this.getLocaleFromQuery()) {
-      locale = this.getLocaleFromQuery();
-    } else if (user && user.data.locale) {
-      locale = user.data.locale;
-    }
-
-    this.i18n.setLocale(locale);
-
-    this.state = {
-      moment,
-      __: this.i18n.__.bind(this.i18n),
-      __n: this.i18n.__n.bind(this.i18n),
-      translate: this.translate.bind(this),
-      user,
-      locale
-    };
-
-    yield next;
-  });
+  app.use(setAppState(config));
 
   // Delicious themes.
   app.use(require('./themes')({
