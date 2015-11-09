@@ -70,6 +70,20 @@ en:
     summary: |
       Generation started on <strong><time>{start, date, full}, {start, time, short}</time></strong>
       and finished in <strong>{seconds, number}</strong> seconds.
+    public: Public Results
+    export: Export
+    id: ID
+    threshold: Threshold
+    ayes: Ayes
+    nays: Nays
+    abstains: Abstains
+    invalids: Invalids
+    isCarried: Carried?
+    carried: Carried
+    lapsed: Lapsed
+    position: Position
+    data: Data
+    order: Order
 
   ## Administration related strings
   index: Index
@@ -77,6 +91,11 @@ en:
   update: Update
   close: Close
   insert: Insert
+  title: Title
+  participants: Participants
+  public: Public
+  private: Private
+  export: Export
 
   home:
     intro: The server is up!
@@ -105,7 +124,9 @@ en:
     username: Username
     password: Password
     logIn: Log in
+    alreadyLoggedIn: Already logged in.
   poll:
+    text: Poll
     details: Poll Details
     name: Poll Name
     slug: Slug
@@ -149,3 +170,10 @@ en:
     flags: Flags
     actions: Actions
     remove: Remove Group
+    notDeleteable: This participant group is currently in use.
+  user:
+    role: Role
+    username: Username
+    password: Password
+    new: New user
+    actions: Actions

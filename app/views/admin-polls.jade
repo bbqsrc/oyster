@@ -21,10 +21,10 @@ block content
   table.table.polls
     thead
       tr
-        th= __("Title")
-        th= __("Participants")
-        th= __("Start Time")
-        th= __("End Time")
+        th= translate("title")
+        th= translate("participants")
+        th= translate("poll.startTime")
+        th= translate("poll.endTime")
     tbody
       each poll in polls
         tr

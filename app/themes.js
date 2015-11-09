@@ -87,22 +87,6 @@ const themeHelpers = {
         config.themeAssetsURL, options.data.theme.name, assetPath));
   },
 
-  __() {
-    const args = [].slice.call(arguments);
-    const options = args.pop();
-    const i18n = options.data.ctx.i18n;
-
-    return i18n.__.apply(i18n, args);
-  },
-
-  __n() {
-    const args = [].slice.call(arguments);
-    const options = args.pop();
-    const i18n = options.data.ctx.i18n;
-
-    return i18n.__n.apply(i18n, args);
-  },
-
   candidate(ctx, id, method, options) {
     let candidateName;
     let candidateInfo;
@@ -174,9 +158,6 @@ class Theme {
     this.path = path.join(themePath, name);
 
     const hbs = this.hbs = handlebars.create();
-    // this.i18n = new I18n({
-    //    // TODO get all the locales from the locales directory.
-    // });
 
     try {
       fs.stat(this.path);
@@ -189,12 +170,6 @@ class Theme {
       this.hbs.registerHelper(helper, themeHelpers[helper]);
     }
     HandlebarsIntl.registerWith(this.hbs);
-
-    /*
-    for (const tmplName of this.basePartials) {
-      registerPartial(this.hbs, path.join(this.path, tmplName + '.hbs'));
-    }
-    */
 
     // The base of the theme.
     this.tmpls = {

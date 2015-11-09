@@ -24,28 +24,28 @@ block content
         | (#{poll.slug})
         | 
         if poll.isPublic
-          span.label.label-success= __("Public")
+          span.label.label-success= translate('public')
         else
-          span.label.label-warning= __("Private")
+          span.label.label-warning= translate('private')
   .well
-    a.btn.btn-primary(href="/results/#{poll.slug}")= __("Public Results")
+    a.btn.btn-primary(href="/results/#{poll.slug}")= translate("results.public")
     | 
-    a.btn.btn-primary(href='export/results') #{__("Export")} (JSON)
+    a.btn.btn-primary(href='export/results') #{translate("export")} (JSON)
   .row
     .col-md-12
-      h2= __("Motions")
+      h2= translate("results.motions")
       
       table.table
         thead
           tr
-            th= __("ID")
-            th= __("Threshold")
-            th= __("Ayes")
-            th= __("Nays")
-            th= __("Abstains")
-            th= __("Invalids")
+            th= translate('results.id')
+            th= translate('results.threshold')
+            th= translate('results.ayes')
+            th= translate('results.nays')
+            th= translate('results.abstains')
+            th= translate('results.invalids')
             th %
-            th= __("Carried?")
+            th= translate('results.isCarried')
         tbody
           each m in results.motions
             tr
@@ -58,21 +58,21 @@ block content
               td.text-right= m.counts.invalid
               td.text-right= m.result.percentage
               if m.result.success
-                td.success= __("Carried")
+                td.success= translate('results.carried')
               else
-                td.danger= __("Lapsed")
+                td.danger= translate('results.lapsed')
       
-      h2= __("Elections")
+      h2= translate('results.elections')
       
       table.table
         thead
           tr
-            th= __("Position")
-            th= __("Method")
-            th= __("Candidates")
-            th= __("Winners")
-            th= __("Data")
-            th= __("Order")
+            th= translate("results.position")
+            th= translate("results.method")
+            th= translate("results.candidates")
+            th= translate("results.winners")
+            th= translate("results.data")
+            th= translate("results.order")
         tbody
           each el in results.elections
             tr

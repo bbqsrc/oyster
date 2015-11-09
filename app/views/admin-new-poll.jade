@@ -53,7 +53,7 @@ block content
         .input-group
           input.form-control(placeholder='2015-01-31', type='date', name='endDate', id='endDate')
           span.input-group-btn
-            button.btn.btn-primary.btn-end-date-7days(type='button', style='width: 6em')= __("+7 Days")
+            button.btn.btn-primary.btn-end-date-7days(type='button', style='width: 6em')= translate('poll.sevenDays')
       .form-group.col-sm-6
         label.control-label(for='endTime')= translate("poll.endTime")
         .input-group
@@ -126,7 +126,7 @@ block content
       select.form-control(multiple, placeholder='foo@bar.lol', name='participants', id='participant-groups', rows='8')
         for p in participants
           option(value=p.name)= p.name
-    h3= __("Email")
+    h3= translate('poll.email')
     .form-group
       label.control-label(for='fld-email1')= translate('poll.from')
       input.form-control(placeholder='Test Person (Organisation) <email@place.lol>', type='text', name='emailFrom', id='fld-email1')

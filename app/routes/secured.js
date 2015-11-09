@@ -52,7 +52,7 @@ router
       if (this.request.query.r) {
         return this.redirect(this.request.query.r);
       }
-      return (this.body = this.i18n.__('Already logged in.'));
+      return (this.body = this.translate('auth.alreadyLoggedIn'));
     } else {
       yield this.render('admin-login', {
         title: 'Log in',
@@ -64,7 +64,7 @@ router
     const self = this;
 
     if (this.req.user) {
-      return (this.body = this.i18n.__('Already logged in.'));
+      return (this.body = this.translate('auth.alreadyLoggedIn'));
     }
 
     yield passport.authenticate('mongodb', function* callback(err, user) {
@@ -98,7 +98,7 @@ router
     const pgs = yield models.ParticipantGroup.find({}).exec();
 
     yield this.render('admin-participants', {
-      title: this.i18n.__('Participants'),
+      title: this.translate('pGroup.participants'),
       participants: pgs
     });
   })
@@ -178,7 +178,7 @@ router
     }
 
     this.status = 403;
-    return (this.body = this.i18n.__('This participant group is currently in use.'));
+    return (this.body = this.translate('pGroup.notDeleteable'));
   })
   .get('/polls', isAdmin, function* getPolls() {
     // TODO pagination!!
@@ -186,25 +186,17 @@ router
     const polls = yield models.Poll.find({}).exec();
 
     yield this.render('admin-polls', {
-      title: this.i18n.__('All Polls'),
+      title: this.translate('nav.allPolls'),
       polls
     });
   })
   .get('/polls/new', isAdmin, function* getNewPoll() {
     const participantGroups = yield models.ParticipantGroup.find({}).exec();
 
-    // TODO dehardcode
-    /*
-    let fp = path.join(__dirname, '../../content/themes');
-    let themes = (yield fs.readdir(fp)).filter(function(v) {
-      return fs.statSync(path.join(fp, v)).isDirectory();
-    });
-    themes.sort();
-    */
     const themes = this.themeManager.themes;
 
     yield this.render('admin-new-poll', {
-      title: this.i18n.__('New Poll'),
+      title: this.translate('nav.newPoll'),
       participants: participantGroups,
       themes
     });
@@ -225,7 +217,7 @@ router
   })
   .get('/poll/:poll', isAdmin, function* getPoll() {
     yield this.render('admin-poll', {
-      title: `${this.i18n.__('Poll')} - ${this.poll.slug}`,
+      title: `${this.translate('poll.text')} - ${this.poll.slug}`,
       poll: this.poll
     });
   })
@@ -269,7 +261,7 @@ router
     const results = yield this.poll.generateResults();
 
     yield this.render('admin-results', {
-      title: `${this.i18n.__('Results')} - ${this.poll.slug}`,
+      title: `${this.translate('poll.results')} - ${this.poll.slug}`,
       poll: this.poll,
       results
     });
@@ -279,12 +271,12 @@ router
   })
   .get('/users', isAdmin, function* getUsers() {
     yield this.render('admin-users', {
-      title: this.i18n.__('Users')
+      title: this.translate('nav.users')
     });
   })
   .get('/change-password', isAdmin, function* getChangePassword() {
     yield this.render('admin-change-password', {
-      title: this.i18n.__('Change Password')
+      title: this.translate('nav.changePassword')
     });
   })
   .post('/change-password', isAdmin, bodyParser(), function* postChangePassword() {
@@ -293,14 +285,14 @@ router
     if (!body.currPassword || !body.password || !body.password2) {
       this.status = 400;
       return yield this.render('admin-change-password', {
-        title: this.i18n.__('Change Password'),
+        title: this.translate('nav.changePassword'),
         error: 'Some fields were missing data.'
       });
     }
 
     if (body.password !== body.password2) {
       return yield this.render('admin-change-password', {
-        title: this.i18n.__('Change Password'),
+        title: this.translate('nav.changePassword'),
         error: 'New password does not match in both fields.'
       });
     }
@@ -309,7 +301,7 @@ router
 
     if (!success) {
       return yield this.render('admin-change-password', {
-        title: this.i18n.__('Change Password'),
+        title: this.translate('nav.changePassword'),
         error: 'Incorrect password.'
       });
     }
@@ -320,13 +312,13 @@ router
     this.req.user = user;
 
     return yield this.render('admin-change-password', {
-      title: this.i18n.__('Change Password'),
+      title: this.translate('nav.changePassword'),
       success: 'Password successfully updated.'
     });
   })
   .get('/change-language', isAdmin, function* getChangeLanguage() {
     return yield this.render('admin-change-language', {
-      title: this.i18n.__('Change Language'),
+      title: this.translate('nav.changeLanguage'),
       locales: config.locales
     });
   })
@@ -339,7 +331,7 @@ router
     }).exec();
 
     return yield this.render('admin-change-language', {
-      title: this.i18n.__('Change Language'),
+      title: this.translate('nav.changeLanguage'),
       locales: config.locales
     });
   })

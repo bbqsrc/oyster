@@ -21,7 +21,7 @@ block content
   +modal('Update role', 'Update')(id='update-role')
     form.form-horizontal
       .form-group
-        label.control-label.col-sm-2(for='c-role')= __("Role")
+        label.control-label.col-sm-2(for='c-role')= translate('user.role')
         .col-sm-10
           select.form-control#c-role
             option(value='admin') Admin
@@ -36,15 +36,15 @@ block content
   +modal('New user', 'Create')(id='create-user')
     form.form-horizontal
       .form-group
-        label.control-label.col-sm-2(for='cu-username')= __("Username")
+        label.control-label.col-sm-2(for='cu-username')= translate('user.username')
         .col-sm-10
           input.form-control#cu-username
       .form-group
-        label.control-label.col-sm-2(for='cu-password')= __("Password")
+        label.control-label.col-sm-2(for='cu-password')= translate('user.password')
         .col-sm-10
           input.form-control#cu-password(type='password')
       .form-group
-        label.control-label.col-sm-2(for='cu-role')= __("Role")
+        label.control-label.col-sm-2(for='cu-role')= translate('user.role')
         .col-sm-10
           select.form-control#cu-role
             option(value='admin') Admin
@@ -52,15 +52,15 @@ block content
     
   .page-header
     .pull-right
-      button.btn.btn-primary#btn-new-user(data-toggle='modal' data-target='#create-user')= __("New user")
+      button.btn.btn-primary#btn-new-user(data-toggle='modal' data-target='#create-user')= translate('user.new')
     h1= title
 
   table.table#users
     thead
       tr 
-        th= __("Username")
-        th= __("Role")
-        th= __("Actions")
+        th= translate('user.username')
+        th= translate('user.role')
+        th= translate('user.actions')
     tbody
   
   script.
