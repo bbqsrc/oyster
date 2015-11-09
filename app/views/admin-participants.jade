@@ -22,37 +22,37 @@ block content
         .modal-header
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') &times;
-          h4= __("Add Participant Group")
+          h4= translate("pGroup.add")
         .modal-body
           form
             .form-group
-              label.control-label(for='pg-name') Group Name
+              label.control-label(for='pg-name')= translate("pGroup.name")
               input.form-control#pg-name(name='name' type='text' required)
             .form-group
-              label.control-label(for='pg-flags') Flags 
-                small (space delimited)
+              label.control-label(for='pg-flags')= translate('pGroup.flags')
+                small (#{translate('pGroup.spaceDelimited')})
               input.form-control#pg-flags(name='flags' type='text')
             .form-group
-              label.control-label(for='pg-participants') Emails 
-                small (newline delimited)
+              label.control-label(for='pg-participants')= translate('pGroup.emails')
+                small (#{translate('pGroup.newlineDelimited')})
               input.form-control#pg-participants(name='emails' type='file' required)
         .modal-footer
-          button.btn.btn-default(type='button' data-dismiss='modal')= __("Close")
+          button.btn.btn-default(type='button' data-dismiss='modal')= translate("close")
           | 
-          button.btn.btn-success#pg-insert-btn(type='button')= __("Insert")
+          button.btn.btn-success#pg-insert-btn(type='button')= translate('insert')
     
   .page-header
-    h1= __("All Participant Groups")
+    h1= translate('pGroup.all')
 
   .well
-    a.btn.btn-primary(data-toggle="modal" data-target="#add-participant-group")= __("Add Participant Group")
+    a.btn.btn-primary(data-toggle="modal" data-target="#add-participant-group")= translate('pGroup.add')
   table.table.participants
     thead
       tr
-        th= __("Group")
-        th= __("Participants")
-        th= __("Flags")
-        th= __("Actions")
+        th= translate("pGroup.group")
+        th= translate("pGroup.participants")
+        th= translate("pGroup.flags")
+        th= translate("pGroup.actions")
     tbody
       each p in participants
         tr(data-id="#{p._id}")
@@ -64,7 +64,7 @@ block content
               span.label.label-info.label-sm= flag
               | 
           td
-            btn.btn.btn-xs.btn-danger.delete-group-btn= __("Remove group")
+            btn.btn.btn-xs.btn-danger.delete-group-btn= translate("pGroup.remove")
   script.
     $('#pg-insert-btn').on('click', function() {
       var self = this;

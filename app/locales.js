@@ -26,9 +26,8 @@ const yaml = require('js-yaml'),
       config = require('./provider').config;
 
 function loadLocaleYaml(fpath) {
-  const messages = yaml.safeLoad(fs.readFileSync(fpath, 'utf8'));
-
   const locale = path.basename(fpath, path.extname(fpath));
+  const messages = yaml.safeLoad(fs.readFileSync(fpath, 'utf8'))[locale];
 
   return { locale, messages };
 }

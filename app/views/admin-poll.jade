@@ -24,16 +24,16 @@ block content
         ul.dropdown-menu
           li
             a(href='/admin/poll/' + poll.slug + '/test')
-              = __("Test Ballot")
+              = translate("ballots.test")
           li  
             a(href="/admin/poll/" + poll.slug + '/ballots')
-              = __("Ballots")
+              = translate("ballots.title")
           li  
             a(href='/admin/poll/' + poll.slug + '/results')
-              = __("Results")
+              = translate("poll.results")
           li.divider(role="separator")
           li
-            a(href='#')= __("Delete poll")
+            a(href='#')= translate("poll.delete")
     h1
       = poll.title 
       small  (#{poll.slug})
