@@ -14,21 +14,21 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * <one line to give the program's name and a brief idea of what it does.>
  */
 'use strict';
 
 const RangeElection = require('./range'),
       ApprovalElection = require('./approval'),
-      SchulzeElection = require('./schulze');
+      SchulzeElection = require('./schulze'),
+      IRVElection = require('./irv');
 
 const map = {
   range: RangeElection,
   approval: ApprovalElection,
-  schulze: SchulzeElection
+  schulze: SchulzeElection,
+  irv: IRVElection
 };
 
-// TODO: maybe we could add a "registerElectionMethod" method to the provider?
 function createElectionCounter(obj) {
   const id = obj.id,
         method = obj.method,

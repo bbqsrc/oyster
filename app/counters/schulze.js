@@ -14,9 +14,10 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * <one line to give the program's name and a brief idea of what it does.>
  */
 'use strict';
+
+const util = require('./util');
 
 function createScoreMatrix(size) {
   const x = [];
@@ -50,15 +51,13 @@ class SchulzeElection {
     for (const c of this.candidates) {
       let v = ballot[c];
 
-      if (!/^\s*(?:(?!0+$)[0-9]+)?\s*$/.test(v)) {
-        return null;
-      }
-
       if (v.trim() === '') {
-        v = Number.MAX_SAFE_INTEGER;
+        v = Infinity;
       } else {
-        v = parseInt(v.trim(), 10);
-        if (v <= 0 || Number.isNaN(v)) {
+        v = util.validRankOrNull(v);
+
+        // Short-circuit if null
+        if (v == null) {
           return null;
         }
       }

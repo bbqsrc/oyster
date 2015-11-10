@@ -14,7 +14,6 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * <one line to give the program's name and a brief idea of what it does.>
  */
 'use strict';
 
@@ -245,43 +244,53 @@ pollSchema.methods.generateResults = function generateResults() {
 
     const pollData = this.preparePollData();
 
-    const mCounters = {};
-    const eCounters = {};
+    const c = {};
 
     // Create counters for all motions
     for (const motion of pollData.motions) {
-      mCounters[motion.id] = new counters.MotionCounter(
+      c[motion.id] = new counters.MotionCounter(
         motion.id, motion.threshold);
     }
 
     for (const election of pollData.elections) {
       // Handle candidates now having info props
-      const candidates = election.candidates.map(c => {
-        return typeof c === 'string' ? c : c.name;
+      election.candidates = election.candidates.map(cand => {
+        return typeof cand === 'string' ? cand : cand.name;
       });
 
-      eCounters[election.id] = counters.createElectionCounter({
-        id: election.id,
-        method: election.method,
-        candidates,
-        winners: election.winners
-      });
+      c[election.id] = counters.createElectionCounter(election);
     }
 
     // Count errthang
-    yield this.model('Ballot').eachForSlug(this.slug, ballot => {
-      if (ballot.data.motions) {
-        for (const m of pollData.motions) {
-          mCounters[m.id].insert(ballot.data.motions[m.id]);
-        }
-      }
+    const pending = new Set(Object.keys(counters));
 
-      if (ballot.data.elections) {
-        for (const e of pollData.elections) {
-          eCounters[e.id].insert(ballot.data.elections[e.id]);
+    while (pending.size) {
+      yield this.model('Ballot').eachForSlug(this.slug, ballot => { //eslint-disable-line
+        if (ballot.data.motions) {
+          for (const m of pollData.motions) {
+            c[m.id].insert(ballot.data.motions[m.id]);
+          }
+        }
+
+        if (ballot.data.elections) {
+          for (const e of pollData.elections) {
+            c[e.id].insert(ballot.data.elections[e.id]);
+          }
+        }
+      });
+
+      for (const k in c) {
+        if (!pending.has(k)) {
+          continue;
+        }
+
+        const counter = c[k];
+
+        if (typeof counter.isDone !== 'function' || counter.isDone()) {
+          pending.delete(k);
         }
       }
-    });
+    }
 
     // Output the objects
     const results = {
@@ -289,12 +298,12 @@ pollSchema.methods.generateResults = function generateResults() {
       elections: []
     };
 
-    for (const id in mCounters) {
-      results.motions.push(mCounters[id].toObject());
+    for (const m of pollData.motions) {
+      results.motions.push(counters[m.id].toObject());
     }
 
-    for (const id in eCounters) {
-      results.elections.push(eCounters[id].toObject());
+    for (const e of pollData.elections) {
+      results.elections.push(counters[e.id].toObject());
     }
 
     const endGen = new Date();
