@@ -36,7 +36,7 @@ class IRVRound {
   }
 
   insert(ballot) {
-    const c = firstValidCandidate(ballot);
+    const c = firstValidCandidate(ballot, this.candidates);
 
     if (c) {
       this.count.inc(c);
@@ -59,10 +59,18 @@ class IRVRound {
   }
 
   toObject() {
-    return {
+    const o = {
       total: this.count.total,
       tally: this.count.ordered()
     };
+
+    if (this.hasWinner()) {
+      o.winner = this.winner();
+    } else {
+      o.eliminated = this.eliminate();
+    }
+
+    return o;
   }
 }
 
@@ -70,11 +78,13 @@ class IRVElection {
   constructor(id, candidates, opts) {
     this.id = id;
     this.candidates = candidates;
+    this.remaining = candidates.slice();
 
     this.currentRound = new IRVRound(candidates);
-    this.options = opts;
+    this.options = opts || {};
 
     this.rounds = [];
+    this.invalids = 0;
   }
 
   parse(ballot) {
@@ -84,10 +94,12 @@ class IRVElection {
     for (const c of this.candidates) {
       const v = util.validRankOrNull(ballot[c], 1, this.candidates.length);
 
-      if (v == null && !this.options.optional) {
-        return null;
-      } else {
-        skipped++;
+      if (v == null) {
+        if (!this.options.optional) {
+          return null;
+        } else {
+          skipped++;
+        }
       }
 
       // Dupe!
@@ -98,8 +110,7 @@ class IRVElection {
       clean[v] = c;
     }
 
-    // -1 because 0th index is blank
-    if ((clean.filter(Boolean).length + skipped - 1) !== this.candidates.length) {
+    if ((clean.filter(Boolean).length + skipped) !== this.candidates.length) {
       return null;
     }
 
@@ -110,7 +121,7 @@ class IRVElection {
     const ballot = this.parse(b);
 
     if (ballot == null) {
-      this.invalid++;
+      this.invalids++;
       return;
     }
 
@@ -125,8 +136,8 @@ class IRVElection {
     this.rounds.push(this.currentRound);
 
     if (!this.currentRound.hasWinner()) {
-      util.arrayRemove(this.candidates, this.currentRound.eliminate());
-      this.currentRound = new IRVRound(this.candidates);
+      util.arrayRemove(this.remaining, this.currentRound.eliminate());
+      this.currentRound = new IRVRound(this.remaining);
     } else {
       this.currentRound = null;
     }
