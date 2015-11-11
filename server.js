@@ -48,6 +48,7 @@ if (config.development) {
 
 const models = require('./app/models'),
       loggers = require('./app/loggers'),
+      PollController = require('./app/controllers/poll'),
       createApp = require('./app');
 
 // Pre-routing
@@ -79,14 +80,14 @@ const app = createApp(__dirname, config);
 
 // Post-routing
 process.on('unhandledRejection', (reason, p) => {
-  Log.e(TAG, `Unhandled Rejection at: Promise ${p}, reason: ${reason}`);
+  Log.wtf(TAG, 'Unhandled promise', reason);
 });
 
 db.once('open', () => {
   co(function* onOpen() {
     Log.i(TAG, 'db connected.');
     Log.i(TAG, 'starting results scheduler.');
-    yield models.Poll.startScheduler();
+    yield PollController.startScheduler();
 
     app.listen(config.port);
     Log.i(TAG, `listening on port ${config.port}`);

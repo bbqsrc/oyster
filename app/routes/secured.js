@@ -24,6 +24,7 @@ const Log = require('huggare'),
       bodyParser = require('koa-better-body'),
       passport = require('koa-passport'),
       models = require('../models'),
+      PollController = require('../controllers/poll'),
       util = require('../util'),
       config = require('../provider').config,
       fs = require('mz/fs');
@@ -203,6 +204,8 @@ router
   .post('/polls/new', isAdmin, bodyParser(), function* postNewPoll() {
     const poll = yield models.Poll.createPoll(this.request.body.fields);
 
+    (new PollController(poll)).schedule();
+
     this.redirect(`/admin/poll/${poll.slug}`);
   })
   .param('poll', function* paramPoll(slug, next) {
@@ -245,7 +248,7 @@ router
       return (this.body = 'Cannot delete: poll has already been started.');
     }
 
-    this.poll.cancel();
+    (new PollController(this.poll)).cancelSchedule();
     yield this.poll.remove();
 
     // TODO dehardcode
@@ -257,7 +260,7 @@ router
     return (this.body = JSON.stringify(data, null, 2));
   })
   .get('/poll/:poll/results', isAdmin, function* getPollResults() {
-    const results = yield this.poll.generateResults();
+    const results = yield (new PollController(this.poll)).generateResults();
 
     yield this.render('admin-results', {
       title: `${this.translate('poll.results')} - ${this.poll.slug}`,
@@ -266,7 +269,7 @@ router
     });
   })
   .get('/poll/:poll/export/results', isAdmin, function* getExportedResults() {
-    return (this.body = JSON.stringify(yield this.poll.generateResults(), null, 2));
+    return (this.body = JSON.stringify(yield (new PollController(this.poll)).generateResults(), null, 2));
   })
   .get('/users', isAdmin, function* getUsers() {
     yield this.render('admin-users', {

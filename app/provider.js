@@ -18,12 +18,20 @@
 'use strict';
 
 class Provider {
+  constructor() {
+    this._schedule = require('node-schedule');
+  }
+
   get config() {
     return this._config;
   }
 
   set config(c) {
     return (this._config = c);
+  }
+
+  get schedule() {
+    return this._schedule;
   }
 }
 
