@@ -90,7 +90,7 @@ class Counter {
   }
 
   last() {
-    return this.ordered()[this.length-1];
+    return this.ordered()[this.length - 1];
   }
 }
 
@@ -104,4 +104,45 @@ function arrayRemove(array, item) {
   return array;
 }
 
-module.exports = { isStrictlyInt, validRankOrNull, majorityQuota, Counter, arrayRemove };
+function transpose(array) {
+  // Naively get m * n
+  const m = array.length;
+  const n = array[0].length;
+  const o = [];
+
+  for (let j = 0; j < n; ++j) {
+    const p = [];
+
+    for (let i = 0; i < m; ++i) {
+      p.push(array[i][j]);
+    }
+    o.push(p);
+  }
+
+  return o;
+}
+
+function diff(arrayA, arrayB) {
+  if (arrayA.length !== arrayB.length) {
+    throw new TypeError('Arrays must be same length');
+  }
+
+  const len = arrayA.length;
+  const o = [];
+
+  for (let i = 0; i < len; ++i) {
+    o.push(arrayA[i] - arrayB[i]);
+  }
+
+  return o;
+}
+
+module.exports = {
+  isStrictlyInt,
+  validRankOrNull,
+  majorityQuota,
+  Counter,
+  arrayRemove,
+  transpose,
+  diff
+};
