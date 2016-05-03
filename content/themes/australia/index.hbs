@@ -4,7 +4,7 @@
     <base target='_blank'>
     <meta charset='utf-8'>
 
-    <title>pageTitle</title>
+    <title>{{title}}</title>
 
     <!--[if lt IE 10]>
     <script src="{{asset 'js/es5-shim.min.js'}}"></script>
@@ -23,7 +23,7 @@
   <body>
     <noscript>
       <div class='alert alert-danger'>
-        {{__ "This application requires JavaScript to be enabled to function. Please enable JavaScript and reload the page."}}
+        {{formatMessage (intlGet "javascript")}}
       </div>
     </noscript>
 
@@ -49,16 +49,16 @@
           <hr>
 
           <div class="alert alert-warning">
-            {{__ "Please ensure that you have completed your ballot. Once you submit, you cannot go back."}}
+            {{formatMessage (intlGet "ballot.warning")}}
           </div>
 
-          <button type='submit' class='btn btn-success btn-lg btn-block'>{{__ "Submit"}}</button>
+          <button type='submit' class='btn btn-success btn-lg btn-block'>{{formatMessage (intlGet "submit")}}</button>
         </form>
       </div>
     </main>
 
     <footer class='powered-by-oyster'>
-      {{{__ "Powered by %s." "<a rel='nofollow' href='https://bbqsrc.github.io/oyster'>Oyster</a>"}}}
+      {{{formatMessage (intlGet "poweredBy") product="<a rel='nofollow' href='https://bbqsrc.github.io/oyster'>Oyster</a>"}}}
     </footer>
   </body>
 </html>

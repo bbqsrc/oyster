@@ -3,9 +3,11 @@
     {{title}}
   </h2>
 
+  {{#if info}}
   <div class='oyster-section-info alert alert-info'>
     {{markdown info}}
   </div>
+  {{/if}}
 
   <div class='oyster-fields'>
     {{#each fields}}

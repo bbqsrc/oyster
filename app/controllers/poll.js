@@ -47,19 +47,21 @@ class PollController {
 
   saveResults() {
     return co(function* co$saveResults() {
-      if (this.results) {
+      const model = this.model;
+
+      if (model.results) {
         throw new Error('This poll already has results.');
       }
 
       const results = yield this.generateResults();
 
-      this.set('results', results);
-      yield this.save();
+      model.set('results', results);
+      yield model.save();
 
-      Log.i(TAG, `Saved results for '${this.slug}'.`);
+      Log.i(TAG, `Saved results for '${model.slug}'.`);
 
       return this.results;
-    }.bind(this.model));
+    }.bind(this));
   }
 
   preparePollData() {
@@ -148,6 +150,10 @@ class PollController {
 
           const counter = c[k];
 
+          if (typeof counter.tally === 'function') {
+            counter.tally();
+          }
+
           if (typeof counter.isDone !== 'function' || counter.isDone()) {
             pending.delete(k);
           }
@@ -226,8 +232,9 @@ class PollController {
   }
 
   cancelSchedule() {
-    const jobStartName = `start:${this.slug}`,
-          jobEndName = `end:${this.slug}`;
+    const model = this.model,
+          jobStartName = `start:${model.slug}`,
+          jobEndName = `end:${model.slug}`;
 
     schedule.cancelJob(jobStartName);
     schedule.cancelJob(jobEndName);
@@ -235,9 +242,9 @@ class PollController {
 
   schedule() {
     const self = this,
-          jobStartName = `start:${this.slug}`,
-          jobEndName = `end:${this.slug}`,
-          model = this.model;
+          model = this.model,
+          jobStartName = `start:${model.slug}`,
+          jobEndName = `end:${model.slug}`;
 
     this.cancelSchedule();
 
@@ -246,14 +253,14 @@ class PollController {
     if (model.startTime) {
       // Don't bother if already ended.
       if (!(model.endTime && +model.endTime < now)) {
-        schedule.scheduleJob(jobStartName, model.startTime, function job() {
-          co(function* co$job() {
-            Log.i(TAG, `Starting job: ${this.name}`);
+        schedule.scheduleJob(jobStartName, model.startTime, function* job() {
+          Log.i(TAG, `Starting job: ${this.name}`);
+          try {
             yield self.sendEmails();
-            Log.i(TAG, `Finished job: ${this.name}`);
-          }.bind(this)).catch(err => {
+          } catch (err) {
             Log.e(TAG, `Failed to send emails for '${model.slug}'.`, err);
-          });
+          }
+          Log.i(TAG, `Finished job: ${this.name}`);
         });
 
         Log.i(TAG, `Scheduled start of '${model.slug}' for ${model.startTime.toISOString()}`);
@@ -261,14 +268,14 @@ class PollController {
     }
 
     if (model.endTime && !model.results) {
-      schedule.scheduleJob(jobEndName, model.endTime, function job() {
-        co(function* co$job() {
-          Log.i(TAG, `Starting job: ${this.name}`);
+      schedule.scheduleJob(jobEndName, model.endTime, function* job() {
+        Log.i(TAG, `Starting job: ${this.name}`);
+        try {
           yield self.saveResults();
-          Log.i(TAG, `Finished job: ${this.name}`);
-        }.bind(this)).catch(err => {
-          Log.e(TAG, `Failed to send emails for '${model.slug}'.`, err);
-        });
+        } catch (err) {
+          Log.e(TAG, `Failed to calculate results for '${model.slug}'.`, err);
+        }
+        Log.i(TAG, `Finished job: ${this.name}`);
       });
 
       Log.i(TAG, `Scheduled end of '${model.slug}' for ${model.endTime.toISOString()}`);

@@ -79,8 +79,8 @@ db.on('reconnected', () => {
 const app = createApp(__dirname, config);
 
 // Post-routing
-process.on('unhandledRejection', (reason, p) => {
-  Log.wtf(TAG, 'Unhandled promise', reason);
+process.on('unhandledRejection', (err) => {
+  Log.wtf(TAG, 'Unhandled promise', err);
 });
 
 db.once('open', () => {

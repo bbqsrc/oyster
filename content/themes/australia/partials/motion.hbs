@@ -10,21 +10,21 @@
   <div class='panel panel-primary'>
     <div class='panel-heading'>
       <span class='panel-title'>
-        {{__ "How do you wish to vote on this motion?"}}
+        {{formatMessage (intlGet "motion.text")}}
       </span>
     </div>
     <div class='panel-body'>
       <div class='btn-group btn-group-justified' data-toggle="buttons">
         <label class="btn btn-success">
-          {{__ "Aye"}}
+          {{formatMessage (intlGet "motion.aye")}}
           <input name="motions.{{id}}" type='radio' value="aye" />
         </label>
         <label class="btn btn-warning">
-          {{__ "Abstain"}}
+          {{formatMessage (intlGet "motion.abstain")}}
           <input name="motions.{{id}}" type='radio' value="abstain" checked />
         </label>
         <label class="btn btn-danger">
-          {{__ "Nay"}}
+          {{formatMessage (intlGet "motion.nay")}}
           <input name="motions.{{id}}" type='radio' value="nay" />
         </label>
       </div>
