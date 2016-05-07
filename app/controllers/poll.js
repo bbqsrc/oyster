@@ -124,7 +124,7 @@ class PollController {
       }
 
       // Count errthang
-      const pending = new Set(Object.keys(counters));
+      const pending = new Set(Object.keys(c));
 
       const model = this.model;
 
@@ -167,11 +167,11 @@ class PollController {
       };
 
       for (const m of pollData.motions) {
-        results.motions.push(counters[m.id].toObject());
+        results.motions.push(c[m.id].toObject());
       }
 
       for (const e of pollData.elections) {
-        results.elections.push(counters[e.id].toObject());
+        results.elections.push(c[e.id].toObject());
       }
 
       const endGen = new Date();
