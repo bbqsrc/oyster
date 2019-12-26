@@ -20,7 +20,7 @@
   "dependencies": {
     "co": "^4.6.0",
     "extend": "^3.0.0",
-    "handlebars": "^3.0.3",
+    "handlebars": "^4.5.3",
     "huggare": "^0.3.0",
     "jade": "^1.11.0",
     "koa": "^1.0.0",
